@@ -1,3 +1,65 @@
 \chapter[2021 April]{April 2021}
 
+\section[2021/04/05]{Tuesday, 5 April 2021}
+
+\subsection{Project Concept Overview}
+
+The following key points were extracted from the project concept note for Mr Grobler's HG2 3D cube-world construction robot project:
+
+\begin{compactitem}
+    \item The project requires the manipulation of small cubes for which the quantity, material and dimensions are unspecified.
+    \item The project requires the cubes be manipulated to construct various novel and moderately complex 3D shapes.
+    \item The project requires a \ac{GUI} to be implemented to facilitate the definition of the 3D shapes to be constructed.
+    \item The project requires that a robot is used to manipulate the cubes.
+    \item The project requires the implementation of a vision system to allow the localisation of the robot and detection of the cubes.
+\end{compactitem}
+
+Based on the above points, the solution system required for the project can be subdivided into the following three broad subsystems:
+
+\begin{compactitem}
+    \item Robotic manipulator subsystem - The robotic mechanism required to manipulate the small cubes in order to alter their location and orientation in 3D space.
+    \item Vision subsystem - The system required to localise the robotic manipulator and detect the position of the small cubes in 3D space.
+    \item \ac{GUI} subsystem - The interface with a user that facilitates the definition of the 3D shape to be constructed by the robotic manipulator.
+\end{compactitem}
+
+\subsection{Initial Assumptions}
+
+The project concept note leaves many details of the exact problem to be solved unspecified. In order to help focus the research for the project, the following assumptions about the cubes:
+
+\begin{compactitem}
+    \item All the cubes to be manipulated will have the same dimensions and consist of the same material.
+    \item The dimensions of each cube will be approximately 10mm x 10mm x 10mm. This is based on the size of cubes in previous iterations of this project as discussed in the group meeting with Mr Grobler on 01/04/2021.
+\end{compactitem}
+
+\subsection{Literature Review: Robots and Robotics \cite{miller_miller_2017}}
+
+This book proved useful in providing a high-level overview of the field of robotics and the terminology used within the field. The primary purpose of robots is to complete various tasks through the manipulation of parts, tools and materials. They are usually controlled by microprocessors which allows them to be programmed to fulfil specific functions which they can fulfil more accurately, efficiently and consistently than humans. The robot that needs to be developed for this project has similar functional needs to those of industrial robots. Industrial robots frequently make use of grippers to manipulate objects.
+
+The three basic parts of a robot are the manipulator, controller and power source. The different types of robotic manipulators are distinguished by arm movements made by the manipulator which are classified by the coordinate systems used to describe them. These four coordinate systems are:
+
+\begin{compactitem}
+    \item Polar coordinates
+    \item Cylindrical coordinates
+    \item Cartesian coordinates
+    \item Articulate coordinates
+\end{compactitem}
+
+The following terminology is common in the field of robotics and will be used going forward in this project unless otherwise stated:
+
+\begin{compactitem}
+    \item Base - The anchor point of the robot that supports all of its other components
+    \item Arm - Component found on most robots that may contain joints and connects the base to the wrist
+    \item Wrist - Component that connects the arm to the end effector and may support a wide range of motions
+    \item Gripper / End effector - Component that holds the object to be manipulated and is attached at the end of the wrist. This component may also be a tool.
+    \item Work envelope - The region in space where the robot is able to access with its end effector and perform it's task.
+\end{compactitem}
+
+The three primary drive mechanisms used for robotic manipulators are:
+
+\begin{compactitem}
+    \item Pneumatic drives
+    \item Hydraulic drives
+    \item Electric drives
+\end{compactitem}
+
 \pendsign
