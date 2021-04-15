@@ -82,3 +82,34 @@ An individual meeting took place with Mr Grobler from 15:00 until 15:25. The fol
 \end{compactitem}
 
 \pendsign
+
+\section[2021/04/09]{Friday, 9 April 2021}
+
+\subsection{Literature Review: Industrial Robot Grippers \cite{lundstrom_1974}}
+
+This article outlines designs for many different robotic gripper variations according to the object or tool to be manipulated as well as other factors shuch as environmental conditions. The different robotic gripper categories are:
+
+\begin{compactitem}
+    \item Grippers with stiff fingers.
+    \item Grippers with flexible fingers.
+    \item Vacuum grippers.
+    \item Magnetic grippers.
+    \item Grippers with sensors.
+    \item Miscellaneous grippers.
+\end{compactitem}
+
+Finger based grippers generally require at least two surfaces to be able to grip a given object while Vacuum grippers involve the use of rubber or plastic suction cups and offer several advantages over clamping grippers. Vacuum grippers are light and simple to build. The suction cup can be attached to a fitting which is attached to a spherical mounting. The tubes can be routed through a hollow arm. Piston, centrifugal and jet vacuum pumps can be used to generate the vacuum. Vacuum grippers are suited for objects with flat surfaces. Electromagnetic grippers are similar in that they can grip objects on a single plane. However, electromagnetic grippers can generate a larger attraction force per unit area, can grip faster and last longer than vacuum grippers. The other listed grippers do not appear to have immediate applicability to the project.
+
+For objects that require a soft landing, springs can be used to attach the gripper mechanism to the robot wrist to ensure the gripper lands softly on the object. This may be beneficial for use with the cubes as a the effector could target a slightly lower Z position to ensure the cube is placed on a surfaces before release to ensure it doesn't drop and shift. A pneumatic activated counter balance can be used in conjunction with the spring to tune the soft landing. A cylindrical spigot joint can be used as an attachment mechanism to allow the gripper to rotate 270 degrees. The cubes will need to be rotated about the Z axis an this mechanism could potentially be used to enable this manipulation.
+
+In the context of this project, a vacuum gripper appears the most promising for further investigation and prototyping for the following reasons:
+
+\begin{compactitem}
+    \item If the cube has two other cubes adjacent to it in the XY plane that are more difficult to move, such the the arrangement is similar to the corner of a square shape of height 1, a clamping gripper design is not able to grip the cube as it is unable to access two opposite faces from the Z direction. A vacuum gripper and electromagnetic gripper are able to manipulate the cube using a single face.
+    \item A vacuum gripper is preferred over an electromagnetic gripper as it is not specified that the cubes consist of a ferromagnetic material which is an operating requirement of the electromagnetic gripper but not the vacuum gripper.
+    \item The faces of cubes are flat which is suited to manipulation by a vacuum gripper.
+\end{compactitem}
+
+The choice to investigate the vacuum gripper further is not a final design choice and may change. The choice facilitates a plan of action for prototyping to assist in deciding the feasibility of system requirements.
+
+\pendsign
