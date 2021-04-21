@@ -155,3 +155,32 @@ An individual meeting took place with Mr Grobler from 15:00 until 15:25. The fol
 It was decided to allow the user to specify the he positions of the cubes individually and not a generic shape and where the system calculates the best approximation of the shape with cubes. This decision was made based on the fact the specification of individual cube positions gives the user greater control over the defined shape and doesn't introduce unnecessary complexity that does not offer a concrete advantage. This selection was made to allow the start of the GUI prototyping phase. Delays have been encountered in sourcing the vacuum pad from SMC. I shall prioritise acquiring the vacuum pad and silicon tubing from the lab for protyping purposes and aim to aquire the vacuum components used in the final design from SMC.
 
 \pendsign
+
+\section[2021/04/17]{Saturday, 17 April 2021}
+
+\subsection{Project Proposal First Draft}
+
+The following relevant sections were written in partial completion of the first project proposal draft.
+
+\subsubsection{Project Description}
+
+There are a wide range of tasks that humans find trivial to complete but prove challenging for an artificial system to perform. Solving 2D puzzles is an example of such a task which has been successfully emulated by robotic systems to a limited degree. This project aims to expand on this by exploring the task of building 3D puzzles using a robot. The 3D puzzles to be investigated in this project entail both novel and moderately complex 3D shapes consisting of small cubes. The shapes will be defined by an operator through a \ac{GUI} and the robot will be required to manipulate the cubes, which will initially be scattered randomly across a flat surface, to construct the specified shape.
+ 
+In order to realise this functionality, a robot capable of manipulating small cubes will be developed along with an embedded platform to perform the processing required to control the robot and cube manipulation mechanism. A PC-based computer vision system will be implemented to allow the localisation of the robot and the detection of the construction pieces (cubes). Lastly, a PC-based \ac{GUI} that facilitates the definition of the 3D shapes to be constructed will be designed and implemented along with the software necessary to plan and control the robotic actions required to build the shape.
+
+\subsubsection{Functional Analysis}
+
+The system in \FigRef{fig:functional_block_diagram} below has two interfaces through which it receives data input from the external environment. The first interface exists at the image acquisition unit (FU1) which captures the light reflected off the workspace containing the cubes and robot and converts it to a digital image. The digital image is transmitted to the cube detection and localisation unit (FU2.2) which uses localisation techniques to align the image with the coordinate system of the robotic manipulator (FU3.4). Following this, FU2.1 detects all the cubes within the workspace image and passes this information to the system controller (FU2.3). The second interface exists at the shape definition unit (FU2.1) which is a \ac{GUI} that facilitates the capture of the user's desired 3D shape input. The shape is defined through the specification of the relative positions of each individual cube in 3D space and this information is passed to FU2.3.
+ 
+FU2.3 is the central system control point which coordinates all major system activities and integrates the computer vision, shape definition and robotic subsystems. FU2.3 forwards the shape definition and cube position information to the construction planner (FU2.4) which computes the translational and rotational transformations as well as the sequence of transformations that need to be applied to the cubes in order to realise the desired 3D shape in the coordinate system of FU3.4. The robotic motion planner uses these transformation sequences to compute the robotic actions required to replicate these transformations with the physical cubes.
+ 
+The communication unit (FU3.1) facilitates data exchange between the PC-based software (FU2) and the embedded robotic controller (FU3.2) which converts the received robotic action sequence to digital signals for the drive systems of FU3.4 and the robotic end-effector (FU3.5). These signals first pass through the driver unit which increases the signal power to a level sufficient to power the drive systems. FU3.4 manipulates the position of FU3.5 in 3D space according to the signal it receives from FU3.3 and the actuation state of F3.5 changes in response to the signal it receives from FU3.3. FU3.5 is able to grip a cube when actuated and release it when not.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\linewidth]{figures/functional-block-diagram.pdf}
+  \caption{Block diagram showing the proposed functional structure of the system.}
+  \label{fig:functional_block_diagram}
+\end{figure}
+
+\pendsign
