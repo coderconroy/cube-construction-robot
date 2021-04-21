@@ -123,14 +123,35 @@ In order to prototype the vacuum gripper system, a vacuum pad, adaptor, tubing a
 There are various types of vacuum pads and adaptors available. The SMC products most suited to the requirements of this project for prototyping were identified as follows:
 
 \begin{compactitem}
-    \item ZPT08UN-04 - Flat type vacuum pad with 8mm diameters consisting of NBR material and a vertical push fit 4mm outer diameter tube adaptor.
+    \item ZPT08UN-04 - Flat type vacuum pad with 8mm diameters consisting of \ac{NBR} material and a vertical push fit 4mm outer diameter tube adaptor.
     \item ZPT08UN-U4 - Identical to the ZPT08UN-04 except the adaptor tube connection is a barbed connection.
 \end{compactitem}
 
-The process of ordering either of these components subject to availability has been initiated. The flat type vacuum pads are suited to flat surfaces, such as is present with the cube and the NBR material is the industry standard vacuum pad material at room temperature. The 4mm outer tube diameter was selected as this tube size fits the vacuum pump available for protyping.
+The process of ordering either of these components subject to availability has been initiated. The flat type vacuum pads are suited to flat surfaces, such as is present with the cube and the \ac{NBR} material is the industry standard vacuum pad material at room temperature. The 4mm outer tube diameter was selected as this tube size fits the vacuum pump available for protyping.
 
 \subsection{Sourcing: Cubes}
 
 The process of acquiring cubes has also been initiated. I contacted several metal work companies in the Pretoria area contacted about the possibility of manufacturing 10mm x 10mm x 10mm metallic cubes. I also enquired if offcuts are available from which the cubes could be manufactured at a lower cost. I plan to acquire wooden cubes from a local hardware store by purchasing and cutting a plank of wood on the same day the metal cubes are acquired. Currently, I am waiting for responses from the metal work companies I contacted.
+
+\pendsign
+
+\section[2021/04/15]{Thursday, 15 April 2021}
+
+\subsection{Individual Meeting}
+
+An individual meeting took place with Mr Grobler from 15:00 until 15:25. The following were the important points to arise from the meeting:
+
+\begin{compactitem}
+    \item A decision needs to be made with regards to the shape definition GUI whether the user will specify the positions of the cubes individually or specifies a generic shape and the system calculates the best approximation of the shape with cubes.
+    \item Path planning of the robot needs to be investigated as its own module.
+    \item The nature of the cubes selected will have an effect on the difficulties encountered within the computer vision module.
+    \item Silicion tubing may be suitable for the vacuum end-effector mechanism over other tubing compounds. This is due to the fact that the robotic mechanism will likely require the tube to bend at significant angles and silicon is more flexible than other tubing compounds.
+    \item A vacuum pad and silicion tubing may be available from the University.
+    \item Mr Grobler noted that this project is not a mechanical design projects and the core focus is not on the mechanical design aspects.
+\end{compactitem}
+
+\subsection{Meeting Review}
+
+It was decided to allow the user to specify the he positions of the cubes individually and not a generic shape and where the system calculates the best approximation of the shape with cubes. This decision was made based on the fact the specification of individual cube positions gives the user greater control over the defined shape and doesn't introduce unnecessary complexity that does not offer a concrete advantage. This selection was made to allow the start of the GUI prototyping phase. Delays have been encountered in sourcing the vacuum pad from SMC. I shall prioritise acquiring the vacuum pad and silicon tubing from the lab for protyping purposes and aim to aquire the vacuum components used in the final design from SMC.
 
 \pendsign
