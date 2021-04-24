@@ -184,3 +184,11 @@ The communication unit (FU3.1) facilitates data exchange between the PC-based so
 \end{figure}
 
 \pendsign
+
+\section[2021/04/21]{Wednesday, 21 April 2021}
+
+\subsection{PC-Based Software selection}
+
+C++ was selected as the protoytyping programming language to be used for the development of the PC-based software components. These include the cube detection, robotic localisation, shape definition \ac{GUI}, construction planner and robotic path planner components. The primary criteria for the selection of C++ was its better performance compared to Python which is also frequently used in the context of computer vision. Python is suitable when using computer vision libraries since they are usually implemented in C or C++ and called using a python wrapper to still enjoy great performance. However, since this project requires the implementation of the functions of these libraries from scratch, it is more efficient to code the algorithms from first principles in C++. C++ was selected to implement the \ac{GUI} as well since the majority of the computational code will already be written in C++ and it also makes integration between the different components of the PC-based software less complex. QT framework was selected to implement the \ac{GUI} component as it is the market leader in this field for the C++ programming language and has excellent support for integration with a graphic \ac{API}.
+
+\pendsign
