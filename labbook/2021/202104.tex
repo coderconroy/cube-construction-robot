@@ -192,3 +192,33 @@ The communication unit (FU3.1) facilitates data exchange between the PC-based so
 C++ was selected as the protoytyping programming language to be used for the development of the PC-based software components. These include the cube detection, robotic localisation, shape definition \ac{GUI}, construction planner and robotic path planner components. The primary criteria for the selection of C++ was its better performance compared to Python which is also frequently used in the context of computer vision. Python is suitable when using computer vision libraries since they are usually implemented in C or C++ and called using a python wrapper to still enjoy great performance. However, since this project requires the implementation of the functions of these libraries from scratch, it is more efficient to code the algorithms from first principles in C++. C++ was selected to implement the \ac{GUI} as well since the majority of the computational code will already be written in C++ and it also makes integration between the different components of the PC-based software less complex. QT framework was selected to implement the \ac{GUI} component as it is the market leader in this field for the C++ programming language and has excellent support for integration with a graphic \ac{API}.
 
 \pendsign
+
+\section[2021/04/24]{Saturday, 24 April 2021}
+
+\subsection{Literature Review: An Introductory Guide to Computer Vision \cite{tryolabs_resources_2019}}
+
+Computer vision is related to image processing and machine vision. The primary focus of image processsing is the application of transformations to raw images while machine vision is a special case of computer vision in production environments where it is used to perform actions. Computer vision is used to solve more complex problems such as object recognition. Image classification, localisation, object detection, object identification, instance segmentation and object tracking are typical computer vision tasks. The Viola and Jones algorithm has been one of the most popular approaches to object detection challenges. A \ac{CNN} is a modern deep learning tool that has achieved excellent results using traditional computer vision methods.
+
+\subsection{Literature Review: Robotic Object Recognition and Grasping with a Natural Background \cite{Wei2020}}
+
+The following important terms are used in the article:
+
+\begin{compactitem}
+    \item \textit{Grasp synthesis} entails finding a grasp configuration that complies with a set of criteria for a given grasping task.
+    \item A \textit{superpixel} is collection of pixels that are related by similar characteristics.
+    \item The \textit{\ac{MTCD}} is a contour-based shape descriptor that extracts triangles from each contour point. \cite{Yang2016}
+\end{compactitem}
+
+Factors that provide uncertainty with object recognition are illumination, occlusion, and the pose of the object. There are generally two main methods for robot grasping, namely empirical methods and analytical methods. Deep-learning techniques have found popularity more recently in this field. The general deep-learning strategy involves identifying the object to be grasped from the image from a series of candidates which are ranked using a \ac{CNN} before grasping the selected candidate in an open-loop fashion. The following disadvantages are presented by the \ac{CNN} deep-learning based approach:
+
+\begin{compactitem}
+    \item Precise end-effector and and camera calibration is required.
+    \item A large annotated dataset is required for training and testing.
+    \item The \ac{CNN} models may lack the ability to generalise well.
+    \item The processing time to rank potential objects using the \ac{CNN} may take too much time.
+    \item The localisation of objects is only course which is not suited to precision tasks.
+\end{compactitem}
+
+Superpixel segmentation can be used to group pixels into distinct regions that have perceptual meaning and provides noise suppression. This article presents a solution that combines superpixel segmentation and edge detection to attain true contour information from the image objects. The algorithm uses this contour information along with the \ac{MTCD} shape descriptor and shape dissimilatiry information as heuristics to guide comparison of contours to exisiting object contours in a reasonable amount of time.
+
+\pendsign
