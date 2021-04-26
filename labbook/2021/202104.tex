@@ -187,13 +187,46 @@ The communication unit (FU3.1) facilitates data exchange between the PC-based so
 
 \section[2021/04/21]{Wednesday, 21 April 2021}
 
-\subsection{PC-Based Software selection}
+\subsection{PC-Based Software Toolset Selection}
 
-C++ was selected as the protoytyping programming language to be used for the development of the PC-based software components. These include the cube detection, robotic localisation, shape definition \ac{GUI}, construction planner and robotic path planner components. The primary criteria for the selection of C++ was its better performance compared to Python which is also frequently used in the context of computer vision. Python is suitable when using computer vision libraries since they are usually implemented in C or C++ and called using a python wrapper to still enjoy great performance. However, since this project requires the implementation of the functions of these libraries from scratch, it is more efficient to code the algorithms from first principles in C++. C++ was selected to implement the \ac{GUI} as well since the majority of the computational code will already be written in C++ and it also makes integration between the different components of the PC-based software less complex. QT framework was selected to implement the \ac{GUI} component as it is the market leader in this field for the C++ programming language and has excellent support for integration with a graphic \ac{API}.
+C++ was selected as the protoytyping programming language to be used for the development of the PC-based software components. These include the cube detection, robotic localisation, shape definition \ac{GUI}, construction planner and robotic path planner components. The primary criteria for the selection of C++ was its better performance compared to Python which is also frequently used in the context of computer vision. Python is suitable when using computer vision libraries since they are usually implemented in C or C++ and called using a python wrapper to still enjoy great performance. However, since this project requires the implementation of the functions of these libraries from scratch, it is more efficient to code the algorithms from first principles in C++. C++ was selected to implement the \ac{GUI} as well since the majority of the computational code will already be written in C++ and it also makes integration between the different components of the PC-based software less complex. The QT framework was selected to implement the \ac{GUI} component as it is the market leader in this field for the C++ programming language and has excellent support for integration with a graphic \ac{API}.
 
 \pendsign
 
 \section[2021/04/24]{Saturday, 24 April 2021}
+
+\subsection{Project Concept Clarifications}
+\label{sec:concept_clarifications_24_04_2021}
+
+Mr Grobler made the following comment in the first draft of the project proposal in response to the statement that the cubes will initially be scattered randomly across a flat surface.
+
+\begin{slantnote}
+From the concept note, there is no specific requirement that the cubes be distributed randomly initially. Similar to a 3D Printer, it is conceivable that the cubes be stored in a dispensing mechanism.
+\end{slantnote}
+
+The following clarification was requested in response to this comment.
+
+\begin{slantnote}
+If such a dispensing mechanism were used, the initial position and orientation of each cube is known and can just be placed using an open loop mechanism similar to that of many 3D printers. What is the purpose of the machine vision system in this scenario?
+\end{slantnote}
+
+The issue was clarified as follows.
+
+\begin{slantnote}
+For both the 2D puzzle building robot, as well as the 3D construction robot, the system is expect to handle the case of dropped pieces. The system should therefore have complete closed loop control over the construction process.
+\end{slantnote}
+
+The following further clarification was requested in response to this.
+
+\begin{slantnote}
+With regards to the dropped piece case, if the piece drops onto the existing shape under construction and causes the constituent cubes to be displaced significantly, will the system be expected to correct the positions of all the cubes and then proceed with construction?
+\end{slantnote}
+
+The issue was clarified as follows.
+
+\begin{slantnote}
+This case should be detected as a build failure and halt the construction process.
+\end{slantnote}
 
 \subsection{Literature Review: An Introductory Guide to Computer Vision \cite{tryolabs_resources_2019}}
 
@@ -220,5 +253,40 @@ Factors that provide uncertainty with object recognition are illumination, occlu
 \end{compactitem}
 
 Superpixel segmentation can be used to group pixels into distinct regions that have perceptual meaning and provides noise suppression. This article presents a solution that combines superpixel segmentation and edge detection to attain true contour information from the image objects. The algorithm uses this contour information along with the \ac{MTCD} shape descriptor and shape dissimilatiry information as heuristics to guide comparison of contours to exisiting object contours in a reasonable amount of time.
+
+\pendsign
+
+\section[2021/04/25]{Sunday, 25 April 2021}
+
+\subsection{Literature Review: An Overview of Visual Servoing for Robot Manipulators \cite{Kumar2020}}
+
+The following important terms are used in the article:
+
+\begin{compactitem}
+    \item \textit{Visual servoing} refers to the use of visual sensors by a robotic system to control its movement in real-time in order to perform a task.
+\end{compactitem}
+
+In order for visual servoing to be successful, good quality kinematic models of the robotic manipulator as well as good kinematic equation solvers are required. Furthermore, the camera system must provide accurate data which requires good calibration, pixel resolution, \ac{fps} and shutter speed. Visual servoing can be viewed as a closed-loop controller that aims to minimise the error between the desired and actual set of visual features in the image. There are two camera positioning paradigms, namely eye-in-hand and eye-to-hand, where the camera is mounted on the end-effector or a fixed position in the world respectively. The two main visual servoing schemes are \ac{PBVS} and \ac{IBVS}. A depth camera can be used to introduce a third dimension to the captured image data.
+
+Image processing and computer vision techniques extract information, or features, from the scene. High-level features include object detection and recognition as well as semantic segmentation while pixel-level features include edges, corners, ridges and colour segments. The two main detection approaches are classical image processing techniques and deep-learning techniques. Deep-learning techniques allow for the extraction of better high-level object information such as the object pose and orientation. The following feature extraction tools and algorithms are considered classical image processing techniques.
+
+\begin{compactitem}
+    \item The \textit{Canny edge detector} is an operator used to detect edges in images by means of a multi-stage algorithm.
+    \item The \textit{\ac{FAST}} and \textit{Shi-Thomas} corner detection algorithms allow for the detection of corners in images.
+    \item The \textit{\ac{SIFT}}, \textit{\ac{SURF}}, \textit{\ac{BRIEF}} and \textit{\ac{ORB}} algorithms allow for feature detection in an image.
+\end{compactitem}
+
+\subsection{Research Questions}
+Considering the project clarifications discussed in \SecRef{sec:concept_clarifications_24_04_2021} as well as the computer vision research completed up to this point, the following collection of research and project questions have arisen.
+
+\begin{compactitem}
+    \item During nominal cube placement conditions, should open-loop or closed-loop control be used to position the cube being placed relative to the placed cubes?
+    \item Is a single-view or multi-view computer vision approach better suited to detecting dropped cubes and erroneous construction shapes?
+    \item Would a single camera capturing a birds-eye view of the workspace be sufficient to detect dropped cubes and erroneous construction shapes?
+    \item Would additional image depth information provide significant advantages in cube detection in comparison to when this information is absent?
+    \item Is a classical image processing approach or deep-learning approach better suited to detecting the cubes.
+    \item What visual alterations can be made to the cube surfaces to assist detection?
+    \item What background colour will assist cube detection the most?
+\end{compactitem}
 
 \pendsign
