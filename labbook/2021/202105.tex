@@ -232,3 +232,97 @@ Complete the following steps to execute the qualification test:
 \end{compactenum}
 
 \pendsign
+
+\section[2021/05/17]{Monday, 17 May 2021}
+
+\subsection{End-Effector Prototype 1}
+
+A vacuum gripper approach was selected for protoyping as the system's end-effector based on earlier research. In order to construct the prototype, the following components were acquired:
+
+\begin{compactitem}
+    \item SMC 8mm diameter vacuum pad M5 female thread with adaptor (ZPT08UN-B5).
+    \item SMC straight M5 male threaded adaptor to push in 5 mm barb (M-5AU-6).
+    \item Through hole guage negative pressure sensor (ADP5111).
+    \item 3m x black silicon tubing.
+    \item 20ml plastic syringe.
+    \item 30 x 12.6mm aluminum cubes.
+    \item 4 x plastic t-couplings for tubing.
+\end{compactitem}
+
+In order to construct the prototype, the vacuum pad adaptor was attached to the straight barb adaptor using the M5 thread connection. Three pieces of length 20mm, 20mm and 150mm were cut from the silicon tubing and the 150mm length was connected to the straight barb adaptor. The t-coupling was used to connect the other end of the 150mm tube to the other two 20mm tube pieces. The other end of one of the 20mm tube pieces was connected to the syringe and the other to the pressure sensor. Initially, the pressure sesnor nozzle diameter proved to be too narrow to form an airtight seal with the silicon tubing. This was rectified using 3 pieces of heat shrink tubing around the nozzle to increase its diameter. 
+
+The idea behind this construction is to place the vacuum pad on the cube and create a negative pressure within the tubing by pulling out the syringe handle. This negative pressure exerts a force perpendicular to the face of the cube and if the force is great enough the cube remains against the vacuum pad during motion. The cubes were manufactured from a square aluminium extrusion and cut slightly oversize. A CNC machine was used to refine the side lengths of the cubes. Lastly, the cubes were blasted with fine sand to reduce the surface reflectivity as reflective surfaces introduce complications with object recognition. To test that the vacuum system design would be capable of gripping the cubes effectively, even with the slightly uneven sand-blasted cube surface, a test was conducted to test the system's ability to maintain pressure.
+
+\subsection{Pressure Leakage Test}
+
+\subsubsection{Aim}
+
+The aim of this experiment is to quantify the ability of the vacuum system prototype to maintain pressure and the maintain its grip on a aluminium cube.
+
+\subsubsection{Equipment}
+
+The following equipment is required to conduct the experiment:
+
+\begin{compactitem}
+    \item End-effector prototype 1.
+    \item Arduino Nano microcontroller board.
+    \item 1 x 100 nF capacitor.
+    \item 1 x 1 nF capacitor.
+    \item Breadboard.
+    \item Connection wires.
+    \item Stand to support the end-effector.
+    \item USB Type B Mini to USB Type A connecting wire.
+    \item Personal computer.
+    \item 1 x 12.6mm aluminium cube.
+\end{compactitem}
+
+\subsubsection{Experimental Setup}
+
+The pressure sensor was connected to the 10-bit ADC input of the Arduino Nano using the connecting wires and the breadboard. The capacitors were connected in parallel across the power supply terminals of the pressure sensor. The setup of the circuit on the breadboard is shown in \FigRef{fig:end-effector-circuit-setup}. A C++ program was developed to sample the ADC pressure readings at a sample rate of 1 kHz and transmit them to the PC using a serial connection and a baud rate of 19200. A Python script was developed to log the values received from the Arduino Nano and cease recording when the pressure reached atmospheric levels. \FigRef{fig:end-effector-experimental-setup} shows the experimental-setup of the system. The wooden stand was used as a support to maintain the vacuum pad in mid-air.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/202105/end-effector-circuit-setup.jpg}
+    \caption{Setup of the Arduino Nano and pressure sensor circuit on the breadboard.}
+    \label{fig:end-effector-circuit-setup}
+\end{figure}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.6\linewidth]{figures/202105/end-effector-experimental-setup.jpg}
+    \caption{The end-effector prototype connected with components required to conduct the pressure leakage experiment.}
+    \label{fig:end-effector-experimental-setup}
+\end{figure}
+
+\subsubsection{Method}
+
+The following steps were followed to carry out the experiment:
+
+\begin{compactenum}
+    \item Hold the cube flush against the bottom of the vacuum pad.
+    \item Pull the syringe handle out to maximum extension and verify the vacuum pad grips the cube as shown in \FigRef{fig:end-effector-cube-grip}.
+    \item Initiate the Python script to record the pressure readings over time.
+    \item When the pressure drops to the extent that the cube drops, verify the Python script terminates.
+\end{compactenum}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.6\linewidth]{figures/202105/end-effector-cube-grip.jpg}
+  \caption{The vacuum pad and adaptor gripping the aluminium cube when the system contains a pressure significantly lower than atmospheric pressure.}
+  \label{fig:end-effector-cube-grip}
+\end{figure}
+
+\subsubsection{Results and Discussion}
+
+\FigRef{fig:end-effector-pressure-leak} shows the change in pressure within the vacuum system over time. Since the pressure sensor type is a guage pressure sensor, it measures the relative difference between the atmospheric pressure and the pressure within the system. Since the sesnor is specified as a -100 kPa sensor, the magnitude of the ADC pressure reading is directly proportional to how much lower the internal pressure is compared to the atmospheric pressure. This relative pressure is important as the magnitude of the pressure difference is proportional to the suction force exerted on the cube by the vacuum pad. An ADC reading of 100 corresponds to atmospheric pressure. 
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/202105/end-effector-pressure-leak.png}
+    \caption{Plot showing the loss of pressure over time within the vacuum system in terms of the raw 10-bit ADC pressure reading. An ADC reading of 100 corresponds to atmospheric pressure and greater readings correspond to lower pressures relative to the atmosphere.}
+    \label{fig:end-effector-pressure-leak}
+  \end{figure}
+
+\FigRef{fig:end-effector-pressure-leak} shows that the system loses pressure at a linear rate over a long period of time. It takes the 10 hours for the reading to drop by 100. However, at 10 hours and a reading of 250, the rate of pressure loss begins to increase exponentially until the loss becomes almost instantaneous at just over 11 hours. This is the point at which the cube was dropped due to insufficient pressure to overcome the weight of the cube. The ability of the system to hold pressure much longer than the required 20 seconds specified in the project proposal indicates it is a good candidate for the end-effector. In order to make a final decision, the system needs to be investigated when greater forces are applied, i.e. when the cube experiences an acceleration.
+
+\pendsign
