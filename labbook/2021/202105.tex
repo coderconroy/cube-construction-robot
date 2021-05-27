@@ -278,7 +278,7 @@ The following equipment is required to conduct the experiment:
 
 \subsubsection{Experimental Setup}
 
-The pressure sensor was connected to the 10-bit ADC input of the Arduino Nano using the connecting wires and the breadboard. The capacitors were connected in parallel across the power supply terminals of the pressure sensor. The setup of the circuit on the breadboard is shown in \FigRef{fig:end-effector-circuit-setup}. A C++ program was developed to sample the ADC pressure readings at a sample rate of 1 kHz and transmit them to the PC using a serial connection and a baud rate of 19200. A Python script was developed to log the values received from the Arduino Nano and cease recording when the pressure reached atmospheric levels. \FigRef{fig:end-effector-experimental-setup} shows the experimental-setup of the system. The wooden stand was used as a support to maintain the vacuum pad in mid-air.
+The pressure sensor was connected to the 10-bit ADC input of the Arduino Nano using the connecting wires and the breadboard. The capacitors were connected in parallel across the power supply terminals of the pressure sensor. The setup of the circuit on the breadboard is shown in \FigRef{fig:end-effector-circuit-setup}. A C++ program was developed to sample the ADC pressure readings at a sample rate of 1 Hz and transmit them to the PC using a serial connection and a baud rate of 19200. A Python script was developed to log the values received from the Arduino Nano and cease recording when the pressure reached atmospheric levels. \FigRef{fig:end-effector-experimental-setup} shows the experimental-setup of the system. The wooden stand was used as a support to maintain the vacuum pad in mid-air.
 
 \begin{figure}[!ht]
     \centering
@@ -321,8 +321,71 @@ The following steps were followed to carry out the experiment:
     \includegraphics[width=0.7\linewidth]{figures/202105/end-effector-pressure-leak.png}
     \caption{Plot showing the loss of pressure over time within the vacuum system in terms of the raw 10-bit ADC pressure reading. An ADC reading of 100 corresponds to atmospheric pressure and greater readings correspond to lower pressures relative to the atmosphere.}
     \label{fig:end-effector-pressure-leak}
-  \end{figure}
+\end{figure}
 
 \FigRef{fig:end-effector-pressure-leak} shows that the system loses pressure at a linear rate over a long period of time. It takes the 10 hours for the reading to drop by 100. However, at 10 hours and a reading of 250, the rate of pressure loss begins to increase exponentially until the loss becomes almost instantaneous at just over 11 hours. This is the point at which the cube was dropped due to insufficient pressure to overcome the weight of the cube. The ability of the system to hold pressure much longer than the required 20 seconds specified in the project proposal indicates it is a good candidate for the end-effector. In order to make a final decision, the system needs to be investigated when greater forces are applied, i.e. when the cube experiences an acceleration.
+
+\pendsign
+
+\section[2021/05/26]{Wednesday, 26 May 2021}
+
+\subsection{Robotic Manipulator Considerations}
+
+The general motor-driven gantry robotic system design is currently the leading option for use in this project's solution. The reasons for this are as follows:
+
+\begin{compactitem}
+    \item A gantry-style robotic system offers the most structural stability due to the multiple mounting points for both the frame as well as the moving sub-components within the system. This mechanical stability improves the precision of the system which is one of the leading requirements in this application. It is for this reason that the gantry design is common in other high-precision applications such as pick-and-place operations in circuit manufacturing.
+    \item Due to the Cartesian nature of the gantry movement, the precision of the system is relatively constant accross all coordinates in the workspace. This stands in contrast to robotic arms which experience a deterioration in accurary as the distance from the robotic base increases.
+    \item The frame of the gantry has the potential to include an integrated mount for the computer vision camera/s. This would allow the camera to always operate from a similar point relative to the workspace and reduce the inaccuracies that are introduced from positional shifts of the camera each time the system is used.
+\end{compactitem}
+
+\subsection{Selection of Motor for Prototyping}
+
+In order to drive movement in each of the Cartesian directions, the gantry robotic system requires at least three motors. Furthermore, in order to drive rotation about the z-axis and to drive the end-effector mechanism, an additional two motors are required. The two primary considerations of the motors for this project are the precision of the motor and the minimum torque that is required from the motor in order to drive the load. Motors are also classified according to their frame size. The precision of the motor is related to its resolution and positioning accuracy which is determined by the stepper angle, drive mode and gear ratios. Since the desired resolution can be achieved in many ways, the motor is selected based on drive type and motor size first \cite{MotionControlProducts}.
+
+At this point in time, it is not possible to provide the exact specifications regarding the selection of the motors as they depend on the design of the robotic manipulator which has not been initiated yet. However, I intend to perform perliminary tests with a single motor in order to gain a better understanding of its capabilities, drive requirements and drive logic as this knowledge is required to continue designing other aspects of the system. For prototyping purposes, a motor in the ISG component bank that is most similar to the largest motor in the Ender 3 v2 3D printer system in terms of form factor and torque was selected. The Ender 3 v2 3D printer is similar in nature to the gantry design likely to be used for this project and therefore the selection of a prototyping motor based on this system is justifiable. A power supply and motor driver that is compatable with the selected motor were also requested from the hardware bank. The 3 requested components are as follows:
+
+\begin{compactitem}
+    \item 1 x Wantai Stepper Motor 42BYGHW609, NEMA17, 1.8 deg/step
+    \item 1 x Switch-mode power supply - 12V 20A
+    \item 1 x Pololu DRV8825 Stepper Motor Driver Carrier, High Current
+\end{compactitem}
+
+\subsection{Features for Cube Detection}
+
+It is anticipated that machine vision techniques will be used in conjuction with RGB-D data in the final computer vision subsystem to detect and localise the small construction cubes. However, these techniques frequently segment the processing of the colour component and the depth component of the image. Therefore, cube detection using only the RGB component will first be investigated to maximise the information extracted from the colour component before the depth data is introduced to supplement the cube detection and localisation procedure. For the purpose of object instance recognition in a relatively controlled setting, classical image processing and computer vision techniques should be sufficient without the use of deep learning and therefore these techniques are investigated first.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/original-cube.png}
+         \caption{Original cube image.}
+         \label{fig:original-cube-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/canny-edge-cube.png}
+         \caption{Image output from Canny Edge Detection algorithm.}
+         \label{fig:canny-edge-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/harris-corner-cube.png}
+         \caption{Image output from Harris Corner Detection algorithm.}
+         \label{fig:harris-corner-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/sift-cube.png}
+        \caption{Image output from \ac{SIFT} alogrithm.}
+        \label{fig:sift-image}
+    \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Images of a single cube from the same perspective before and after being seperately subjected to edge detection, corner detection and a feature descriptor to isolate features that may be useful in the cube detection process.}
+    \label{fig:feature-detectors}
+\end{figure}
+
+Detection of an object in a single-view image generally involves the identification of features in the image which can be compared to a template set of features for the desired object to determine its presence and location in the image. Furthermore, certain features may be used in to generate further information about the object beyond feature matching. For example, edges and corners may be used to identify planes which are combined to identify the presence of a cuboid. The first step in this process is to identify what features can be extracted from the image containing a cube that will be useful in detecting the cube. To facilitate this, two LED lights were set up both facing a central point on a plain black surface where a single aluminium construction cube was placed. Multiple photos of the cube with various poses from varying viewpoints were taken with the camera of a Samsung S8 Galaxy smartphone.
+
+The OpenCV C++ library was utilised as the source of various pre-written image processing and machine vision functions required to prototype the feature detection process. Specifically, the Canny Edge Detection, Harris Corner Detection and SIFT feature descriptor implementations were utilised to detect edges, corners and features in the cube images respectively. The OpenCV GUI components were utilised to facilitate the adjustment and tuning of various parameters related to the machine vision functions utilised. This allowed the function to be tuned to produced better results on the cube image dataset. \FigRef{fig:feature-detectors} shows the output of these functions when tuned and applied to the original image of the cube shown in \FigRef{fig:original-cube-image}.
+
+The Canny Edge Detection output shown in \FigRef{fig:canny-edge-image} was the clearest output of the three algorithms. However, the algorithm frequently detected the edges of the fine pattern present on the surface. Image segmentation will be considered to address this issue. The Harris Corner Detection algorithm whose output is shown in \FigRef{fig:harris-corner-image} did not perform as well as the edge detection and needed to have its sensitivity increased significantly to detect most of the cube corners. Lastly, the \ac{SIFT} algorithm output as shown in \FigRef{fig:sift-image} was poor as it identified very few features on the cube itself and the features it did identify were mostly edge features which are less useful. The next computer vision technique I intend to explore in order to supplement the feature descriptor techniques explored so far is image segmentation as the background noise introduced difficulty in tuning the feature descriptors.
 
 \pendsign
