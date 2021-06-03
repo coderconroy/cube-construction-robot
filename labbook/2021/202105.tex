@@ -389,3 +389,110 @@ The OpenCV C++ library was utilised as the source of various pre-written image p
 The Canny Edge Detection output shown in \FigRef{fig:canny-edge-image} was the clearest output of the three algorithms. However, the algorithm frequently detected the edges of the fine pattern present on the surface. Image segmentation will be considered to address this issue. The Harris Corner Detection algorithm whose output is shown in \FigRef{fig:harris-corner-image} did not perform as well as the edge detection and needed to have its sensitivity increased significantly to detect most of the cube corners. Lastly, the \ac{SIFT} algorithm output as shown in \FigRef{fig:sift-image} was poor as it identified very few features on the cube itself and the features it did identify were mostly edge features which are less useful. The next computer vision technique I intend to explore in order to supplement the feature descriptor techniques explored so far is image segmentation as the background noise introduced difficulty in tuning the feature descriptors.
 
 \pendsign
+
+\section[2021/05/28]{Friday, 28 May 2021}
+
+\subsection{Image Segmentation}
+
+\subsubsection{Grey Intensity Segmentation}
+
+In order to identify if there was any colour information within \FigRef{fig:original-cube-image}, a version of the image zoomed in on the cube was cropped to provide an even distribution of background area as well as cube area within the image. A histogram showing the RGB colour component distributions within the \FigRef{fig:original-cube-image} was generated as shown in \FigRef{fig:original-cube-close-hist}. The histogram shows the RGB components are all approximately aligned which means there is no significant colour information in the image, only grey intensity information. The histogram shows the pixel intensities are clustered around two intensity values. \FigRef{fig:original-cube-image} was converted to greyscale and had binary thresholding applied to generate the cube mask shown in \FigRef{fig:original-cube-mask}. Applying this mask to \FigRef{fig:original-cube-image} yields \FigRef{fig:original-cube-segment} showing a successfully segmented cube.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/original-cube-close.jpg}
+         \caption{Zoomed in perspective of original cube.}
+         \label{fig:original-cube-close-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/original-cube-close-hist.jpg}
+         \caption{Histogram showing the distribution of RGB component pixel intensities with the pixel intensity increasing linearly from left to right.}
+         \label{fig:original-cube-close-hist}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/original-cube-mask.jpg}
+        \caption{Cube segmentation binary image mask.}
+        \label{fig:original-cube-mask}
+   \end{subfigure}
+   \begin{subfigure}[b]{0.35\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/original-cube-segment.jpg}
+        \caption{Segmented cube.}
+        \label{fig:original-cube-segment}
+   \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Segmentation of cube in \FigRef{fig:original-cube-image} using grey intensity thresholding.}
+    \label{fig:grey-cube-segment}
+\end{figure}
+
+\subsubsection{Colour Segmentation with Overhead Lighting}
+
+Although the cube was successfully segmented as shown in \FigRef{fig:grey-cube-segment} the following points must be made:
+
+\begin{compactitem}
+    \item The cube had relatively even lighting from several angles. This caused all the faces to have a similar grey intensity which facilitated intensity segmentation but introduced difficulties with reliable face segmentation.
+    \item By using a plain black background, colour information does not play a role in the segmentation process.
+    \item The image of the cube is relatively high resolution which may not be possible in the final project configuration.
+    \item The camera is likely to be located relatively high above the cubes in which case such low angle images of the cube are unlikely to be processed.
+\end{compactitem}
+
+To explore the possibilities for cube recognition further, the above points were investigated. \FigRef{fig:blue-cube-image} shows the image of the cube captured from a high angle with a plain blue paper background and diffuse overhead lighting. The first interesting point noted from this image is the intensity of the pixels corresponding to the top face of the cube. This high intensity was present even when the position of the cube and camera were varied provided the angle was sufficiently high. The following points are made considering this observation:
+
+\begin{compactitem}
+    \item Given the constrained nature of cube recognition problem, knowledge of the top face of the cube should be sufficient to identify both the location and the pose of the cube.
+    \item Due to the light dispersion that occurs from the sand-blasted cube surface, a significant mirror effect does not occur on the cube surface despite the intensity of light reflection. This is beneficial as mirror-like surfaces introduce complications in machine vision problems.
+    \item If the lighting conditions are well-controlled, the top-face of the cube can be potentially be reliably segmented from the image. It is much simpler to extract geometric information from a segmented square face than from a given segmented view of a cube.
+\end{compactitem}
+
+\FigRef{fig:blue-cube-close-image} was created to provide a better representation of the colour component differences between the cube and the light blue background. \FigRef{fig:blue-cube-close-hist} shows the histogram showing the RGB component pixel intensity distribution in \FigRef{fig:blue-cube-close-image}. In order to produce more tightly coupled colour groups for segmentation purposes, a Gaussian blur function was applied to \FigRef{fig:blue-cube-close-image} from which the histogram shown in \FigRef{fig:blue-cube-close-hist-blur} was produced. This histogram shows that the red channel exhibits the clearest difference between the top face of the cube and the sides and background. A red channel binary threshold was therefore applied to \FigRef{fig:blue-cube-image} to produce the top cube face mask shown in \FigRef{fig:blue-cube-top-mask}. Canny edge detection was further applied to yield \FigRef{fig:blue-cube-top-canny} followed by the Hough Transform for straight lines to yield \FigRef{fig:blue-cube-top-hough}. The intended approach from this point would be to merge similar lines into a single line and identify the points of intersection as vertices which can then be used to identify the location and pose of the cube.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/blue-cube.jpg}
+         \caption{Single cube with plain light blue background and diffuse overhead lighting.}
+         \label{fig:blue-cube-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+         \includegraphics[width=\textwidth]{figures/202105/blue-cube-close.jpg}
+         \caption{Zoomed in perspective of cube in \FigRef{fig:blue-cube-image}.}
+         \label{fig:blue-cube-close-image}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/blue-cube-close-hist.jpg}
+        \caption{Histogram showing the distribution of RGB component pixel intensities in \FigRef{fig:blue-cube-close-image} with the pixel intensity increasing linearly from left to right.}
+        \label{fig:blue-cube-close-hist}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/blue-cube-close-hist-blur.jpg}
+        \caption{Histogram showing the distribution of RGB component pixel intensities in \FigRef{fig:blue-cube-close-image} with Guassian blurring applied with the pixel intensity increasing linearly from left to right.}
+        \label{fig:blue-cube-close-hist-blur}
+    \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Extraction of colour information from \FigRef{fig:blue-cube-image} to be used in segmentation of the cube.}
+    \label{fig:blue-cube-color-info}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/blue-cube-top-mask.jpg}
+        \caption{Segmentation mask for top cube face in \FigRef{fig:blue-cube-image}.}
+        \label{fig:blue-cube-top-mask}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/blue-cube-top-canny.jpg}
+        \caption{Output of Canny edge detector applied to \FigRef{fig:blue-cube-top-mask}.}
+        \label{fig:blue-cube-top-canny}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{figures/202105/blue-cube-top-hough.jpg}
+        \caption{Output of Hough Transform for straight line detection applied to \FigRef{fig:blue-cube-top-mask}.}
+        \label{fig:blue-cube-top-hough}
+    \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Segmentation of top cube face in \FigRef{fig:blue-cube-image} and extraction of line information.}
+    \label{fig:blue-cube-segment}
+\end{figure}
+
+\pendsign
