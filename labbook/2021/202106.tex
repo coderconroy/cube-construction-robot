@@ -27,3 +27,95 @@ Previous results have shown that segmentation of the top face of the cube based 
 
 \pendsign
 
+\section[2021/06/16]{Thursday, 16 June 2021}
+
+\subsection{Camera Calibration}
+
+The next step in the development of the computer vision subsystem is the mapping of the points in the image coordinate system to coordinates in the world coordinate system. In order to perform this, several parameters about the camera and its orientation need to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ and the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinates of the scene and include the rotation and translation transformations that need to be performed to map a point in the world coordinate system to image ecoordinate system. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$. Camera calibration is used to estimate the intrinsic characteristics of the camera while camera localisation is used to estimate the extrinsic parameters of the camera \cite{Szeliski2010}. This description is based on the pinhole camera model which is shown in \FigRef{fig:pinhole-camera-model}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.7\linewidth]{figures/202106/pinhole-camera-model.png}
+    \caption{Diagram showing the parameters of the pinhole camera model. Source: \cite{OpenCVCameraCalibration}}
+    \label{fig:pinhole-camera-model}
+\end{figure}
+
+The intrinsic parameters of the camera can be expressed as a calibration matrix $\textbf{K}$ as shown in \EquRef{eqn:calibration-matrix} below.
+
+\begin{equation}
+    \textbf{K}=
+    \begin{bmatrix}
+        f_x & s & c_x \\ 
+        0 & f_y & c_y \\ 
+        0 & 0 & 1
+    \end{bmatrix}
+  \label{eqn:calibration-matrix}
+\end{equation}
+
+The parameter $s$ captures the skew of the sensor axes that occurs as a result of the optical axis not being exactly perpendicular to the sensor plane. However, for practical purposes $s$ can be set to 0. Since the extrinsic parameters are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$, both the intrinsic and extrinsic parameters are captured by the product of this matrix and the calibration matrix $K$. This 3 x 4 product matrix is refered to the camera matrix $P$ and is defined in \EquRef{eqn:camera-matrix} below.
+
+\begin{equation}
+    \textbf{P}=\textbf{K}[\textbf{R}|\textbf{t}]
+  \label{eqn:camera-matrix}
+\end{equation}
+
+The camera matrix is sufficient to map the world coordinates to the coordinates on the image plane provided that the pinhole camera model is used and no lens distortion effects are present. This mapping is captured by \EquRef{eqn:pinhole-camera-mapping} below where $(u,v)$ represent the pixel coordinates on the image plane, $(X,Y,Z)$ represents a point in the world coordinate system and $s$ is simply a scaling factor \cite{OpenCVCameraCalibration}.
+
+\begin{equation}
+    s
+    \begin{bmatrix}
+        u \\ 
+        v \\ 
+        1
+    \end{bmatrix}
+    =
+    \textbf{P}
+    \begin{bmatrix}
+        X \\ 
+        Y \\ 
+        Z \\
+        1
+    \end{bmatrix}
+  \label{eqn:pinhole-camera-mapping}
+\end{equation}
+
+Therefore, in order to map the centroids of the cubes from the image coordinate space to the world coordinate space, the intrinsic and extrinsic parameters of the camera need to be determined. Furthermore, real world cameras have lens distortion effects that need to be adjusted for. The OpenCV library was used to perform this camera calibration process to produce the intrinsic parameters of the camera. Furthermore, in order to account for the lens distortion, an improved intrinsic matrix was computed. It must be noted that most literature identifies the camera matrix $P$ as a product of the intrinsic and extrinsic matrices. However, OpenCV refers to the intrinsic matrix $K$ as the camera matrix. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+         \includegraphics[width=\textwidth]{figures/202106/original-checkerboard.jpg}
+         \caption{Checkerboard placed at an angle to facilitate the camera calibration process.}
+         \label{fig:original-checkerboard}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+         \includegraphics[width=\textwidth]{figures/202106/detected-checkerboard.jpg}
+         \caption{\FigRef{fig:original-checkerboard} with various keypoints identified and highlighted.}
+         \label{fig:detected-checkerboard}
+    \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Images showing the initial stages of the camera calibration process.}
+    \label{fig:checkerboard-calibration}
+\end{figure}
+
+In order to perform the camera calibration process and account for the lens distortion, 35 images were taken of a 8x6 checkerboard at various positions and orientations within the camera's \ac{FOV} such as shown in \FigRef{fig:original-checkerboard}. Various known points were subsequently identified on the checkerboard as shown in \FigRef{fig:detected-checkerboard} to facilitate computation of the camera matrix. The improved camera matrix as well as the distortion coefficients describing the tangential and radial lens distortion are used to remap a distorted image as shown in \FigRef{fig:distorted-checkerboard} as to remove the distortion. The undistorted image is shown in \FigRef{fig:undistorted-checkerboard}. Note how the checkerboard lines are perfectly aligned with the red ground truth lines while they are compressed inwards in the distorted image in \FigRef{fig:distorted-checkerboard}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/202106/distorted-checkerboard.png}
+        \caption{Original distorted image of the checkerboard.}
+        \label{fig:distorted-checkerboard}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{figures/202106/undistorted-checkerboard.png}
+        \caption{Undistorted version of \FigRef{fig:distorted-checkerboard}}
+        \label{fig:undistorted-checkerboard}
+    \end{subfigure}
+    \captionsetup{singlelinecheck = false, justification=justified}
+    \caption{Images showing the effect of lens distortion.}
+    \label{fig:checkerboard-distortion}
+\end{figure}
+
+
+\pendsign
