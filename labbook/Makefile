@@ -23,10 +23,10 @@ labbook.pdf: $(SOURCES)
 
 ## Housecleaning
 clean:
-	rm -f *.aux *.log *.toc *.lof *.lot *.bbl *.blg *.dvi *.ps *.idx *.brf
-	rm -f *.ind *.ilg *.gld *.glb *.glo *.bak *.ent *.out labbook.pdf
-	rm -f *.fls *.synctex.gz *.fdb_latexmk
-	rm -f *converted-to.pdf
+	del -f *.aux *.log *.toc *.lof *.lot *.bbl *.blg *.dvi *.ps *.idx *.brf
+	del -f *.ind *.ilg *.gld *.glb *.glo *.bak *.ent *.out labbook.pdf
+	del -f *.fls *.synctex.gz *.fdb_latexmk
+	del -f *converted-to.pdf
 
 ## End of File
 
