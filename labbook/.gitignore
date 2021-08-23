@@ -8,3 +8,7 @@ labbook.out
 labbook.pdf
 labbook.synctex.gz
 labbook.toc
+labbook.fdb_latexmk
+labbook.fls
+labbook.ilg
+labbook.ind
