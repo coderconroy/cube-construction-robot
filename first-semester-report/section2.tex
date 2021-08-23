@@ -1,0 +1,58 @@
+%%
+%%  Department of Electrical, Electronic and Computer Engineering.
+%%  EPR400/2 First Semester Report - Section 2.
+%%  Copyright © 2011-2021 University of Pretoria.
+%%
+
+\section{Work breakdown and first semester progress}
+
+All tasks necessary to complete the project along with their state of progress up to 20 August 2021 are detailed in the work breakdown shown in Tables 1-3 below.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{|>{\raggedright}p{4.5cm}|>{\raggedright}p{2.8cm}|>{\raggedright\arraybackslash}p{6.8cm}|}
+		\hline
+		\textbf{Task} & \textbf{Progress} & \textbf{Brief description} \\ \hline
+		Preparation of project proposal & 100\% complete & Revision 0 was approved. \\ \hline
+		Procurement of small construction cubes & 100\% complete & Square aluminium extrusions have been acquired and machined into cubes. \\ \hline
+		Prototyping of vacuum component of end-effector mechanism & 100\% complete & A prototype of the vacuum component has been constructed and an experiment has been conducted to assess its cube gripping performance. \\ \hline
+		Prototyping of computer vision subsystem & 100\% complete & Software has been developed to detect multiple construction cubes in various images using the C++ OpenCV framework. \\ \hline
+		Design of mechanical component of robotic subsystem & 100\% complete & Calculations for the required torque of each of the stepper motors for each axis of movement have been performed. All the off-the-shelf mechanical components required to construct the robotic subsystem have been specified and all the custom components to be manufactured have been designed. A complete CAD design detailing the configuration of all components in the robotic subsystem has been completed. \\ \hline
+		Procurement of mechanical components for robotic subsystem & 95\% complete & All off-the-shelf mechanical components for the robotic subsystem have been procured with exception of the wooden base for the subsystem. The roll of PETG 3D printing filament required to manufacture the custom mechanical components has been procured. \\ \hline
+	\end{tabular}
+	\caption{Work breakdown showing the progress of the first set of project tasks}
+\end{table}
+
+\begin{table}[ht]
+	\centering
+\begin{tabular}{|>{\raggedright}p{4.5cm}|>{\raggedright}p{2.8cm}|>{\raggedright\arraybackslash}p{6.8cm}|}
+	\hline
+	\textbf{Task} & \textbf{Progress} & \textbf{Brief description} \\ \hline
+	Construction of mechanical component of robotic subsystem & 50\% complete & All the custom mechanical components have been manufactured by means of 3D printing which is the most time-consuming aspect of this task. The v-slot aluminium extrusions, chromed steel rods, linear rails and lead screw need to be cut to length. All the components need to be assembled. \\ \hline
+	Development of vacuum generation mechanism & 10\% complete & A syringe actuated by a DS3118MG digital servo motor has been selected as the vacuum generation mechanism and both of these components have been acquired. A mechanical link between the servo and syringe needs to be designed and manufactured by means of 3D printing. \\ \hline
+	Development of camera and lighting mount for robotic subsystem & 10\% complete & The base aluminium extrusion onto which the lighting and camera will be mounted has been included in the robotic subsystem design. Components to connect the lighting and camera to the extrusion need to be designed and manufactured by means of 3D printing. \\ \hline
+	Development of embedded controller hardware for robotic subsystem & 20\% complete & The STM32L072RZT6 has been selected as the base processing platform and procured. Four DRV8825 stepper motor drivers have been acquired. The drivers have been tested using the Arduino Nano development board, Wantai 35BYG312P1 stepper motor and GF240-1H-AM 12V/20A power supply unit. A schematic integrating all electrical components needs to be designed and prototyped. \\ \hline
+	Development of firmware for embedded controller for robotic subsystem & 0\% complete & Firmware needs to be written to communicate with the PC-based software as well as to control the robotic subsystem's motors and monitor its sensors. \\ \hline
+\end{tabular}
+	\caption{Work breakdown showing the progress of the second set of project tasks}
+\end{table}
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{|>{\raggedright}p{4.5cm}|>{\raggedright}p{2.8cm}|>{\raggedright\arraybackslash}p{6.8cm}|}
+		\hline
+		\textbf{Task} & \textbf{Progress} & \textbf{Brief description} \\ \hline
+		Design of PC-based software & 5\% complete & The C++ QT framework with OpenGL support has been selected as the foundation for the PC software component and installed on the student's PC. A high-level design of the software and its core components needs to be created. \\ \hline
+		Development of serial communication protocol & 0\% complete & A format for data transmission between the PC-based software and robotic controller needs to be designed and developed. \\ \hline
+		Implementation of computer vision software component from first principles & 0\% complete & The OpenCV computer vision prototype needs to be converted to a first principles implementation. \\ \hline
+		Implementation of shape definition software component & 0\% complete & The GUI used to specify the 3D shape to build needs to be implemented. \\ \hline
+		Implementation of robotic route planner software component & 0\% complete & The software component that converts the desired 3D shape description into instructions for the robot needs to be implemented. \\ \hline
+		Development of permanent circuit board for embedded controller for robotic subsystem & 0\% complete & The embedded controller hardware needs to be transferred to a permanent circuit board. \\ \hline
+		Debugging and tuning of integrated system & 0\% complete & Any lingering issues in any of the subsystems after integration need to be addressed. The system needs to be tweaked for best performance. \\ \hline
+		Final testing of integrated system & 0\% complete & The qualification tests need to be performed on the integrated system. \\ \hline
+		Writing of final report & 0\% complete & The entire process needs to be captured in the report. \\ \hline
+	\end{tabular}
+	\caption{Work breakdown showing the progress of the third set of project tasks}
+\end{table}
+
+%% End of File.

@@ -1,0 +1,46 @@
+%%
+%%  Department of Electrical, Electronic and Computer Engineering.
+%%  EPR400/2 First Semester Report - Main File.
+%%  Copyright © 2011-2021 University of Pretoria.
+%%
+
+\documentclass{epr400}
+
+%% EDIT: Replace the following with your information.
+\eprtitle{EPR402 First Semester Report}
+\eprcode{EPR402}
+\eprcandidatename{Christopher Henry Conroy}
+\eprstudentnumber{18072918}
+\eprdate{19 August 2021}
+\eprsupervisor{Mr. H. Grobler}
+
+% Additional packages
+\usepackage{longtable}
+
+\begin{document}
+
+%% Include the required cover sheet exported from MS Word in PDF format.
+\includepdf[pages=-,lastpage=1]{coversheet.pdf}
+
+%% Add the Table of Contents.
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+%% Reset the page style and page count.
+\pagestyle{plain}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%% Import the content
+\input{section1}
+\input{section2}
+\input{section3}
+
+%% Use the IEEE Transactions style for the references.
+\bibliographystyle{IEEEtran}
+\bibliography{firstsemreport}
+
+\end{document}
+
+%% End of File.
