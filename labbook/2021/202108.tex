@@ -182,3 +182,129 @@ The second design that needs to be completed in order to complete the robotic su
 \end{figure}
 
 \pendsign
+
+\section[2021/08/24]{Tuesday, 24 August 2021}
+
+\subsection{Component Manufacturing}
+
+I have a personal 3D printer available and therefore it was decided to manufacture the custom components designed for the robotic subsystem using this 3D printer. One of the most commonly used filaments for 3D printing is \ac{PLA} primarily due to the fact that it is easier to print. However, \ac{PLA} has a low glass transition temperature of $50^{\circ}C$. This means that it is possible for the plastic to soften if left in direct sunlight. For this and other reasons, PLA is usually used for art prints as opposed to engineering prints. A filament more suited to engineering applications is \ac{PETG}. \ac{PETG} has a higher glass transition temperature of $80^{\circ}C$ which is much better suited to everyday conditions. Furthermore, \ac{PETG} has mechanical properties that make it less likely to mechanically fail than \ac{PLA}. Therefore, it was chosen to use \ac{PETG} to manufacture the custom components using \ac{FDM} 3D printing techniques. \ac{PETG} has the drawback that it is more challenging to print than \ac{PLA}. In order to achieve successful prints, all of the custom components were printed using a build plate temperature of $85^{\circ}C$ and a nozzle temperature of $240^{\circ}C$. Furthermore, blue painters tape was first placed on the glass build plate to improve build plate adhesion along with rafts. However, the rafts needed to be manually cut away after the print had completed while the blue painter's tape had to be softened by soaking in IPA alcohol before being removed. \FigRef{fig:3d-printed-components} shows all of the custom components printed using the method described over the course of approximately one week. The majority of the components were printed using 0.12 mm layer height to best capture the intricate part details.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202108/3d-printed-components.JPG}
+	\caption{All the robotic components that were manufactured by means of \ac{FDM} 3D printing methods.}
+	\label{fig:3d-printed-components}
+\end{figure}
+
+\pendsign
+
+\section[2021/08/27]{Friday, 27 August 2021}
+
+\subsection{Metal Component Machining}
+
+ A number of metal components including aluminium v-slot extrusions, chromed steel linear rods, linear rails and a stainless steel leadscrew were required in order to construct the robotic subsystem. These components could only be purchased in set lengths and therefore needed to be cut to the correct length for the project. Since the length of components such as the y-axis rail spacer extrusions and the leg extrusions affected the accuracy of the robotic subsystem (in terms of consistency of height and distance between the linear rails), the components needed very close to their design length. Therefore, a tolerance of 0.1 mm for the component lengths was specified. Furthermore, in order to facilitate the joining of aluminium extrusions in the design, M5 threads of 20mm depth needed to be tapped into the ends of some of the aluminium extrusions. M5 clearance holes also needed to be drilled through the extrusions along with the corresponding counterbores. Again the tolerance specified for this was 0.1 mm. The high accuracy required for these tasks required specialised machinery. In order to acquire access to such machinery, I approached the Heavy Machinery Lab at the University of Pretoria and was able to acquire access to use the machinery.
+
+The following list summarises the structural components as procured as well as the lengths each of the original components needed to be cut into:
+
+\begin{compactitem}
+	\item 1m 2040 aluminium v-slot extrusion: Cut into 3 x 80mm and 2 x 370mm lengths
+	\item 1m 2040 aluminium v-slot extrusion: Cut into 1 x 80mm, 1 x 280mm and 1 x 320mm lengths
+	\item 1m 2020 aluminium v-slot extrusion: Cut into 2 x 250mm and 1 x 370mm lengths
+	\item 1m 2020 aluminium v-slot extrusion: Cut to length 280mm
+	\item 1m 8mm diameter chromed steel rod: Cut into 2 x 195mm and 1 x 213mm lengths
+	\item 1m, 12mm x 8mm, stainless steel linear rail: Cut into 2 x 320mm lengths
+	\item 300mm 8mm diameter stainless steel lead screw: Cut to length 168mm
+\end{compactitem}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202108/hg2-001-drawing.png}
+	\caption{Technical drawing showing the M5 clearance holes to be cut into the left y-axis 2040 aluminium v-slot extrusion.}
+	\label{fig:hg2-001-drawing}
+\end{figure}
+
+In order to cut the components to the correct length, a bandsaw to cut the component with approximately 1 mm excess. The bandsaw does not produce a perfectly straight or square cut and the tolerance is relatively high. In order to attain the 0.1 mm tolerance specification, the milling machine was used to shave the excess material of the face of the component to an accuracy of approximately 10 microns. \FigRef{fig:hg2-001-drawing} and \FigRef{fig:hg2-002-drawing} show the technical drawings for the M5 clearance holes that needed to be cut into the y-axis extrusions to facilitate joining of the components to the frame. The drawings were created to be sent in for review during the application process to access the Heavy Machinery Lab. Across the course of three days in the Heavy Machinery Lab, all the required tasks were completed barring the length milling of 6 of the extrusions. It is estimated this will take another day to complete subject to the demand of the milling machine. \FigRef{fig:machined-components} shows the current state of the machined components.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202108/hg2-002-drawing.png}
+	\caption{Technical drawing showing the M5 clearance holes to be cut into the right y-axis 2040 aluminium v-slot extrusion.}
+	\label{fig:hg2-002-drawing}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\linewidth]{figures/202108/machined-components.JPG}
+	\caption{Metal components after the machining process.}
+	\label{fig:machined-components}
+\end{figure}
+
+\pendsign
+
+\section[2021/08/28]{Saturday, 28 August 2021}
+
+\subsection{PC-Based Software}
+
+\subsubsection{Initialisation}
+
+Visual Studio 2019 is used as the development environment for creating the PC-based \ac{GUI} software. As discussed previously, the QT C++ framework is used as the basis for the software. In order to facilitate the use of this framework in Visual Studio, the \textit{QT Visual Studio Tools} extension was installed. This was done by accessing the \textit{Extensions > Manage Extensions} menu in Visual Studio. In order to create the Visual Studio project in which the software would be developed, a new project of type \textit{QT Widgets Application} was created. The base class for the project was selected as \textit{QWidget} in the QT Widgets Application wizard that executed when the project was created. When building the project for the first time, a number of errors were generated. This was due to the fact that Visual Studio selected the C++ 14 standard by default for the project when the QT libraries make use of C++ 17 conventions. In order to remedy this issue, the C++ standard for the project was updated from C++ 14 to C++ 17. This was done so by changing the C++ language standard setting located at \textit{Project > Properties > C/C++ > Language > C++ Language Standard} in Visual Studio to \textit{ISO C++17 Standard (/std:c++17)}. The project was successfully compiled and the application executed after updating this setting.
+
+\subsubsection{Software Requirements}
+
+The core requirements that the PC-based software needs to fulfil are as follows:
+
+\begin{compactitem}
+	\item The software needs to capture the desired 3D shape to be constructed from the user.
+	\item The software needs to provide a visualisation of the shape to be constructed to the user to verify the captured shape is correct.
+	\item The software needs to interface with the camera hardware to receive the image input data from the camera.
+	\item The software needs to process the image data to detect and localise the cubes input image data.
+	\item The software needs to display the raw and annotated camera image data to the user to show the image processing functionality to the user.
+	\item The software needs to the utilise the 3D shape input information in conjunction with the processed image information to generate instructions for the robot to construct the 3D shape.
+	\item The software needs to convert the robot instructions into a format corresponding to the serial communication protocol between the robot and the computer before sending this data to the robot.
+	\item The software needs to monitor the status of the robotic subsystem based on data received from the robot.
+	\item The software needs to support the initialisation of the necessary system qualification tests.
+	
+\end{compactitem}
+
+\pendsign
+
+\section[2021/08/29]{Sunday, 29 August 2021}
+
+\subsection{Robotic Subsystem Construction}
+
+With the custom components manufactured using 3D printing, the supporting components acquired and the metal components mostly machined, the construction of the robotic subsystem could finally begin. Note since the linear rails still needed to be machined to length and cleaned, it was only possible to construct the robot to the completion of the y-axis assembly. Once the final machining is complete, the robotic subsystem can be fully constructed. The construction process primarily consisted of connecting custom, procured and machined components using M3 and M5 machine screws. The combination of these components required to construct the x-axis assembly are shown in \FigRef{fig:physical-x-axis-assembly} with \FigRef{fig:disassembled-x-axis-assembly} showing the components before assembly and \FigRef{fig:assembled-x-axis-assembly} showing the mechanism after assembly. Note the gear on the end-effector motor still needs to be 3D printed. Furthermore, the vacuum rod experienced an issue during printing which prevented the insertion of the vacuum components. Therefore, this part will also have to be re-printed to rectify the issue.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.7\textwidth}
+		\includegraphics[width=\textwidth]{figures/202108/disassembled-x-axis-assembly.JPG}
+		\caption{Components required to construct the x-axis assembly.}
+		\label{fig:disassembled-x-axis-assembly}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.212\textwidth}
+		\includegraphics[width=\textwidth]{figures/202108/assembled-x-axis-assembly.JPG}
+		\caption{X-axis assembly.}
+		\label{fig:assembled-x-axis-assembly}
+	\end{subfigure}
+	\captionsetup{singlelinecheck = false, justification=justified}
+	\caption{X-axis assembly shown in disassembled as well as assembled state.}
+	\label{fig:physical-x-axis-assembly}
+\end{figure}
+
+The x-axis assembly is used as one of the components to construct the y-axis assembly. The x-axis assembly along with the other components required to construct the y-axis assembly is shown in \FigRef{fig:disassembled-y-axis-assembly}. \FigRef{fig:assembled-y-axis-assembly} shows the assembled y-axis assembly. Note that the timing belt is also included in the assembly despite not being explicitly shown in the components image. Any nuts and bolts required to construct the assembly are also not explicitly shown in \FigRef{fig:disassembled-y-axis-assembly}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.4\linewidth]{figures/202108/disassembled-y-axis-assembly.JPG}
+	\caption{Components required to construct the y-axis assembly.}
+	\label{fig:disassembled-y-axis-assembly}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.8\linewidth]{figures/202108/assembled-y-axis-assembly.JPG}
+	\caption{Assembled y-axis assembly.}
+	\label{fig:assembled-y-axis-assembly}
+\end{figure}
+
+\pendsign
