@@ -263,7 +263,6 @@ The core requirements that the PC-based software needs to fulfil are as follows:
 	\item The software needs to convert the robot instructions into a format corresponding to the serial communication protocol between the robot and the computer before sending this data to the robot.
 	\item The software needs to monitor the status of the robotic subsystem based on data received from the robot.
 	\item The software needs to support the initialisation of the necessary system qualification tests.
-	
 \end{compactitem}
 
 \pendsign
@@ -306,5 +305,75 @@ The x-axis assembly is used as one of the components to construct the y-axis ass
 	\caption{Assembled y-axis assembly.}
 	\label{fig:assembled-y-axis-assembly}
 \end{figure}
+
+\pendsign
+
+\section[2021/09/03]{Sunday, 03 September 2021}
+
+\subsection{STM32L072RZT6}
+
+\subsubsection{Programming}
+
+The STM32L0 series does not support \ac{JTAG} programming and rather only offers the \ac{SWD} programming interface. Therefore, the \ac{SWD} approach will be used to program the device. The \ac{SWD} programming interface requires the following 5 pins:
+
+\begin{compactitem}
+	\item SWDIO - Data input/output
+	\item SWCLK - Clock signal
+	\item NRST - Reset signal
+	\item VDD - Supply voltage
+	\item GND - Ground reference
+\end{compactitem}
+
+Note that the NRST pin is not actually necessary with \ac{SWD} interface programming since \ac{SWD} bypasses the bootloader and is capable of resetting and flashing the device directly.
+
+\subsubsection{Power}
+
+The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range is not necessary. However, the use of the maximum CPU frequency of 32 MHz is preferable. Therefore, range 1 was selected as the power consumption range for the purposes of this project.
+
+The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. It needs to be ensured that the 3.3 V regulator powering the device is capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all fo the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all fo the I/O pins and control pins combined is 90 mA.
+
+According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors should be connected across the power supply pins. $V_{DDA}$ indicates a pin dedicated to supply the ADC with power if a very clean and stable power source is required. For the purposes of this project, the ADC is only being used to monitor a pressure sensor. Therefore, high ADC performance is not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
+
+\subsubsection{General Notes}
+
+
+\begin{compactitem}
+	\item Unless otherwise specified by a note, all I/Os are set as floating inputs during and after reset.
+	\item General PCB design guidelines are discussed on pg 105 of the datasheet.
+\end{compactitem}
+
+\subsection{Supporting Components}
+
+The following components are required to support the operation of the STM32L072RZT6 microcontroller:
+
+\begin{compactitem}
+	\item 3.3 V regulator to step down 12 V input from the power supply to power the microcontroller. The TLV70233 from Texas Instruments is an example of a \ac{SMD} 3.3 V regulator that could potentially be used.
+\end{compactitem}
+
+\subsection{Pin Connections}
+
+The pin connections for the STM32L072RZT6 are as follows:
+
+\begin{compactitem}
+	\item Pin 1 - $V_{DD}$
+	\item Pin 5 - OSC\_IN
+	\item Pin 6 - OSC\_OUT
+	\item Pin 7 - NRST
+	\item Pin 12 - $V_{SSA}$
+	\item Pin 13 - $V_{DDA}$
+	\item Pin 18 - $V_{SS}$
+	\item Pin 19 - $V_{DD}$
+	\item Pin 31 - $V_{SS}$
+	\item Pin 32 - $V_{DD}$
+	\item Pin 46 - SWDIO
+	\item Pin 47 - $V_{SS}$
+	\item Pin 48 - $V_{DD\_USB}$
+	\item Pin 49 - SWCLK
+	\item Pin 60 - BOOT0
+	\item Pin 63 - $V_{SS}$
+	\item Pin 64 - $V_{DD}$
+\end{compactitem}
+
+
 
 \pendsign
