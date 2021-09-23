@@ -1,7 +1,8 @@
 # 3D cube-world construction robot
 ## Project Details
-ISG Undergraduate Project Student of H Grobler: CH Conroy (18072918)
-Assigned project: HG2 3D cube-world construction robot
+
+- ISG Undergraduate Project Student of H Grobler: CH Conroy (18072918)
+- Assigned project: HG2 3D cube-world construction robot
 
 ## Project Description
 
