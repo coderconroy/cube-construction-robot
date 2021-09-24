@@ -4,7 +4,11 @@
 void initialize_system();
 void initialize_gpio();
 void initialize_usart();
+void usart_transmit(uint8_t*, uint8_t);
 void delay(int);
+
+// Variables
+uint8_t buffer[10];
 
 int main(void)
 {
@@ -15,10 +19,14 @@ int main(void)
 	initialize_gpio();
 	initialize_usart();
 
+	for (uint8_t i = 0; i < 10; i++)
+		buffer[i] = i + 100;
+
 	while(1)
 	{
 		GPIOA->BSRR |= GPIO_BSRR_BS_1;
 		delay(1000000);
+		usart_transmit(buffer, 10);
 		GPIOA->BSRR |= GPIO_BSRR_BR_1;
 		delay(1000000);
 	}
@@ -69,8 +77,7 @@ void initialize_system()
 void initialize_gpio()
 {
 	// Enable GPIO port clocks
-	RCC->IOPENR |= RCC_IOPENR_IOPAEN; // GPIOA
-	RCC->IOPENR |= RCC_IOPENR_IOPBEN; // GPIOB
+	RCC->IOPENR |= RCC_IOPENR_IOPAEN | RCC_IOPENR_IOPBEN; // GPIOA, GPIOB
 
 	// Configure PA1
 	GPIOA->MODER |= GPIO_MODER_MODE1_0;
@@ -89,32 +96,24 @@ void initialize_gpio()
 
 void initialize_usart()
 {
-	/* (1) oversampling by 16, 9600 baud */
-	/* (2) 8 data bit, 1 start bit, 1 stop bit, no parity */
-//	USART1->BRR = 160000 / 96; /* (1) */
-//	USART1->CR1 = USART_CR1_TE | USART_CR1_UE; /* (2) */
+	// Enable USART1 clock
+	RCC->APB2ENR |=RCC_APB2ENR_USART1EN;
 
-//	1. Program the M bits in USART_CR1 to define the word length.
+	// Configure USART1 TX
+	USART1->CR1 &= ~ (USART_CR1_M1 |  USART_CR1_M0); // Start bit, 8 data bits, n stop bits
+	USART1->BRR = 0x116; // Baud rate = 115200 bits/s
+	USART1->CR2 &= ~(USART_CR2_STOP_1 | USART_CR2_STOP_0); // 1 stop bit
+	USART1->CR1 |= USART_CR1_UE; // Enable USART
+	USART1->CR1 |= USART_CR1_TE; // Enable transmitter
+}
 
-//	2. Select the desired baud rate using the USART_BRR register.
-
-//	3. Program the number of stop bits in USART_CR2.
-
-//	4. Enable the USART by writing the UE bit in USART_CR1 register to 1.
-
-//	5. Select DMA enable (DMAT) in USART_CR3 if multibuffer communication is to take
-//	place. Configure the DMA register as explained in multibuffer communication.
-
-//	6. Set the TE bit in USART_CR1 to send an idle frame as first transmission.
-
-//	7. Write the data to send in the USART_TDR register (this clears the TXE bit). Repeat this
-//	for each data to be transmitted in case of single buffer.
-
-//	8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
-//	that the transmission of the last frame is complete. This is required for instance when
-//	the USART is disabled or enters the Halt mode to avoid corrupting the last
-//	transmission.
-
+void usart_transmit(uint8_t* data, uint8_t size)
+{
+	for (uint8_t i = 0; i < size; i++)
+	{
+		// TO DO: Implement interrupt based delay
+		USART1->TDR = data[i];
+	}
 }
 
 void delay(int count)
