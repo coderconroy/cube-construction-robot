@@ -1,12 +1,31 @@
 #include "main.h"
 
-void DelayTime(int count)
-{
-	volatile int i = 0;
-	while (i < count) i++;
-}
+// Function prototypes
+void initialize_system();
+void initialize_gpio();
+void initialize_usart();
+void delay(int);
 
 int main(void)
+{
+	// Configure the system clock, flash memory and power settings
+	initialize_system();
+
+	// Configure peripherals
+	initialize_gpio();
+	initialize_usart();
+
+	while(1)
+	{
+		GPIOA->BSRR |= GPIO_BSRR_BS_1;
+		delay(1000000);
+		GPIOA->BSRR |= GPIO_BSRR_BR_1;
+		delay(1000000);
+	}
+
+}
+
+void initialize_system()
 {
 	// Configure HSI as system clock for initialization phase
 	RCC->CR |= RCC_CR_HSION; // Enable HSI
@@ -45,23 +64,61 @@ int main(void)
 	// Configure system clock
 	RCC->CFGR = (RCC->CFGR & (~RCC_CFGR_SW)) | RCC_CFGR_SW_PLL; // Set PLL as system clock;
 	while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL); // Wait for PLL to be selected as system clock source
+}
 
-	// Enable clock for GPIOA
-	RCC->IOPENR |= RCC_IOPENR_IOPAEN;
+void initialize_gpio()
+{
+	// Enable GPIO port clocks
+	RCC->IOPENR |= RCC_IOPENR_IOPAEN; // GPIOA
+	RCC->IOPENR |= RCC_IOPENR_IOPBEN; // GPIOB
+
 	// Configure PA1
 	GPIOA->MODER |= GPIO_MODER_MODE1_0;
 	GPIOA->MODER &= ~(GPIO_MODER_MODE1_1); // General purpose output mode
 	GPIOA->OTYPER &= ~ (GPIO_OTYPER_OT_1);  //  Output push-pull
 	GPIOA->OSPEEDR  |= GPIO_OSPEEDER_OSPEED1; // Very high speed
-	GPIOA->PUPDR &= ~ (GPIO_PUPDR_PUPD0_1);   // No pull up, no pull down
+	GPIOA->PUPDR &= ~ (GPIO_PUPDR_PUPD0_1);   // No pull-up, no pull-down
 
-	while(1)
-	{
-		GPIOA->BSRR |= GPIO_BSRR_BS_1;
-		DelayTime(1000000);
-		GPIOA->BSRR |= GPIO_BSRR_BR_1;
-		DelayTime(1000000);
-	}
+	// Configure PB6 (USART TX)
+	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (0x0 << GPIO_AFRL_AFSEL6_Pos) ; // Alternate function selection = AF0 (USART1_TX)
+	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_6; // Output push-pull
+	GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0x0 << GPIO_PUPDR_PUPD6_Pos); // No pull-up, pull-down
+	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDER_OSPEED6)) | (0x3 << GPIO_OSPEEDER_OSPEED6_Pos); // Very high output speed
+	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0x2 << GPIO_MODER_MODE6_Pos);
 }
 
+void initialize_usart()
+{
+	/* (1) oversampling by 16, 9600 baud */
+	/* (2) 8 data bit, 1 start bit, 1 stop bit, no parity */
+//	USART1->BRR = 160000 / 96; /* (1) */
+//	USART1->CR1 = USART_CR1_TE | USART_CR1_UE; /* (2) */
 
+//	1. Program the M bits in USART_CR1 to define the word length.
+
+//	2. Select the desired baud rate using the USART_BRR register.
+
+//	3. Program the number of stop bits in USART_CR2.
+
+//	4. Enable the USART by writing the UE bit in USART_CR1 register to 1.
+
+//	5. Select DMA enable (DMAT) in USART_CR3 if multibuffer communication is to take
+//	place. Configure the DMA register as explained in multibuffer communication.
+
+//	6. Set the TE bit in USART_CR1 to send an idle frame as first transmission.
+
+//	7. Write the data to send in the USART_TDR register (this clears the TXE bit). Repeat this
+//	for each data to be transmitted in case of single buffer.
+
+//	8. After writing the last data into the USART_TDR register, wait until TC=1. This indicates
+//	that the transmission of the last frame is complete. This is required for instance when
+//	the USART is disabled or enters the Halt mode to avoid corrupting the last
+//	transmission.
+
+}
+
+void delay(int count)
+{
+	volatile int i = 0;
+	while (i < count) i++;
+}
