@@ -7,13 +7,20 @@ void initialize_gpio();
 void initialize_usart();
 void usart_transmit(uint8_t*, uint8_t);
 void delay(int);
+void error_handler();
 
-// Variables
-uint8_t buffer[10];
+// USART TX state variables
 uint8_t tx_count = 0;
 uint8_t tx_size = 0;
 uint8_t* tx_data = 0;
 bool tx_busy = false; // Flag to indicate USART data is currently being transmitted
+
+// USART RX state variables
+uint8_t rx_buffer[255]; // Buffer to store received bytes
+uint8_t rx_count = 0; // Number of bytes in rx_buffer
+
+// General
+uint8_t* buffer =(uint8_t*) "Hello\n";
 
 int main(void)
 {
@@ -24,16 +31,16 @@ int main(void)
 	initialize_gpio();
 	initialize_usart();
 
-	for (uint8_t i = 0; i < 10; i++)
-		buffer[i] = i;
-
 	while(1)
 	{
 		GPIOA->BSRR |= GPIO_BSRR_BS_1;
 		delay(1000000);
-		usart_transmit(buffer, 10);
+		usart_transmit(buffer, 6);
 		GPIOA->BSRR |= GPIO_BSRR_BR_1;
 		delay(1000000);
+		// Echo bytes
+		usart_transmit(rx_buffer, rx_count);
+		rx_count = 0;
 	}
 
 }
@@ -97,21 +104,33 @@ void initialize_gpio()
 	GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0x0 << GPIO_PUPDR_PUPD6_Pos); // No pull-up, pull-down
 	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDER_OSPEED6)) | (0x3 << GPIO_OSPEEDER_OSPEED6_Pos); // Very high output speed
 	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0x2 << GPIO_MODER_MODE6_Pos);
+
+	// Configure PB7 (USART RX)
+	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (0x0 << GPIO_AFRL_AFSEL7_Pos) ; // Alternate function selection = AF0 (USART1_RX)
+	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_7; // Output push-pull
+	GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0x0 << GPIO_PUPDR_PUPD7_Pos); // No pull-up, pull-down
+	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDER_OSPEED7)) | (0x3 << GPIO_OSPEEDER_OSPEED7_Pos); // Very high output speed
+	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE7)) | (0x2 << GPIO_MODER_MODE7_Pos);
 }
 
 void initialize_usart()
 {
 	// Enable USART1 clock
 	RCC->APB2ENR |=RCC_APB2ENR_USART1EN;
-	// Configure USART1 TX
+
+	// Configure USART1
 	USART1->CR1 &= ~ (USART_CR1_M1 |  USART_CR1_M0); // Start bit, 8 data bits, n stop bits
 	USART1->BRR = 0x116; // Baud rate = 115200 bits/s
 	USART1->CR2 &= ~(USART_CR2_STOP_1 | USART_CR2_STOP_0); // 1 stop bit
 	USART1->CR1 |= USART_CR1_UE; // Enable USART
 	USART1->CR1 |= USART_CR1_TE; // Enable transmitter
+	USART1->CR1 |= USART_CR1_RE; // Enable receiver
 	USART1->CR1 |= USART_CR1_TCIE; // Enable transmission complete interrupt
+	USART1->CR1 |= USART_CR1_RXNEIE; // Enable byte received interrupt
 	USART1->ICR |= USART_ICR_TCCF; // Clear transmission complete interrupt flag
+//	USART1->RQR |= USART_RQR_RXFRQ;// Clear byte received interrupt flag
 
+	// Enable USART1 interrupt line in NVIC
 	__disable_irq();
 	NVIC_EnableIRQ(USART1_IRQn);
 	NVIC_SetPriority(USART1_IRQn, 0);
@@ -124,13 +143,16 @@ void usart_transmit(uint8_t* data, uint8_t size)
 	// TODO: Handle this error
 	// USART is busy transmitting set of data
 	if (tx_busy)
+	{
 		return;
+//		error_handler();
+	}
 
 	// No data specified for transmission
 	if (size <= 0)
 		return;
 
-	// Initialize transmission status variables
+	// Initialize transmission state variables
 	tx_busy = true;
 	tx_data = data;
 	tx_size = size;
@@ -159,5 +181,24 @@ void USART1_IRQHandler()
 		else
 			tx_busy = false;
 	}
+	// Byte received interrupt
+	else if ((USART1->ISR & USART_ISR_RXNE) == USART_ISR_RXNE)
+	{
+		rx_buffer[rx_count++] = USART1->RDR; // Store byte
+	}
+	// Receiver overrun error interrupt
+	else if ((USART1->ISR & USART_ISR_ORE) == USART_ISR_ORE)
+	{
+		error_handler();
+	}
+}
+
+// General error handling
+void error_handler()
+{
+  __disable_irq();
+  while (1)
+  {
+  }
 
 }
