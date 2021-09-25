@@ -1,4 +1,5 @@
 #include "main.h"
+#include "stdbool.h"
 
 // Function prototypes
 void initialize_system();
@@ -9,6 +10,10 @@ void delay(int);
 
 // Variables
 uint8_t buffer[10];
+uint8_t tx_count = 0;
+uint8_t tx_size = 0;
+uint8_t* tx_data = 0;
+bool tx_busy = false; // Flag to indicate USART data is currently being transmitted
 
 int main(void)
 {
@@ -20,7 +25,7 @@ int main(void)
 	initialize_usart();
 
 	for (uint8_t i = 0; i < 10; i++)
-		buffer[i] = i + 100;
+		buffer[i] = i;
 
 	while(1)
 	{
@@ -98,26 +103,61 @@ void initialize_usart()
 {
 	// Enable USART1 clock
 	RCC->APB2ENR |=RCC_APB2ENR_USART1EN;
-
 	// Configure USART1 TX
 	USART1->CR1 &= ~ (USART_CR1_M1 |  USART_CR1_M0); // Start bit, 8 data bits, n stop bits
 	USART1->BRR = 0x116; // Baud rate = 115200 bits/s
 	USART1->CR2 &= ~(USART_CR2_STOP_1 | USART_CR2_STOP_0); // 1 stop bit
 	USART1->CR1 |= USART_CR1_UE; // Enable USART
 	USART1->CR1 |= USART_CR1_TE; // Enable transmitter
+	USART1->CR1 |= USART_CR1_TCIE; // Enable transmission complete interrupt
+	USART1->ICR |= USART_ICR_TCCF; // Clear transmission complete interrupt flag
+
+	__disable_irq();
+	NVIC_EnableIRQ(USART1_IRQn);
+	NVIC_SetPriority(USART1_IRQn, 0);
+	NVIC_ClearPendingIRQ(USART1_IRQn);
+	__enable_irq();
 }
 
 void usart_transmit(uint8_t* data, uint8_t size)
 {
-	for (uint8_t i = 0; i < size; i++)
-	{
-		// TO DO: Implement interrupt based delay
-		USART1->TDR = data[i];
-	}
+	// TODO: Handle this error
+	// USART is busy transmitting set of data
+	if (tx_busy)
+		return;
+
+	// No data specified for transmission
+	if (size <= 0)
+		return;
+
+	// Initialize transmission status variables
+	tx_busy = true;
+	tx_data = data;
+	tx_size = size;
+	tx_count = 0;
+
+	// Transmit first byte
+	USART1->TDR = tx_data[tx_count++];
 }
 
 void delay(int count)
 {
 	volatile int i = 0;
 	while (i < count) i++;
+}
+
+void USART1_IRQHandler()
+{
+	// Transmission complete interrupt
+	if ((USART1->ISR & USART_ISR_TC) == USART_ISR_TC)
+	{
+		// Clear transmission complete flag
+		USART1->ICR |= USART_ICR_TCCF;
+		// Transmit Byte
+		if (tx_count < tx_size)
+			USART1->TDR = tx_data[tx_count++];
+		else
+			tx_busy = false;
+	}
+
 }
