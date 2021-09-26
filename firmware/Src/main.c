@@ -1,13 +1,4 @@
 #include "main.h"
-#include "stdbool.h"
-
-// Function prototypes
-void initialize_system();
-void initialize_gpio();
-void initialize_usart();
-void usart_transmit(uint8_t*, uint8_t);
-void delay(int);
-void error_handler();
 
 // USART TX state variables
 uint8_t tx_count = 0;
@@ -33,9 +24,11 @@ int main(void)
 
 	while(1)
 	{
+		GPIOA->BSRR |= GPIO_BSRR_BR_0;
 		GPIOA->BSRR |= GPIO_BSRR_BS_1;
 		delay(1000000);
 		usart_transmit(buffer, 6);
+		GPIOA->BSRR |= GPIO_BSRR_BS_0;
 		GPIOA->BSRR |= GPIO_BSRR_BR_1;
 		delay(1000000);
 		// Echo bytes
@@ -91,26 +84,21 @@ void initialize_gpio()
 	// Enable GPIO port clocks
 	RCC->IOPENR |= RCC_IOPENR_IOPAEN | RCC_IOPENR_IOPBEN; // GPIOA, GPIOB
 
-	// Configure PA1
-	GPIOA->MODER |= GPIO_MODER_MODE1_0;
-	GPIOA->MODER &= ~(GPIO_MODER_MODE1_1); // General purpose output mode
-	GPIOA->OTYPER &= ~ (GPIO_OTYPER_OT_1);  //  Output push-pull
-	GPIOA->OSPEEDR  |= GPIO_OSPEEDER_OSPEED1; // Very high speed
-	GPIOA->PUPDR &= ~ (GPIO_PUPDR_PUPD0_1);   // No pull-up, no pull-down
+	configure_gpio_pin(GPIOA, GPIO_PIN_0, GENERAL_PURPOSE, PUSH_PULL, LOW, NO_PUPD); // Configure PA0 (LED0)
+	configure_gpio_pin(GPIOA, GPIO_PIN_1, GENERAL_PURPOSE, PUSH_PULL, LOW, NO_PUPD); // Configure PA1 (LED1)
+
+	// Configure PA2 (V_SERVO)
+	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL2)) | (0x2 << GPIO_AFRL_AFSEL2_Pos) ; // Alternate function selection = AF2 (TIM2_CH3)
+	configure_gpio_pin(GPIOA, GPIO_PIN_2, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
 
 	// Configure PB6 (USART TX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (0x0 << GPIO_AFRL_AFSEL6_Pos) ; // Alternate function selection = AF0 (USART1_TX)
-	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_6; // Output push-pull
-	GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD6)) | (0x0 << GPIO_PUPDR_PUPD6_Pos); // No pull-up, pull-down
-	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDER_OSPEED6)) | (0x3 << GPIO_OSPEEDER_OSPEED6_Pos); // Very high output speed
-	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE6)) | (0x2 << GPIO_MODER_MODE6_Pos);
+	configure_gpio_pin(GPIOB, GPIO_PIN_6, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
 
 	// Configure PB7 (USART RX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (0x0 << GPIO_AFRL_AFSEL7_Pos) ; // Alternate function selection = AF0 (USART1_RX)
-	GPIOB->OTYPER &= ~GPIO_OTYPER_OT_7; // Output push-pull
-	GPIOB->PUPDR = (GPIOB->PUPDR & (~GPIO_PUPDR_PUPD7)) | (0x0 << GPIO_PUPDR_PUPD7_Pos); // No pull-up, pull-down
-	GPIOB->OSPEEDR = (GPIOB->OSPEEDR & (~GPIO_OSPEEDER_OSPEED7)) | (0x3 << GPIO_OSPEEDER_OSPEED7_Pos); // Very high output speed
-	GPIOB->MODER = (GPIOB->MODER & (~GPIO_MODER_MODE7)) | (0x2 << GPIO_MODER_MODE7_Pos);
+	configure_gpio_pin(GPIOB, GPIO_PIN_7, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
+
 }
 
 void initialize_usart()
@@ -128,7 +116,7 @@ void initialize_usart()
 	USART1->CR1 |= USART_CR1_TCIE; // Enable transmission complete interrupt
 	USART1->CR1 |= USART_CR1_RXNEIE; // Enable byte received interrupt
 	USART1->ICR |= USART_ICR_TCCF; // Clear transmission complete interrupt flag
-//	USART1->RQR |= USART_RQR_RXFRQ;// Clear byte received interrupt flag
+	USART1->RQR |= USART_RQR_RXFRQ;// Clear byte received interrupt flag
 
 	// Enable USART1 interrupt line in NVIC
 	__disable_irq();
@@ -196,9 +184,6 @@ void USART1_IRQHandler()
 // General error handling
 void error_handler()
 {
-  __disable_irq();
-  while (1)
-  {
-  }
-
+	__disable_irq();
+	while (1);
 }

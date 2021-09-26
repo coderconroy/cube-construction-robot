@@ -2,8 +2,9 @@
 #define MAIN_H_
 
 #include "stm32l072xx.h"
+#include "gpio_hal.h"
+#include "stdbool.h"
 
-// Pin and port assignments
 #define X_LIM_Pin GPIO_PIN_1
 #define X_LIM_GPIO_Port GPIOC
 #define Y_LIM_Pin GPIO_PIN_2
@@ -90,5 +91,13 @@
 #define FAN_GPIO_Port GPIOB
 #define LIGHT_Pin GPIO_PIN_9
 #define LIGHT_GPIO_Port GPIOB
+
+// Function prototypes
+void initialize_system();
+void initialize_gpio();
+void initialize_usart();
+void usart_transmit(uint8_t*, uint8_t);
+void delay(int);
+void error_handler();
 
 #endif /* MAIN_H_ */
