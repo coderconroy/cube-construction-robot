@@ -56,5 +56,8 @@ typedef enum
 
 // Function prototypes
 void configure_gpio_pin(GPIO_TypeDef*, gpio_pin_t, gpio_moder_mode_t, gpio_otyper_ot_t, gpio_ospeedr_ospeed_t, gpio_pupdr_pupd_t);
+void gpio_pin_set(GPIO_TypeDef*, gpio_pin_t);
+void gpio_pin_reset(GPIO_TypeDef*, gpio_pin_t);
+void gpio_pin_toggle(GPIO_TypeDef*, gpio_pin_t);
 
 #endif /* GPIO_HAL_H_ */

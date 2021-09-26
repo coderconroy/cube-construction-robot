@@ -96,6 +96,7 @@
 void initialize_system();
 void initialize_gpio();
 void initialize_usart();
+void intitialize_tim2();
 void usart_transmit(uint8_t*, uint8_t);
 void delay(int);
 void error_handler();

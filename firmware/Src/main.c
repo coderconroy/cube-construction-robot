@@ -24,13 +24,16 @@ int main(void)
 
 	while(1)
 	{
-		GPIOA->BSRR |= GPIO_BSRR_BR_0;
-		GPIOA->BSRR |= GPIO_BSRR_BS_1;
+		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
+		gpio_pin_reset(LED1_GPIO_Port, LED1_Pin);
 		delay(1000000);
+
 		usart_transmit(buffer, 6);
-		GPIOA->BSRR |= GPIO_BSRR_BS_0;
-		GPIOA->BSRR |= GPIO_BSRR_BR_1;
+
+		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
+		gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
 		delay(1000000);
+
 		// Echo bytes
 		usart_transmit(rx_buffer, rx_count);
 		rx_count = 0;
@@ -98,7 +101,6 @@ void initialize_gpio()
 	// Configure PB7 (USART RX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (0x0 << GPIO_AFRL_AFSEL7_Pos) ; // Alternate function selection = AF0 (USART1_RX)
 	configure_gpio_pin(GPIOB, GPIO_PIN_7, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
-
 }
 
 void initialize_usart()
