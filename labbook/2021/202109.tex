@@ -152,7 +152,27 @@ The D+ and D- lines for the USB portion of the USB to serial converter constitut
 
 \subsection{LED Strip}
 
-A white \ac{LED} strip was selected to provide sufficient lighting to support the computer vision component of the project. The \ac{LED} strip contains 3528 \ac{SMD} white LEDs which consume a maximum of 20 mA each. The \ac{LED} density of the strip is 60 LEDs/m. This project maximum LED strip length that this project will use is 3m which implies that a maximum of 180 LEDs will be powered. 
+A white \ac{LED} strip was selected to provide sufficient lighting to support the computer vision component of the project. The \ac{LED} strip contains 3528 \ac{SMD} white LEDs which consume a maximum of 20 mA each. The \ac{LED} density of the strip is 60 LEDs/m. This project maximum LED strip length that this project will use is 3m which implies that a maximum of 180 LEDs will be powered.
+
+\subsection{Implementation}
+
+The PCB design was developed using the KiCAD software design environment and the design process consisted of two steps. The first step involved the electrical design in which all the pins of the electrical components were assigned to electrical nodes. This was followed by the PCB routing process . The result of this routing process is shown in \FigRef{fig:pcb-routing} below. A 3D render of the PCB with all the components assembled is also shown in \FigRef{fig:robotic-controller-model} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202109/robotic-controller-model.png}
+	\caption{3D model showing the assembled robotic controller PCB.}
+	\label{fig:robotic-controller-model}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{figures/202109/pcb-routing.PNG}
+	\caption{PCB routing layout for robotic controller.}
+	\label{fig:pcb-routing}
+\end{figure}
+
+
 
 \pendsign
 
@@ -195,7 +215,21 @@ The dimensions of the syringe plunger are as follows:
 	\item Rubber end piece height = 9.00 mm
 \end{compactitem}
 
-The syringe has a maximum range of linear travel of 78 mm. The servo has a maximum range of rotational motion of $180^{\circ}$. Therefore, in order to achieve the full range of linear motion for the syringe, the mechanism connecting the servo to the syringe needs to translate the servo's $180^{\circ}$ of rotational motion into 78 mm of linear motion. A rack and pinion system is a mechanism that is commonly used for converting translational motion into rotational motion. Therefore, half of the circumference of the pitch diameter circle of the gear needs to be equal to the length of linear travel for these specifications to be achieved. A gear with a pitch diameter of 49.66 mm satisfies this requirement. Therefore, it was selected to use a gear with a pitch diameter of 50 mm.
+The syringe has a maximum range of linear travel of 78 mm. The servo has a maximum range of rotational motion of $180^{\circ}$. Therefore, in order to achieve the full range of linear motion for the syringe, the mechanism connecting the servo to the syringe needs to translate the servo's $180^{\circ}$ of rotational motion into 78 mm of linear motion. A rack and pinion system is a mechanism that is commonly used for converting translational motion into rotational motion. Therefore, half of the circumference of the pitch diameter circle of the gear needs to be equal to the length of linear travel for these specifications to be achieved. A gear with a pitch diameter of 49.66 mm satisfies this requirement. Therefore, it was selected to use a gear with a pitch diameter of 50 mm. The mechanical connection mechanism to connect the syringe to the servo motor is shown as a 3D model in \FigRef{fig:vacuum-actuator-model} as well as the physical realisation in \FigRef{fig:vacuum-actuator} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{figures/202109/vacuum-actuator-model.PNG}
+	\caption{3D model of vacuum actuator designed in Fusion 360.}
+	\label{fig:vacuum-actuator-model}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.6\linewidth]{figures/202109/vacuum-actuator.JPG}
+	\caption{Physical vacuum actuator model manufactured using 3D printing processes.}
+	\label{fig:vacuum-actuator}
+\end{figure}
 
 \pendsign
 
