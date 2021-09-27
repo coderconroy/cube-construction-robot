@@ -5,6 +5,7 @@
 #include "gpio_hal.h"
 #include "stdbool.h"
 
+// GPIO defines
 #define X_LIM_Pin GPIO_PIN_1
 #define X_LIM_GPIO_Port GPIOC
 #define Y_LIM_Pin GPIO_PIN_2
@@ -92,11 +93,15 @@
 #define LIGHT_Pin GPIO_PIN_9
 #define LIGHT_GPIO_Port GPIOB
 
+// Constants
+#define SERVO_PERIOD_MIN  500 // Pulse high time (us)
+#define SERVO_PERIOD_MAX  2400 // Pulse high time (us)
+
 // Function prototypes
 void initialize_system();
 void initialize_gpio();
 void initialize_usart();
-void intitialize_tim2();
+void initialize_tim2();
 void usart_transmit(uint8_t*, uint8_t);
 void delay(int);
 void error_handler();

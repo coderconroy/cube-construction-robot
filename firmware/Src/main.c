@@ -21,24 +21,24 @@ int main(void)
 	// Configure peripherals
 	initialize_gpio();
 	initialize_usart();
+	initialize_tim2();
 
 	while(1)
 	{
 		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
 		gpio_pin_reset(LED1_GPIO_Port, LED1_Pin);
-		delay(1000000);
+		delay(3000000);
 
 		usart_transmit(buffer, 6);
 
 		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
 		gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
-		delay(1000000);
+		delay(3000000);
 
 		// Echo bytes
 		usart_transmit(rx_buffer, rx_count);
 		rx_count = 0;
 	}
-
 }
 
 void initialize_system()
@@ -84,28 +84,30 @@ void initialize_system()
 
 void initialize_gpio()
 {
-	// Enable GPIO port clocks
+	// Enable GPIO port peripheral clocks
 	RCC->IOPENR |= RCC_IOPENR_IOPAEN | RCC_IOPENR_IOPBEN; // GPIOA, GPIOB
 
 	configure_gpio_pin(GPIOA, GPIO_PIN_0, GENERAL_PURPOSE, PUSH_PULL, LOW, NO_PUPD); // Configure PA0 (LED0)
 	configure_gpio_pin(GPIOA, GPIO_PIN_1, GENERAL_PURPOSE, PUSH_PULL, LOW, NO_PUPD); // Configure PA1 (LED1)
 
 	// Configure PA2 (V_SERVO)
-	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL2)) | (0x2 << GPIO_AFRL_AFSEL2_Pos) ; // Alternate function selection = AF2 (TIM2_CH3)
+	GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRL_AFSEL2)) | (0x2 << GPIO_AFRL_AFSEL2_Pos) ; // Alternate function selection = AF2 (TIM2_CH3)
 	configure_gpio_pin(GPIOA, GPIO_PIN_2, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
+
+	configure_gpio_pin(GPIOA, GPIO_PIN_1, ANALOG, PUSH_PULL, LOW, NO_PUPD); // Configure PA3 (V_SENSOR)
 
 	// Configure PB6 (USART TX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (0x0 << GPIO_AFRL_AFSEL6_Pos) ; // Alternate function selection = AF0 (USART1_TX)
-	configure_gpio_pin(GPIOB, GPIO_PIN_6, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
+	configure_gpio_pin(GPIOB, GPIO_PIN_6, ALTERNATE_FUNCTION, PUSH_PULL, VERY_HIGH, NO_PUPD);
 
 	// Configure PB7 (USART RX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL7)) | (0x0 << GPIO_AFRL_AFSEL7_Pos) ; // Alternate function selection = AF0 (USART1_RX)
-	configure_gpio_pin(GPIOB, GPIO_PIN_7, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
+	configure_gpio_pin(GPIOB, GPIO_PIN_7, ALTERNATE_FUNCTION, PUSH_PULL, VERY_HIGH, NO_PUPD);
 }
 
 void initialize_usart()
 {
-	// Enable USART1 clock
+	// Enable USART1 peripheral clock
 	RCC->APB2ENR |=RCC_APB2ENR_USART1EN;
 
 	// Configure USART1
@@ -126,6 +128,22 @@ void initialize_usart()
 	NVIC_SetPriority(USART1_IRQn, 0);
 	NVIC_ClearPendingIRQ(USART1_IRQn);
 	__enable_irq();
+}
+
+void initialize_tim2()
+{
+	// Enable TIM2 peripheral clock
+	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+	 // Configure TIM2 for PWM
+	 TIM2->PSC = 31; // Clock prescalar
+	 TIM2->ARR = 20000; // Auto reload value
+	 TIM2->CCR3 = SERVO_PERIOD_MAX; // Channel 3 compare value
+	 TIM2->CCMR2 |= TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1 ; // PWM mode 1
+	 TIM2->CCMR2 |= TIM_CCMR2_OC3PE; // Enable output compare 3 preload
+	 TIM2->CCER |= TIM_CCER_CC3E; // Compare 3 output enable
+	 TIM2->CR1 |= TIM_CR1_CEN; // Enable timer
+	 TIM2->EGR = TIM_EGR_UG; // Enable update generation
 }
 
 void usart_transmit(uint8_t* data, uint8_t size)
