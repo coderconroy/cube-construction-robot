@@ -70,29 +70,37 @@ The pin connections for the STM32L072RZT6 are as follows:
 
 \section[2021/09/08]{Wednesday, 08 September 2021}
 
+\subsection{Robotic Subsystem}
+
+The mechanical assembly of the robotic subsystem was completed using chipboard wood as a base for the system. Furthermore, rubber feet were added to the base to reduce the effect of environmental vibrations on the system. The assembly is shown in \FigRef{fig:final-robotic-system}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202109/final-robotic-system.JPG}
+	\caption{Assembled mechanical component of robotic subsystem.}
+	\label{fig:final-robotic-system}
+\end{figure}
+
 \subsection{External Oscillator}
 
 The STM32L072RZT device supports the use of an external oscillator in the frequency range 1 to 24 MHz to drive the main clock. The advantage of using this oscillator over the main clock is the accuracy with which it operates in comparison to the internal oscillator.
 
 \pendsign
 
-\section[2021/09/10]{Friday, 10 September 2021}
-
-\subsection{Servo Motor}
-xxx
-
-
-
-
-\pendsign
-
 \section[2021/09/11]{Saturday, 11 September 2021}
 
 \subsection{PCB Design}
-xxx
 
 \subsubsection{Prototype}
-xxx
+
+The robotic controller prototype was created by soldering the STM32L072RZT6 microcontroller to a \ac{TQFP} breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which was removed using solder wick. Finally the solder flux residue was cleaned using \ac{IPA}. The final prototype is shown in \FigRef{fig:robotic-controller-prototype}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{figures/202109/robotic-controller-prototype.JPG}
+	\caption{Robotic controller prototype.}
+	\label{fig:robotic-controller-prototype}
+\end{figure}
 
 
 \subsubsection{Power}
@@ -111,25 +119,9 @@ In order to determine the width of the power supply trace, the maximum current t
 	\item CH340G chip - 30 mA
 \end{compactitem}
 
-Based on the sum of these values, the initial power connection trace needs to be able to support 5.835 A of current. A value of 6 A was used to incorporate a degree of engineering safety margin. Furthermore, a maximum temperature rise tolerance of $10\;^{\circ}C$ and a copper thickness of $1 \text{oz/ft}^2$ was used in the calculation of the trace width. Based on this, it was calculated a trace width of at least 140 mil or 3.56 mm is required. A similar procedure was used to calculate the power trace sections which supported fewer components
+Based on the sum of these values, the initial power connection trace needs to be able to support 5.835 A of current. A value of 6 A was used to incorporate a degree of engineering safety margin. Furthermore, a maximum temperature rise tolerance of $10\;^{\circ}C$ and a copper thickness of $1 \text{oz/ft}^2$ was used in the calculation of the trace width. Based on this, it was calculated a trace width of at least 140 mil or 3.56 mm is required. A similar procedure was used to calculate the power trace sections which supported fewer components. The board house, JLC PCB, charges a significantly greater amount for 2 oz outer copper weight over 1 oz. Therefore 1 oz was selected as the outer copper weight for the PCB. 
 
-\subsubsection{Vacuum Sensor}
-xxx
-
-
-\subsection{USB to Serial Converter}
-
-xx
-
-\subsection{Routing Considerations}
-
-xx
-
-\subsection{General}
-
-\begin{compactitem}
-	\item The board house, JLC PCB, charges a significantly greater amount for 2 oz outer copper weight over 1 oz. Therefre 1 oz was selected as the outer copper weight for the PCB.
-\end{compactitem}
+\subsection{USB Differential Routing}
 
 The D+ and D- lines for the USB portion of the USB to serial converter constitute a differential pair. As such, a number of \ac{PCB} layout guidelines need to be adhered to ensure the integrity of the differential pair signal. The following guidelines were considered for this purpose:
 
@@ -140,12 +132,12 @@ The D+ and D- lines for the USB portion of the USB to serial converter constitut
 	\item The lengths of each trace in the differential pair must be identical even if symmetry needs be sacrificed to achieve this.
 \end{compactitem}
 
-https://resources.pcb.cadence.com/blog/2021-efficient-differential-pair-routing-guidelines-to-speed-up-pcb-routing
+% https://resources.pcb.cadence.com/blog/2021-efficient-differential-pair-routing-guidelines-to-speed-up-pcb-routing
 
 
 \subsection{Oscillator}
 
-See https://ecsxtal.com/crystal-and-oscillator-printed-circuit-board-design-considerations
+% See https://ecsxtal.com/crystal-and-oscillator-printed-circuit-board-design-considerations
 
 \begin{compactitem}
 	\item The crystal and its supporting capacitors should be placed as close as possible to the oscillator input and output pins on the microcontroller.
@@ -161,7 +153,6 @@ See https://ecsxtal.com/crystal-and-oscillator-printed-circuit-board-design-cons
 \subsection{LED Strip}
 
 A white \ac{LED} strip was selected to provide sufficient lighting to support the computer vision component of the project. The \ac{LED} strip contains 3528 \ac{SMD} white LEDs which consume a maximum of 20 mA each. The \ac{LED} density of the strip is 60 LEDs/m. This project maximum LED strip length that this project will use is 3m which implies that a maximum of 180 LEDs will be powered. 
-
 
 \pendsign
 
@@ -301,5 +292,20 @@ The baud rate error can then be calculated as
 
 The datasheet specifies an error tolerance of $3\%$ for the \ac{USART} receiver with the given configuration. Therefore, the error is acceptable and has sufficient margin to account for other error sources such as transmitter clock deviation, local oscillator deviation and errors introduced by the transmission line.
 
-NOTE: https://electronics.stackexchange.com/questions/222638/clearing-usart-uart-interrupt-flags-in-an-stm32
+\pendsign
+
+\section[2021/09/26]{Sunday, 26 September 2021}
+
+\subsection{\ac{PWM}}
+
+The first step in configuring \ac{PWM} requires the configuration of the counter clock speed. A counter clock speed of $1\;MHz$ is desired given that the system clock frequency is $f_{CK}=32\;MHz$. These two quantities are related by the timer prescalar PSC[15:0] as
+
+\begin{align}
+	\text{CK\_CNT}=\frac{f_{CK}}{\text{PSC[15:0]}}.
+	\label{pwm-counter-clock}
+\end{align}
+
+Using \EquRef{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
+
+\pendsign
 
