@@ -22,18 +22,19 @@ int main(void)
 	initialize_gpio();
 	initialize_usart();
 	initialize_tim2();
+	initialize_adc();
 
 	while(1)
 	{
 		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
 		gpio_pin_reset(LED1_GPIO_Port, LED1_Pin);
-		delay(3000000);
+		delay(1000000);
 
-		usart_transmit(buffer, 6);
+		ADC1->CR |= ADC_CR_ADSTART; // Start conversion
 
 		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
 		gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
-		delay(3000000);
+		delay(1000000);
 
 		// Echo bytes
 		usart_transmit(rx_buffer, rx_count);
@@ -94,7 +95,7 @@ void initialize_gpio()
 	GPIOA->AFR[0] = (GPIOA->AFR[0] & (~GPIO_AFRL_AFSEL2)) | (0x2 << GPIO_AFRL_AFSEL2_Pos) ; // Alternate function selection = AF2 (TIM2_CH3)
 	configure_gpio_pin(GPIOA, GPIO_PIN_2, ALTERNATE_FUNCTION, PUSH_PULL, LOW, NO_PUPD);
 
-	configure_gpio_pin(GPIOA, GPIO_PIN_1, ANALOG, PUSH_PULL, LOW, NO_PUPD); // Configure PA3 (V_SENSOR)
+	configure_gpio_pin(GPIOA, GPIO_PIN_3, ANALOG, PUSH_PULL, LOW, NO_PUPD); // Configure PA3 (V_SENSOR)
 
 	// Configure PB6 (USART TX)
 	GPIOB->AFR[0] = (GPIOB->AFR[0] & (~GPIO_AFRL_AFSEL6)) | (0x0 << GPIO_AFRL_AFSEL6_Pos) ; // Alternate function selection = AF0 (USART1_TX)
@@ -138,12 +139,35 @@ void initialize_tim2()
 	 // Configure TIM2 for PWM
 	 TIM2->PSC = 31; // Clock prescalar
 	 TIM2->ARR = 20000; // Auto reload value
-	 TIM2->CCR3 = SERVO_PERIOD_MAX; // Channel 3 compare value
+	 TIM2->CCR3 = 1000; // Channel 3 compare value
 	 TIM2->CCMR2 |= TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1 ; // PWM mode 1
 	 TIM2->CCMR2 |= TIM_CCMR2_OC3PE; // Enable output compare 3 preload
 	 TIM2->CCER |= TIM_CCER_CC3E; // Compare 3 output enable
 	 TIM2->CR1 |= TIM_CR1_CEN; // Enable timer
 	 TIM2->EGR = TIM_EGR_UG; // Enable update generation
+}
+
+void initialize_adc()
+{
+	// Enable ADC peripheral clock
+	 RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+
+	 // Calibrate ADC
+	 ADC1->CR |= ADC_CR_ADCAL; // Start ADC calibration
+	 while ((ADC1->CR & ADC_CR_ADCAL) == ADC_CR_ADCAL); // Wait for ADC calibration to complete
+
+	 // Configure ADC
+	 ADC1->CHSELR |= ADC_CHSELR_CHSEL3; // Enable channel 3 for conversion
+	 ADC1->IER |= ADC_IER_EOCIE; // Enable end of conversion interrupt
+	 ADC1->ISR |= ADC_ISR_ADRDY; // Set ADC to not ready
+	 ADC1->CR |= ADC_CR_ADEN; // Enable ADC
+	 while ((ADC1->ISR & ADC_ISR_ADRDY) != ADC_ISR_ADRDY); // Wait for ADC to be ready
+
+	// Enable ADC interrupt line in NVIC
+	__disable_irq();
+	NVIC_EnableIRQ(ADC1_COMP_IRQn);
+	NVIC_SetPriority(ADC1_COMP_IRQn, 0);
+	__enable_irq();
 }
 
 void usart_transmit(uint8_t* data, uint8_t size)
@@ -198,6 +222,16 @@ void USART1_IRQHandler()
 	else if ((USART1->ISR & USART_ISR_ORE) == USART_ISR_ORE)
 	{
 		error_handler();
+	}
+}
+
+void ADC_COMP_IRQHandler()
+{
+	// ADC end of conversion interrupt
+	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
+	{
+		uint16_t value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
+		usart_transmit((uint8_t*) &value, 2);
 	}
 }
 
