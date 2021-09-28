@@ -102,9 +102,9 @@
 // Function prototypes
 void initialize_system();
 void initialize_tim2();
-void initialize_tim3();
 void initialize_tim6();
 void initialize_tim7();
+void initialize_tim21();
 void initialize_tim22();
 void initialize_adc();
 void error_handler();

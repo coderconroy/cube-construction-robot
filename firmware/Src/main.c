@@ -13,9 +13,9 @@ int main(void)
 	initialize_usart_hal();
 	initialize_adc();
 	initialize_tim2();
-	initialize_tim3();
 	initialize_tim6();
 	initialize_tim7();
+	initialize_tim21();
 	initialize_tim22();
 
 	while(1)
@@ -104,24 +104,6 @@ void initialize_tim2()
 	 TIM2->EGR = TIM_EGR_UG; // Enable update generation
 }
 
-void initialize_tim3()
-{
-	//	 Enable TIM3 peripheral clock
-	 RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
-
-	// Configure TIM3
-	TIM3->PSC = (uint16_t) 31999; // Set prescalar
-	TIM3->ARR = (uint16_t) 999; // Set auto-reload register value
-	TIM3->DIER |= TIM_DIER_UIE; // Enable update interrupt
-	TIM3->CR1 |= TIM_CR1_CEN; // Enable counter
-
-	//	 Enable TIM3 interrupt line in NVIC
-	__disable_irq();
-	NVIC_EnableIRQ(TIM3_IRQn);
-	NVIC_SetPriority(TIM3_IRQn, 0);
-	__enable_irq();
-}
-
 void initialize_tim6()
 {
 	// Enable TIM6 peripheral clock
@@ -158,6 +140,24 @@ void initialize_tim7()
 	__enable_irq();
 }
 
+void initialize_tim21()
+{
+	// Enable TIM21 peripheral clock
+	 RCC->APB2ENR |= RCC_APB2ENR_TIM21EN;
+
+	// Configure TIM21
+	TIM21->PSC = (uint16_t) 31999; // Set prescalar
+	TIM21->ARR = (uint16_t) 999; // Set auto-reload register value
+	TIM21->DIER |= TIM_DIER_UIE; // Enable update interrupt
+	TIM21->CR1 |= TIM_CR1_CEN; // Enable counter
+
+	// Enable TIM21 interrupt line in NVIC
+	__disable_irq();
+	NVIC_EnableIRQ(TIM21_IRQn);
+	NVIC_SetPriority(TIM21_IRQn, 0);
+	__enable_irq();
+}
+
 void initialize_tim22()
 {
 	// Enable TIM22 peripheral clock
@@ -181,16 +181,6 @@ void USART1_IRQHandler()
 	usart_handle_interrupt();
 }
 
-void TIM3_IRQHandler()
-{
-	// TIM3 update interrupt
-	if ((TIM3->SR & TIM_SR_UIF) == TIM_SR_UIF)
-	{
-		TIM3->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		gpio_pin_toggle(LED1_GPIO_Port, LED1_Pin);
-	}
-}
-
 void TIM6_DAC_IRQHandler()
 {
 	// TIM6 update interrupt
@@ -210,22 +200,33 @@ void TIM7_IRQHandler()
 	}
 }
 
+void TIM21_IRQHandler()
+{
+	// TIM21 update interrupt
+	if ((TIM21->SR & TIM_SR_UIF) == TIM_SR_UIF)
+	{
+		TIM21->SR &= ~TIM_SR_UIF; // Clear interrupt flag
+		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
+	}
+}
+
 void TIM22_IRQHandler()
 {
 	// TIM22 update interrupt
 	if ((TIM22->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM22->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
+		gpio_pin_toggle(LED1_GPIO_Port, LED1_Pin);
 	}
 }
 
+uint16_t value;
 void ADC_COMP_IRQHandler()
 {
 	// ADC end of conversion interrupt
 	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
 	{
-		uint16_t value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
+		value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
 		usart_transmit((uint8_t*) &value, 2);
 	}
 }
