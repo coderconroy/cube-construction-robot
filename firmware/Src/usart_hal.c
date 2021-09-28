@@ -5,7 +5,6 @@ uint8_t tx_buffer[TX_BUFFER_SIZE]; // Bytes to be transmitted
 uint8_t tx_read_index = 0; // Index of next byte to be transmitted in TX buffer
 uint8_t tx_write_index = 0; // Index of position in TX buffer next byte will be written to
 
-
 // USART RX state variables
 uint8_t rx_buffer[RX_BUFFER_SIZE]; // Buffer to store received bytes
 uint8_t rx_read_index = 0; // Index of next byte to be read in RX buffer
