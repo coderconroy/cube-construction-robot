@@ -21,24 +21,16 @@ int main(void)
 	// Configure peripherals
 	initialize_gpio();
 	initialize_usart();
-	initialize_tim2();
 	initialize_adc();
+	initialize_tim2();
+	initialize_tim6();
+	initialize_tim7();
+	initialize_tim21();
+	initialize_tim22();
 
 	while(1)
 	{
-		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
-		gpio_pin_reset(LED1_GPIO_Port, LED1_Pin);
-		delay(1000000);
 
-		ADC1->CR |= ADC_CR_ADSTART; // Start conversion
-
-		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
-		gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
-		delay(1000000);
-
-		// Echo bytes
-		usart_transmit(rx_buffer, rx_count);
-		rx_count = 0;
 	}
 }
 
@@ -131,22 +123,6 @@ void initialize_usart()
 	__enable_irq();
 }
 
-void initialize_tim2()
-{
-	// Enable TIM2 peripheral clock
-	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-
-	 // Configure TIM2 for PWM
-	 TIM2->PSC = 31; // Clock prescalar
-	 TIM2->ARR = 20000; // Auto reload value
-	 TIM2->CCR3 = 1000; // Channel 3 compare value
-	 TIM2->CCMR2 |= TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1 ; // PWM mode 1
-	 TIM2->CCMR2 |= TIM_CCMR2_OC3PE; // Enable output compare 3 preload
-	 TIM2->CCER |= TIM_CCER_CC3E; // Compare 3 output enable
-	 TIM2->CR1 |= TIM_CR1_CEN; // Enable timer
-	 TIM2->EGR = TIM_EGR_UG; // Enable update generation
-}
-
 void initialize_adc()
 {
 	// Enable ADC peripheral clock
@@ -168,6 +144,68 @@ void initialize_adc()
 	NVIC_EnableIRQ(ADC1_COMP_IRQn);
 	NVIC_SetPriority(ADC1_COMP_IRQn, 0);
 	__enable_irq();
+}
+
+void initialize_tim2()
+{
+	// Enable TIM2 peripheral clock
+	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+
+	 // Configure TIM2 for PWM
+	 TIM2->PSC = 31; // Clock prescalar
+	 TIM2->ARR = 19999; // Auto reload value
+	 TIM2->CCR3 = 1000; // Channel 3 compare value
+	 TIM2->CCMR2 |= TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1 ; // PWM mode 1
+	 TIM2->CCMR2 |= TIM_CCMR2_OC3PE; // Enable output compare 3 preload
+	 TIM2->CCER |= TIM_CCER_CC3E; // Compare 3 output enable
+	 TIM2->CR1 |= TIM_CR1_CEN; // Enable timer
+	 TIM2->EGR = TIM_EGR_UG; // Enable update generation
+}
+
+void initialize_tim6()
+{
+	// Enable TIM6 peripheral clock
+	 RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+
+	// Configure TIM6
+	TIM6->PSC = (uint16_t) 31999; // Set prescalar
+	TIM6->ARR = (uint16_t) 999; // Set auto-reload register value
+	TIM6->DIER |= TIM_DIER_UIE; // Enable update interrupt
+	TIM6->CR1 |= TIM_CR1_CEN; // Enable counter
+
+	// Enable TIM6 interrupt line in NVIC
+	__disable_irq();
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	NVIC_SetPriority(TIM6_DAC_IRQn, 0);
+	__enable_irq();
+}
+
+void initialize_tim7()
+{
+	// Enable TIM7 peripheral clock
+	 RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
+
+	// Configure TIM7
+	TIM7->PSC = (uint16_t) 31999; // Set prescalar
+	TIM7->ARR = (uint16_t) 499; // Set auto-reload register value
+	TIM7->DIER |= TIM_DIER_UIE; // Enable update interrupt
+	TIM7->CR1 |= TIM_CR1_CEN; // Enable counter
+
+	// Enable TIM6 interrupt line in NVIC
+	__disable_irq();
+	NVIC_EnableIRQ(TIM7_IRQn);
+	NVIC_SetPriority(TIM7_IRQn, 0);
+	__enable_irq();
+}
+
+void initialize_tim21()
+{
+
+}
+
+void initialize_tim22()
+{
+
 }
 
 void usart_transmit(uint8_t* data, uint8_t size)
@@ -194,12 +232,6 @@ void usart_transmit(uint8_t* data, uint8_t size)
 	USART1->TDR = tx_data[tx_count++];
 }
 
-void delay(int count)
-{
-	volatile int i = 0;
-	while (i < count) i++;
-}
-
 void USART1_IRQHandler()
 {
 	// Transmission complete interrupt
@@ -223,6 +255,40 @@ void USART1_IRQHandler()
 	{
 		error_handler();
 	}
+}
+
+void TIM6_DAC_IRQHandler()
+{
+	// TIM6 update interrupt
+	if ((TIM6->SR & TIM_SR_UIF) == TIM_SR_UIF)
+	{
+		TIM6->SR &= ~TIM_SR_UIF; // Clear interrupt flag
+		gpio_pin_toggle(LED0_GPIO_Port, LED0_Pin);
+		ADC1->CR |= ADC_CR_ADSTART; // Start conversion
+	}
+}
+
+void TIM7_IRQHandler()
+{
+	// TIM7 update interrupt
+	if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
+	{
+		TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag
+		gpio_pin_toggle(LED0_GPIO_Port, LED1_Pin);
+		// Echo bytes
+		usart_transmit(rx_buffer, rx_count);
+		rx_count = 0;
+	}
+}
+
+void TIM21_IRQHandler()
+{
+
+}
+
+void TIM22_IRQHandler()
+{
+
 }
 
 void ADC_COMP_IRQHandler()
