@@ -1,14 +1,15 @@
 #include "usart_hal.h"
 
 // USART TX state variables
-uint8_t tx_count = 0; // Number of bytes transmitted in transmission operation
-uint8_t tx_size = 0; // Total number of bytes to transmit in transmission operation
-uint8_t* tx_data = 0; // Bytes to be transmitted
-bool tx_busy = false; // Flag to indicate USART data is busy being transmitted
+uint8_t tx_buffer[TX_BUFFER_SIZE]; // Bytes to be transmitted
+uint8_t tx_read_index = 0; // Index of next byte to be transmitted in TX buffer
+uint8_t tx_write_index = 0; // Index of position in TX buffer next byte will be written to
+
 
 // USART RX state variables
 uint8_t rx_buffer[RX_BUFFER_SIZE]; // Buffer to store received bytes
-uint8_t rx_count = 0; // Number of bytes available in rx_buffer
+uint8_t rx_read_index = 0; // Index of next byte to be read in RX buffer
+uint8_t rx_write_index = 0; // Index of position in RX buffer next byte will be written to
 
 void initialize_usart_hal()
 {
@@ -28,6 +29,7 @@ void initialize_usart_hal()
 	USART1->RQR |= USART_RQR_RXFRQ;// Clear byte received interrupt flag
 
 	// Enable USART1 interrupt line in NVIC
+	// NOTE: The interrupt priority must be 0 as the interrupt handler assumes it cannot be interrupted
 	__disable_irq();
 	NVIC_EnableIRQ(USART1_IRQn);
 	NVIC_SetPriority(USART1_IRQn, 0);
@@ -35,30 +37,37 @@ void initialize_usart_hal()
 	__enable_irq();
 }
 
-void usart_transmit(uint8_t* data, uint8_t size)
+void usart_transmit(const uint8_t* data, const uint8_t size)
 {
 	// No data provided for transmission
 	if (size <= 0)
 		return;
 
-	// Initialize transmission state variables
-	tx_busy = true;
-	tx_data = data;
-	tx_size = size;
-	tx_count = 0;
+	// Copy data to TX buffer
+	for (uint8_t i = 0; i < size; i++)
+	{
+		tx_buffer[tx_write_index] = data[i];
+		tx_write_index= (tx_write_index + 1) % TX_BUFFER_SIZE;
+	}
 
-	// Transmit first byte
-	USART1->TDR = tx_data[tx_count++];
+	// Transmit first byte if there are no previous bytes ahead in the transmission queue
+	if (bytes_waiting() == size)
+		USART1->TDR = tx_buffer[tx_read_index];
 }
 
-void usart_receive(uint8_t* data, uint8_t size)
+void usart_receive(uint8_t* const data, const uint8_t size)
 {
 
 }
 
 uint8_t bytes_available()
 {
-	return rx_count;
+	return (((int16_t) rx_write_index) - rx_read_index) % RX_BUFFER_SIZE;
+}
+
+uint8_t bytes_waiting()
+{
+	return (((int16_t) tx_write_index) - tx_read_index) % TX_BUFFER_SIZE;
 }
 
 void usart_handle_interrupt()
@@ -68,16 +77,18 @@ void usart_handle_interrupt()
 	{
 		// Clear transmission complete flag
 		USART1->ICR |= USART_ICR_TCCF;
-		// Transmit Byte
-		if (tx_count < tx_size)
-			USART1->TDR = tx_data[tx_count++];
-		else
-			tx_busy = false;
+
+		// Update transmission state variables to reflect completed transmission
+		tx_read_index = (tx_read_index + 1) % TX_BUFFER_SIZE;
+
+		// Transmit byte
+		if (bytes_waiting())
+			USART1->TDR = tx_buffer[tx_read_index];
 	}
 	// Byte received interrupt
 	else if ((USART1->ISR & USART_ISR_RXNE) == USART_ISR_RXNE)
 	{
-		rx_buffer[rx_count++] = USART1->RDR; // Store byte
+//		rx_buffer[rx_count++] = USART1->RDR; // Store byte
 	}
 	// Receiver overrun error interrupt
 	else if ((USART1->ISR & USART_ISR_ORE) == USART_ISR_ORE)

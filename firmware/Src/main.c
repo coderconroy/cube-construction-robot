@@ -1,12 +1,14 @@
 #include "main.h"
 
 // General
-uint8_t* buffer =(uint8_t*) "Hello\n";
-
+uint8_t arr[256];
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings
 	initialize_system();
+
+	for (int i = 0; i < 256; i++)
+		arr[i] = i;
 
 	// Configure peripherals
 	initialize_gpio_hal();
@@ -227,7 +229,23 @@ void ADC_COMP_IRQHandler()
 	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
 	{
 		value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
-		usart_transmit((uint8_t*) &value, 2);
+//		usart_transmit((uint8_t*) &value, 2);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 16);
+//		usart_transmit(arr, 15);
 	}
 }
 

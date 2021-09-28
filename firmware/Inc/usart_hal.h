@@ -3,10 +3,10 @@
 
 // Includes
 #include "stm32l072xx.h"
-#include "stdbool.h"
 
 // Defines
-#define RX_BUFFER_SIZE 255 // Size of buffer to store received bytes before they are read
+#define TX_BUFFER_SIZE 256 // Size of buffer to store bytes waiting to be transmitted
+#define RX_BUFFER_SIZE 256 // Size of buffer to store received bytes before they are read
 
 // Function prototypes
 
@@ -21,7 +21,7 @@ void initialize_usart_hal();
  *@param [in] data Source bytes to be transmitted.
  *@param [in] size Number of bytes to transmit.
  */
-void usart_transmit(uint8_t* data, uint8_t size);
+void usart_transmit(const uint8_t* data, const uint8_t size);
 
 
 /**
@@ -31,7 +31,7 @@ void usart_transmit(uint8_t* data, uint8_t size);
  *@param [out] data Destination of received bytes.
  *@param [in] size Number of bytes to transmit.
  */
-void usart_receive(uint8_t* data, uint8_t size);
+void usart_receive(uint8_t* const data, const uint8_t size);
 
 /**
  * Get the number of received bytes available.
@@ -39,6 +39,13 @@ void usart_receive(uint8_t* data, uint8_t size);
  * @return Number of bytes available.
  */
 uint8_t bytes_available();
+
+/**
+ * Get the number of bytes that are in queue for waiting for transmission.
+ *
+ * @return Number of bytes waiting.
+ */
+uint8_t bytes_waiting();
 
 /**
  * Handles all interrupts associated with the USART. This must be placed in the USART ISR.

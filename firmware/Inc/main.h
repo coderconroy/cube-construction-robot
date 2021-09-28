@@ -5,7 +5,6 @@
 #include "stm32l072xx.h"
 #include "gpio_hal.h"
 #include "usart_hal.h"
-#include "stdbool.h"
 
 // GPIO defines
 #define X_LIM_Pin GPIO_PIN_1
