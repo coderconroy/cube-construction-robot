@@ -38,14 +38,14 @@ void usart_receive(uint8_t* const data, const uint8_t size);
  *
  * @return Number of bytes available.
  */
-uint8_t bytes_available();
+uint8_t usart_bytes_available();
 
 /**
  * Get the number of bytes that are in queue for waiting for transmission.
  *
  * @return Number of bytes waiting.
  */
-uint8_t bytes_waiting();
+uint8_t usart_bytes_waiting();
 
 /**
  * Handles all interrupts associated with the USART. This must be placed in the USART ISR.

@@ -229,23 +229,7 @@ void ADC_COMP_IRQHandler()
 	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
 	{
 		value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
-//		usart_transmit((uint8_t*) &value, 2);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 16);
-//		usart_transmit(arr, 15);
+		usart_transmit((uint8_t*) &value, 2);
 	}
 }
 

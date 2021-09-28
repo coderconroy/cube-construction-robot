@@ -51,21 +51,29 @@ void usart_transmit(const uint8_t* data, const uint8_t size)
 	}
 
 	// Transmit first byte if there are no previous bytes ahead in the transmission queue
-	if (bytes_waiting() == size)
+	if (usart_bytes_waiting() == size)
 		USART1->TDR = tx_buffer[tx_read_index];
 }
 
 void usart_receive(uint8_t* const data, const uint8_t size)
 {
-
+	for (uint8_t i = 0; i < size; i++)
+	{
+		// Copy bytes from TX buffer to read destination
+		if (usart_bytes_available() > 0)
+			data[i] = rx_buffer[rx_read_index];
+		else
+			data[i] = 0x0;
+		rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
+	}
 }
 
-uint8_t bytes_available()
+uint8_t usart_bytes_available()
 {
 	return (((int16_t) rx_write_index) - rx_read_index) % RX_BUFFER_SIZE;
 }
 
-uint8_t bytes_waiting()
+uint8_t usart_bytes_waiting()
 {
 	return (((int16_t) tx_write_index) - tx_read_index) % TX_BUFFER_SIZE;
 }
@@ -82,13 +90,14 @@ void usart_handle_interrupt()
 		tx_read_index = (tx_read_index + 1) % TX_BUFFER_SIZE;
 
 		// Transmit byte
-		if (bytes_waiting())
+		if (usart_bytes_waiting())
 			USART1->TDR = tx_buffer[tx_read_index];
 	}
 	// Byte received interrupt
 	else if ((USART1->ISR & USART_ISR_RXNE) == USART_ISR_RXNE)
 	{
-//		rx_buffer[rx_count++] = USART1->RDR; // Store byte
+		rx_buffer[rx_write_index] = USART1->RDR; // Store byte
+		rx_write_index = (rx_write_index + 1) % RX_BUFFER_SIZE;
 	}
 	// Receiver overrun error interrupt
 	else if ((USART1->ISR & USART_ISR_ORE) == USART_ISR_ORE)
