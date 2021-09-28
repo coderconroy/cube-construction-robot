@@ -1,8 +1,10 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
+// Includes
 #include "stm32l072xx.h"
 #include "gpio_hal.h"
+#include "usart_hal.h"
 #include "stdbool.h"
 
 // GPIO defines
@@ -99,15 +101,12 @@
 
 // Function prototypes
 void initialize_system();
-void initialize_gpio();
-void initialize_usart();
 void initialize_tim2();
+void initialize_tim3();
 void initialize_tim6();
 void initialize_tim7();
-void initialize_tim21();
 void initialize_tim22();
 void initialize_adc();
-void usart_transmit(uint8_t*, uint8_t);
 void error_handler();
 
 #endif /* MAIN_H_ */
