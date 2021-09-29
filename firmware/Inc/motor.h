@@ -77,6 +77,12 @@
 #define X_MOT_M0_Pin GPIO_PIN_5
 #define X_MOT_M0_GPIO_Port GPIOB
 
+//// Motor base timer defines
+//#define X_MOT_TIM TIM6
+//#define Y_MOT_TIM TIM7
+//#define Z_MOT_TIM TIM21
+//#define R_MOT_TIM TIM21
+
 // Motor direction defines
 #define X_LEFT GPIO_PIN_LOW
 #define X_RIGHT GPIO_PIN_HIGH
@@ -96,7 +102,7 @@
 #define Y_MIN_POS Y_REF_POS
 #define Y_MAX_POS 79000
 #define Z_REF_POS -9000
-#define Z_MIN POS 0
+#define Z_MIN_POS 0
 #define Z_MAX_POS 151000
 #define R_REF_POS 0
 #define R_MIN_POS -5000 // Anti-clockwise
@@ -117,8 +123,7 @@ typedef enum
 	IDLE = 0x2,
 	CALIBRATE = 0x4,
 	READY = 0x8,
-	RUN = 0x10,
-	DEMO = 0x20
+	RUN = 0x10
 } motor_sys_state_t;
 
 // Function prototypes
@@ -144,23 +149,71 @@ void motor_disable_all();
 void motor_calibrate();
 
 /**
+ * Read the motor control state
+ *
+ * @return Motor control system state
+ */
+const motor_sys_state_t motor_system_state();
+
+/**
+ * Set the target position for the system on the X axis.
+ * If the target position is outside of [X_MIN_POS, X_MAX_POS], the value will not be updated
+ *
+ * @param [in] pos Step position on X axis (1/32 microstepping).
+ */
+void motor_x_target_pos(const int pos);
+
+/**
+ * Set the target position for the system on the Y axis.
+ * If the target position is outside of [Y_MIN_POS, Y_MAX_POS], the value will not be updated
+ *
+ * @param [in] pos Step position on Y axis (1/32 microstepping).
+ */
+void motor_y_target_pos(const int pos);
+
+/**
+ * Set the target position for the system on the Z axis.
+ * If the target position is outside of [Z_MIN_POS, Z_MAX_POS], the value will not be updated
+ *
+ * @param [in] pos Step position on Z axis (1/32 microstepping).
+ */
+void motor_z_target_pos(const int pos);
+
+/**
+ * Set the target position for the system on the R axis.
+ * If the target position is outside of [R_MIN_POS, R_MAX_POS], the value will not be updated
+ *
+ * @param [in] pos Step position on R axis (1/32 microstepping).
+ */
+void motor_r_target_pos(const int pos);
+
+/**
  * Trigger motor to take next step for the X motor. The nature of the step depends on the motor state and configuration.
+ * This must be called from the timer interrupt for the base timer for the motor
  */
 void motor_x_execute_step();
 
 /**
  * Trigger motor to take next step for the Y motor. The nature of the step depends on the motor state and configuration.
+ * This must be called from the timer interrupt for the base timer for the motor
  */
 void motor_y_execute_step();
 
 /**
  * Trigger motor to take next step for the Z motor. The nature of the step depends on the motor state and configuration.
+ * This must be called from the timer interrupt for the base timer for the motor
  */
 void motor_z_execute_step();
 
 /**
  * Trigger motor to take next step for the R motor. The nature of the step depends on the motor state and configuration.
+ * This must be called from the timer interrupt for the base timer for the motor
  */
 void motor_r_execute_step();
+
+/**
+ * Initiate motor run to target positions. The motor control state will be set to READY when all motors have reached their target position.
+ */
+void motor_run();
 
 #endif /* MOTOR_H_ */

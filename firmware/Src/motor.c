@@ -21,6 +21,9 @@ bool y_enable = false;
 bool z_enable = false;
 bool r_enable = false;
 
+// Function prototypes
+static void update_run_state();
+
 void initialize_motor()
 {
 	// Initialize state
@@ -81,34 +84,69 @@ void motor_calibrate()
 	z_pos = Z_REF_POS;
 	r_pos = R_REF_POS;
 
-	// Initialize target position
-	x_target_pos = X_MIN_POS;
-	y_target_pos = X_MIN_POS;
-	z_target_pos = X_MIN_POS;
-	r_target_pos = X_REF_POS;
-
-	// Initialize next state
-	system_state = READY;
-
-	// Run motors to initial target position
-	system_state = RUN;
-	while ((x_pos != x_target_pos) || (y_pos != y_target_pos) || (z_pos != z_target_pos) || (r_pos != r_target_pos));
-
 	// Initialize next state
 	system_state = READY;
 
 	// Initialize target position
-	x_target_pos = X_MAX_POS / 2;
-	y_target_pos = Y_MAX_POS / 2;
-	z_target_pos = Z_MAX_POS / 2;
-	r_target_pos = R_MIN_POS;
+	motor_x_target_pos(X_MIN_POS);
+	motor_y_target_pos(Y_MIN_POS);
+	motor_z_target_pos(Z_MIN_POS);
+	motor_r_target_pos(R_REF_POS);
 
 	// Run motors to initial target position
 	system_state = RUN;
-	while ((x_pos != x_target_pos) || (y_pos != y_target_pos) || (z_pos != z_target_pos) || (r_pos != r_target_pos));
 
-	// Initialize next state
-	system_state = READY;
+	// Wait for motor runs to complete (system state will change to READY)
+	while ((system_state & READY) == 0);
+}
+
+const motor_sys_state_t motor_system_state()
+{
+	return system_state;
+}
+
+void motor_x_target_pos(const int pos)
+{
+	// Check current state is valid for function call
+	if ((system_state & READY) == 0)
+		return;
+
+	//Update target position if valid
+	if (pos >= X_MIN_POS && pos <= X_MAX_POS)
+		x_target_pos = pos;
+}
+
+void motor_y_target_pos(const int pos)
+{
+	// Check current state is valid for function call
+	if ((system_state & READY) == 0)
+		return;
+
+	//Update target position if valid
+	if (pos >= Y_MIN_POS && pos <= Y_MAX_POS)
+		y_target_pos = pos;
+}
+
+void motor_z_target_pos(const int pos)
+{
+	// Check current state is valid for function call
+	if ((system_state & READY) == 0)
+		return;
+
+	//Update target position if valid
+	if (pos >= Z_MIN_POS && pos <= Z_MAX_POS)
+		z_target_pos = pos;
+}
+
+void motor_r_target_pos(const int pos)
+{
+	// Check current state is valid for function call
+	if ((system_state & READY) == 0)
+		return;
+
+	//Update target position if valid
+	if (pos >= R_MIN_POS && pos <= R_MAX_POS)
+		r_target_pos = pos;
 }
 
 void motor_x_execute_step()
@@ -138,6 +176,10 @@ void motor_x_execute_step()
 
 			// Execute step
 			gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
+
+			// Initiate RUN state review when target position is reached
+			if (x_pos == x_target_pos)
+				update_run_state();
 		}
 	}
 }
@@ -169,6 +211,10 @@ void motor_y_execute_step()
 
 			// Execute step
 			gpio_pin_toggle(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
+
+			// Initiate RUN state review when target position is reached
+			if (y_pos == y_target_pos)
+				update_run_state();
 		}
 	}
 }
@@ -200,6 +246,10 @@ void motor_z_execute_step()
 
 			// Execute step
 			gpio_pin_toggle(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);
+
+			// Initiate RUN state review when target position is reached
+			if (z_pos == z_target_pos)
+				update_run_state();
 		}
 	}
 }
@@ -226,6 +276,37 @@ void motor_r_execute_step()
 
 			// Execute step
 			gpio_pin_toggle(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
+
+			// Initiate RUN state review when target position is reached
+			if (r_pos == r_target_pos)
+				update_run_state();
 		}
 	}
+}
+
+void motor_run()
+{
+	// Check current state is valid for function call
+	if ((system_state & (READY)) == 0)
+		return;
+
+	// Initialize state
+	system_state = RUN;
+}
+
+/**
+ * Check if all motors have reached their target position and set system state to READY if true.
+ * Only intended for use in the RUN motor control state.
+ *
+ * @return True if all motors have reached their target position. False otherwise.
+ */
+static void update_run_state()
+{
+	// Check current state is valid for function call
+	if ((system_state & RUN) == 0)
+		return;
+
+	// Check if all motors have reached their target position
+	if ((x_pos == x_target_pos) && (y_pos == y_target_pos) && (z_pos == z_target_pos) && (r_pos == r_target_pos))
+		system_state = READY;
 }

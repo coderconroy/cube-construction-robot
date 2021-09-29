@@ -17,7 +17,22 @@ int main(void)
 	initialize_tim22();
 	initialize_motor();
 
-//	motor_calibrate();
+	// Calibrate stepper motors
+	motor_calibrate();
+
+	// Move to center
+	// Initialize target position
+	motor_x_target_pos(X_MAX_POS / 2);
+	motor_y_target_pos(Y_MAX_POS / 2);
+	motor_z_target_pos(Z_MAX_POS / 2);
+	motor_r_target_pos(R_MAX_POS);
+
+	// Run motors to target position
+	motor_run(); // Initiate motor run
+	while(motor_system_state() != READY); // Wait for run to complete
+
+	gpio_pin_set(LED0_GPIO_Port, LED0_Pin);
+	gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
 
 	while(1)
 	{
@@ -188,7 +203,7 @@ void TIM6_DAC_IRQHandler()
 	if ((TIM6->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM6->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		motor_x_execute_step();
+		motor_x_execute_step(TIM6);
 	}
 }
 
@@ -198,7 +213,7 @@ void TIM7_IRQHandler()
 	if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		motor_y_execute_step();
+		motor_y_execute_step(TIM7);
 	}
 }
 
@@ -208,7 +223,7 @@ void TIM21_IRQHandler()
 	if ((TIM21->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM21->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		motor_z_execute_step();
+		motor_z_execute_step(TIM21);
 	}
 }
 
@@ -218,7 +233,7 @@ void TIM22_IRQHandler()
 	if ((TIM22->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM22->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		motor_r_execute_step();
+		motor_r_execute_step(TIM22);
 	}
 }
 
