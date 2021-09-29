@@ -27,8 +27,8 @@ typedef enum
 
 typedef enum
 {
-	GPIO_STATE_LOW = 0x0U,
-	GPIO_STATE_HIGH = 0x1U
+	GPIO_PIN_LOW = 0x0U,
+	GPIO_PIN_HIGH = 0x1U
 } gpio_pin_state_t;
 
 typedef enum
@@ -104,12 +104,21 @@ void gpio_pin_reset(GPIO_TypeDef* const port, const gpio_pin_t pin);
  */
 void gpio_pin_toggle(GPIO_TypeDef* const port, const gpio_pin_t pin);
 
+/*
+ * Set GPIO pin logic state.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ * @param [in] state Desired GPIO pin state
+ */
+void gpio_pin_write(GPIO_TypeDef* const port, const gpio_pin_t pin, const gpio_pin_state_t state);
+
 /**
- * Get the current logic state of the GPIO pin.
+ * Get the current input logic state of the GPIO pin.
  *
  * @param [in] port GPIO port of pin
  * @param [in] pin GPIO pin number
  */
-const gpio_pin_state_t gpio_pin_state(GPIO_TypeDef* const port, const gpio_pin_t pin);
+const gpio_pin_state_t gpio_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin);
 
 #endif /* GPIO_HAL_H_ */
