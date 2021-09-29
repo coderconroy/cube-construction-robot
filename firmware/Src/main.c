@@ -112,8 +112,8 @@ void initialize_tim6()
 	 RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
 
 	// Configure TIM6
-	TIM6->PSC = (uint16_t) 31999; // Set prescalar
-	TIM6->ARR = (uint16_t) 999; // Set auto-reload register value
+	TIM6->PSC = (uint16_t) 31; // Set prescalar
+	TIM6->ARR = (uint16_t) 199; // Set auto-reload register value
 	TIM6->DIER |= TIM_DIER_UIE; // Enable update interrupt
 	TIM6->CR1 |= TIM_CR1_CEN; // Enable counter
 
@@ -130,8 +130,8 @@ void initialize_tim7()
 	 RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
 
 	// Configure TIM7
-	TIM7->PSC = (uint16_t) 31999; // Set prescalar
-	TIM7->ARR = (uint16_t) 499; // Set auto-reload register value
+	TIM7->PSC = (uint16_t) 31; // Set prescalar
+	TIM7->ARR = (uint16_t) 199; // Set auto-reload register value
 	TIM7->DIER |= TIM_DIER_UIE; // Enable update interrupt
 	TIM7->CR1 |= TIM_CR1_CEN; // Enable counter
 
@@ -148,8 +148,8 @@ void initialize_tim21()
 	 RCC->APB2ENR |= RCC_APB2ENR_TIM21EN;
 
 	// Configure TIM21
-	TIM21->PSC = (uint16_t) 31999; // Set prescalar
-	TIM21->ARR = (uint16_t) 999; // Set auto-reload register value
+	TIM21->PSC = (uint16_t) 31; // Set prescalar
+	TIM21->ARR = (uint16_t) 99; // Set auto-reload register value
 	TIM21->DIER |= TIM_DIER_UIE; // Enable update interrupt
 	TIM21->CR1 |= TIM_CR1_CEN; // Enable counter
 
@@ -166,8 +166,8 @@ void initialize_tim22()
 	 RCC->APB2ENR |= RCC_APB2ENR_TIM22EN;
 
 	// Configure TIM22
-	TIM22->PSC = (uint16_t) 31999; // Set prescalar
-	TIM22->ARR = (uint16_t) 499; // Set auto-reload register value
+	TIM22->PSC = (uint16_t) 31; // Set prescalar
+	TIM22->ARR = (uint16_t) 199; // Set auto-reload register value
 	TIM22->DIER |= TIM_DIER_UIE; // Enable update interrupt
 	TIM22->CR1 |= TIM_CR1_CEN; // Enable counter
 

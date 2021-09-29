@@ -27,6 +27,12 @@ typedef enum
 
 typedef enum
 {
+	GPIO_STATE_LOW = 0x0U,
+	GPIO_STATE_HIGH = 0x1U
+} gpio_pin_state_t;
+
+typedef enum
+{
 	INPUT = 0x0U,
 	GENERAL_PURPOSE = 0x1U,
 	ALTERNATE_FUNCTION = 0x2U,
@@ -55,10 +61,55 @@ typedef enum
 } gpio_pupdr_pupd_t;
 
 // Function prototypes
+
+/**
+ * Configure all the registers necessary for GPIO operation.
+ */
 void initialize_gpio_hal();
-void configure_gpio_pin(GPIO_TypeDef*, gpio_pin_t, gpio_moder_mode_t, gpio_otyper_ot_t, gpio_ospeedr_ospeed_t, gpio_pupdr_pupd_t);
-void gpio_pin_set(GPIO_TypeDef*, gpio_pin_t);
-void gpio_pin_reset(GPIO_TypeDef*, gpio_pin_t);
-void gpio_pin_toggle(GPIO_TypeDef*, gpio_pin_t);
+
+/**
+ * Configure individual GPIO pin settings.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ * @param [in] mode GPIO pin mode
+ * @param [in] type GPIO pin output type
+ * @param [in] speed GPIO pin output speed
+ * @param [in] pupd Pull-up pull-down resistor configuration
+ */
+void configure_gpio_pin(GPIO_TypeDef* const port, const gpio_pin_t pin, const gpio_moder_mode_t mode, const gpio_otyper_ot_t type,
+		const gpio_ospeedr_ospeed_t speed, const gpio_pupdr_pupd_t pupd);
+
+/*
+ * Set GPIO pin output to logic high.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ */
+void gpio_pin_set(GPIO_TypeDef* const port, const gpio_pin_t pin);
+
+/*
+ * Set GPIO pin output to logic low.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ */
+void gpio_pin_reset(GPIO_TypeDef* const port, const gpio_pin_t pin);
+
+/*
+ * Set GPIO pin logic state to the opposite of the current logic state.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ */
+void gpio_pin_toggle(GPIO_TypeDef* const port, const gpio_pin_t pin);
+
+/**
+ * Get the current logic state of the GPIO pin.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ */
+const gpio_pin_state_t gpio_pin_state(GPIO_TypeDef* const port, const gpio_pin_t pin);
 
 #endif /* GPIO_HAL_H_ */

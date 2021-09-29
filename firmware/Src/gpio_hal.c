@@ -67,7 +67,8 @@ void initialize_gpio_hal()
 	configure_gpio_pin(GPIOB, GPIO_PIN_7, ALTERNATE_FUNCTION, PUSH_PULL, VERY_HIGH, NO_PUPD);
 }
 
-void configure_gpio_pin(GPIO_TypeDef* port, gpio_pin_t pin, gpio_moder_mode_t mode, gpio_otyper_ot_t type, gpio_ospeedr_ospeed_t speed, gpio_pupdr_pupd_t pupd)
+void configure_gpio_pin(GPIO_TypeDef* const port, const gpio_pin_t pin, const gpio_moder_mode_t mode, const gpio_otyper_ot_t type,
+		const gpio_ospeedr_ospeed_t speed, const gpio_pupdr_pupd_t pupd)
 {
 	port->MODER = (port->MODER & (~(0x3<< (pin * 2)))) | (mode << (pin * 2)); // Port mode
 	port->OTYPER = (port->OTYPER & (~(0x1<< pin))) | (type << pin); // Port mode
@@ -75,24 +76,36 @@ void configure_gpio_pin(GPIO_TypeDef* port, gpio_pin_t pin, gpio_moder_mode_t mo
 	port->PUPDR = (port->PUPDR & (~(0x3<< (pin * 2)))) | (pupd << (pin * 2)); // Port pull-up/pull-down
 }
 
-void gpio_pin_set(GPIO_TypeDef* port, gpio_pin_t pin)
+void gpio_pin_set(GPIO_TypeDef* const port, const gpio_pin_t pin)
 {
 	port->BSRR |= 0x1 << pin;
 }
 
-void gpio_pin_reset(GPIO_TypeDef* port, gpio_pin_t pin)
+void gpio_pin_reset(GPIO_TypeDef* const port, const gpio_pin_t pin)
 {
 	port->BSRR |= 0x1 << (pin + 0x10);
 }
 
-void gpio_pin_toggle(GPIO_TypeDef* port, gpio_pin_t pin)
+void gpio_pin_toggle(GPIO_TypeDef* const port, const gpio_pin_t pin)
 {
 	// Get pin state
-	uint32_t state = port->ODR & (0x1 << pin);
+	gpio_pin_state_t state = gpio_pin_state(port, pin);
 
 	// Set pin to opposite value
-	if (state == (0x1 << pin))
-		gpio_pin_reset(port, pin);
-	else
+	if (state == GPIO_STATE_LOW)
 		gpio_pin_set(port, pin);
+	else
+		gpio_pin_reset(port, pin);
+}
+
+const gpio_pin_state_t gpio_pin_state(GPIO_TypeDef* const port, const gpio_pin_t pin)
+{
+	gpio_pin_state_t state;
+
+	if ((port->ODR & (0x1 << pin)) == (GPIO_STATE_LOW << pin))
+		state = GPIO_STATE_LOW;
+	else
+		state = GPIO_STATE_HIGH;
+
+	return state;
 }

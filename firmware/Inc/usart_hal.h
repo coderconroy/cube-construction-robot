@@ -11,7 +11,7 @@
 // Function prototypes
 
 /**
- * Configures all the registers necessary for USART operation.
+ * Configure all the registers necessary for USART operation.
  */
 void initialize_usart_hal();
 
