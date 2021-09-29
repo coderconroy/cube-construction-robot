@@ -1,8 +1,6 @@
 #include "main.h"
 #include "stdbool.h"
 
-
-
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings

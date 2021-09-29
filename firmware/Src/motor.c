@@ -96,6 +96,19 @@ void motor_calibrate()
 
 	// Initialize next state
 	system_state = READY;
+
+	// Initialize target position
+	x_target_pos = X_MAX_POS / 2;
+	y_target_pos = Y_MAX_POS / 2;
+	z_target_pos = Z_MAX_POS / 2;
+	r_target_pos = R_MIN_POS;
+
+	// Run motors to initial target position
+	system_state = RUN;
+	while ((x_pos != x_target_pos) || (y_pos != y_target_pos) || (z_pos != z_target_pos) || (r_pos != r_target_pos));
+
+	// Initialize next state
+	system_state = READY;
 }
 
 void motor_x_execute_step()
@@ -105,6 +118,28 @@ void motor_x_execute_step()
 		if (x_enable && gpio_pin_read(X_LIM_GPIO_Port, X_LIM_Pin))
 			gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
 	}
+	else if (system_state == RUN)
+	{
+		// Update position
+		if (x_pos != x_target_pos)
+		{
+			// Update direction
+			if (x_pos < x_target_pos)
+				gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_RIGHT);
+			else if (x_pos > x_target_pos)
+				gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
+
+			gpio_pin_state_t direction = gpio_pin_read(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin);
+
+			if (direction == X_LEFT)
+				x_pos--;
+			else
+				x_pos++;
+
+			// Execute step
+			gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
+		}
+	}
 }
 
 void motor_y_execute_step()
@@ -113,6 +148,28 @@ void motor_y_execute_step()
 	{
 		if (y_enable && gpio_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin))
 			gpio_pin_toggle( Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
+	}
+	else if (system_state == RUN)
+	{
+		// Update position
+		if (y_pos != y_target_pos)
+		{
+			// Update direction
+			if (y_pos < y_target_pos)
+				gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_FORWARD);
+			else if (y_pos > y_target_pos)
+				gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
+
+			gpio_pin_state_t direction = gpio_pin_read(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin);
+
+			if (direction == Y_BACKWARD)
+				y_pos--;
+			else
+				y_pos++;
+
+			// Execute step
+			gpio_pin_toggle(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
+		}
 	}
 }
 
@@ -125,15 +182,15 @@ void motor_z_execute_step()
 	}
 	else if (system_state == RUN)
 	{
-		// Update direction
-		if (z_pos < z_target_pos)
-			gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_UP);
-		else if (z_pos > z_target_pos)
-			gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
-
 		// Update position
 		if (z_pos != z_target_pos)
 		{
+			// Update direction
+			if (z_pos < z_target_pos)
+				gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_UP);
+			else if (z_pos > z_target_pos)
+				gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
+
 			gpio_pin_state_t direction = gpio_pin_read(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin);
 
 			if (direction == Z_DOWN)
@@ -149,5 +206,26 @@ void motor_z_execute_step()
 
 void motor_r_execute_step()
 {
+	if (system_state == RUN)
+	{
+		// Update position
+		if (r_pos != r_target_pos)
+		{
+			// Update direction
+			if (r_pos < r_target_pos)
+				gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
+			else if (r_pos > r_target_pos)
+				gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
 
+			gpio_pin_state_t direction = gpio_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
+
+			if (direction == R_COUNTERCLOCKWISE)
+				r_pos--;
+			else
+				r_pos++;
+
+			// Execute step
+			gpio_pin_toggle(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
+		}
+	}
 }
