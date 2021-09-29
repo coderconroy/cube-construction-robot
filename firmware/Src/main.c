@@ -36,16 +36,10 @@ const int HOME_MODE = 0;
 const int CYCLE_MODE = 1;
 int mode = HOME_MODE;
 
-// General
-uint8_t arr[256];
-
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings
 	initialize_system();
-
-	for (int i = 0; i < 256; i++)
-		arr[i] = i;
 
 	// Configure peripherals
 	initialize_gpio_hal();
@@ -58,10 +52,8 @@ int main(void)
 	initialize_tim22();
 
 	// Set motor to sleep mode
-	gpio_pin_write(X_MOT_SLEEP_GPIO_Port, X_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
-	gpio_pin_write(Y_MOT_SLEEP_GPIO_Port, Y_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
-	gpio_pin_write(Z_MOT_SLEEP_GPIO_Port, Z_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
-	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
+	motor_disable_all();
+//	motor_enable_all();
 
 	// Initialize motor directions
 	gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
@@ -270,9 +262,6 @@ void TIM6_DAC_IRQHandler()
 		{
 			if (x_enable && gpio_pin_read(X_LIM_GPIO_Port, X_LIM_Pin))
 				gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
-
-			if (y_enable && gpio_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin))
-				gpio_pin_toggle( Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
 		}
 		else if (mode == CYCLE_MODE)
 		{
@@ -294,7 +283,24 @@ void TIM6_DAC_IRQHandler()
 				// Execute step
 				gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
 			}
+		}
+	}
+}
 
+void TIM7_IRQHandler()
+{
+	// TIM7 update interrupt
+	if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
+	{
+		TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag
+
+		if (mode == HOME_MODE)
+		{
+			if (y_enable && gpio_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin))
+				gpio_pin_toggle( Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
+		}
+		else if (mode == CYCLE_MODE)
+		{
 			if (y_enable)
 			{
 				// Update direction
@@ -313,35 +319,7 @@ void TIM6_DAC_IRQHandler()
 				// Execute step
 				gpio_pin_toggle(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
 			}
-
-			if (r_enable)
-			{
-				// Update direction
-				if (r_pos == R_MIN_POS)
-					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
-				else if (r_pos == R_MAX_POS)
-					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
-
-				// Update position
-				gpio_pin_state_t direction = gpio_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
-				if (direction == R_COUNTERCLOCKWISE)
-					r_pos--;
-				else
-					r_pos++;
-
-				// Execute step
-				gpio_pin_toggle(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
-			}
 		}
-	}
-}
-
-void TIM7_IRQHandler()
-{
-	// TIM7 update interrupt
-	if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
-	{
-		TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag
 	}
 }
 
@@ -387,6 +365,27 @@ void TIM22_IRQHandler()
 	if ((TIM22->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM22->SR &= ~TIM_SR_UIF; // Clear interrupt flag
+		if (mode == CYCLE_MODE)
+		{
+			if (r_enable)
+			{
+				// Update direction
+				if (r_pos == R_MIN_POS)
+					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
+				else if (r_pos == R_MAX_POS)
+					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
+
+				// Update position
+				gpio_pin_state_t direction = gpio_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
+				if (direction == R_COUNTERCLOCKWISE)
+					r_pos--;
+				else
+					r_pos++;
+
+				// Execute step
+				gpio_pin_toggle(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
+			}
+		}
 	}
 }
 
