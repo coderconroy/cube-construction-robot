@@ -3,6 +3,7 @@
 
 // Includes
 #include "gpio_hal.h"
+#include "stdbool.h"
 
 // GPIO defines
 #define X_LIM_Pin GPIO_PIN_1
@@ -76,6 +77,24 @@
 #define X_MOT_M0_Pin GPIO_PIN_5
 #define X_MOT_M0_GPIO_Port GPIOB
 
+// Motor direction defines
+#define X_LEFT GPIO_PIN_LOW
+#define X_RIGHT GPIO_PIN_HIGH
+#define Y_FORWARD GPIO_PIN_LOW
+#define Y_BACKWARD GPIO_PIN_HIGH
+#define Z_UP GPIO_PIN_LOW
+#define Z_DOWN GPIO_PIN_HIGH
+#define R_CLOCKWISE GPIO_PIN_LOW
+#define R_COUNTERCLOCKWISE GPIO_PIN_HIGH
+
+// Motor range defines (max steps for each axis (1/32 microstepping)
+#define X_MAX_POS 65000U
+#define Y_MAX_POS 79000U
+#define Z_MAX_POS 160000U
+#define Z_MIN_POS 9000U
+#define R_MAX_POS 5000 // Clockwise
+#define R_MIN_POS - R_MAX_POS // Anti-clockwise
+
 // Type definitions
 typedef enum
 {
@@ -85,23 +104,47 @@ typedef enum
 	R_MOTOR = 0x3U
 } motor_t;
 
+typedef enum
+{
+	CALIBRATE,
+	RUN
+} motor_sys_state_t;
+
 // Function prototypes
 
-/*
+/**
  * Place all motors in the active state.
  */
 void motor_enable_all();
 
-/*
+/**
  * Place all motors in the sleep state.
  */
 void motor_disable_all();
 
-/*
- * Trigger motor to take next step. The nature of the step depends on the motor state and configuration.
- *
- * @param motor Target motor for the command
+/**
+ * Locate the limit switch reference point on each Cartesian axis.
  */
-void motor_execute_step(const motor_t motor);
+void motor_calibrate();
+
+/**
+ * Trigger motor to take next step for the X motor. The nature of the step depends on the motor state and configuration.
+ */
+void motor_x_execute_step();
+
+/**
+ * Trigger motor to take next step for the Y motor. The nature of the step depends on the motor state and configuration.
+ */
+void motor_y_execute_step();
+
+/**
+ * Trigger motor to take next step for the Z motor. The nature of the step depends on the motor state and configuration.
+ */
+void motor_z_execute_step();
+
+/**
+ * Trigger motor to take next step for the R motor. The nature of the step depends on the motor state and configuration.
+ */
+void motor_r_execute_step();
 
 #endif /* MOTOR_H_ */

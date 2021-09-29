@@ -1,40 +1,7 @@
 #include "main.h"
 #include "stdbool.h"
 
-// Motor directions
-const gpio_pin_state_t X_LEFT = GPIO_PIN_LOW;
-const gpio_pin_state_t X_RIGHT = GPIO_PIN_HIGH;
-const gpio_pin_state_t Y_FORWARD = GPIO_PIN_LOW;
-const gpio_pin_state_t Y_BACKWARD = GPIO_PIN_HIGH;
-const gpio_pin_state_t Z_UP = GPIO_PIN_LOW;
-const gpio_pin_state_t Z_DOWN = GPIO_PIN_HIGH;
-const gpio_pin_state_t R_CLOCKWISE = GPIO_PIN_LOW;
-const gpio_pin_state_t R_COUNTERCLOCKWISE = GPIO_PIN_HIGH;
 
-// Max steps for each axis (1/32 microsteps)
-const uint32_t X_MAX_POS = 65000U;
-const uint32_t Y_MAX_POS = 79000U;
-const int Z_MAX_POS = 160000U;
-const int Z_MIN_POS = 9000U;
-const int R_MAX_POS = 5000; // Clockwise
-const int R_MIN_POS = - R_MAX_POS; // Anti-clockwise
-
-// Step position for each axis
-uint32_t x_pos = 0;
-uint32_t y_pos = 0;
-uint32_t z_pos = 0;
-int r_pos = 0;
-
-// Motor enable flags
-bool x_enable = false;
-bool y_enable = false;
-bool z_enable = false;
-bool r_enable = false;
-
-// State variables
-const int HOME_MODE = 0;
-const int CYCLE_MODE = 1;
-int mode = HOME_MODE;
 
 int main(void)
 {
@@ -51,42 +18,7 @@ int main(void)
 	initialize_tim21();
 	initialize_tim22();
 
-	// Set motor to sleep mode
-	motor_disable_all();
-//	motor_enable_all();
-
-	// Initialize motor directions
-	gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
-	gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
-	gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
-	gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
-
-	  // Find position zero for X axis
-	  x_enable = true;
-	  while (gpio_pin_read(X_LIM_GPIO_Port, X_LIM_Pin));
-	  x_enable = false;
-
-	  // Find position zero for Y axis
-	  y_enable = true;
-	  while (gpio_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin));
-	  y_enable = false;
-
-	  // Find position zero for Z axis
-	  z_enable = true;
-	  while (gpio_pin_read(Z_LIM_GPIO_Port, Z_LIM_Pin));
-	  z_enable = false;
-
-	  // Cycle motors along axis
-	  mode = CYCLE_MODE;
-
-	  // Wait for Z axis to move up enough to remove suction cup from floor
-	  z_enable = true;
-	  while (z_pos < Z_MIN_POS);
-
-	  // Enable all motors
-	  x_enable = true;
-	  y_enable = true;
-	  r_enable = true;
+	motor_calibrate();
 
 	while(1)
 	{
@@ -257,33 +189,7 @@ void TIM6_DAC_IRQHandler()
 	if ((TIM6->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM6->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-
-		if (mode == HOME_MODE)
-		{
-			if (x_enable && gpio_pin_read(X_LIM_GPIO_Port, X_LIM_Pin))
-				gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
-		}
-		else if (mode == CYCLE_MODE)
-		{
-			if (x_enable)
-			{
-				// Update direction
-				if (x_pos == 0)
-					gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_RIGHT);
-				else if (x_pos == X_MAX_POS)
-					gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
-
-				// Update position
-				gpio_pin_state_t direction = gpio_pin_read(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin);
-				if (direction == X_LEFT)
-					x_pos--;
-				else
-					x_pos++;
-
-				// Execute step
-				gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
-			}
-		}
+		motor_x_execute_step();
 	}
 }
 
@@ -293,33 +199,7 @@ void TIM7_IRQHandler()
 	if ((TIM7->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM7->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-
-		if (mode == HOME_MODE)
-		{
-			if (y_enable && gpio_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin))
-				gpio_pin_toggle( Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
-		}
-		else if (mode == CYCLE_MODE)
-		{
-			if (y_enable)
-			{
-				// Update direction
-				if (y_pos == 0)
-					gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_FORWARD);
-				else if (y_pos == Y_MAX_POS)
-					gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
-
-				// Update position
-				gpio_pin_state_t direction = gpio_pin_read(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin);
-				if (direction == Y_BACKWARD)
-					y_pos--;
-				else
-					y_pos++;
-
-				// Execute step
-				gpio_pin_toggle(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
-			}
-		}
+		motor_y_execute_step();
 	}
 }
 
@@ -329,33 +209,7 @@ void TIM21_IRQHandler()
 	if ((TIM21->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM21->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-
-		if (mode == HOME_MODE)
-		{
-			if (z_enable && gpio_pin_read(Z_LIM_GPIO_Port, Z_LIM_Pin))
-				gpio_pin_toggle(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);
-		}
-		else if (mode == CYCLE_MODE)
-		{
-			if (z_enable)
-			{
-				// Update direction
-				if (z_pos == 0 || z_pos == Z_MIN_POS)
-					gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_UP);
-				else if (z_pos == Z_MAX_POS)
-					gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
-
-				// Update position
-				gpio_pin_state_t direction = gpio_pin_read(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin);
-				if (direction == Z_DOWN)
-					z_pos--;
-				else
-					z_pos++;
-
-				// Execute step
-				gpio_pin_toggle(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);
-			}
-		}
+		motor_z_execute_step();
 	}
 }
 
@@ -365,27 +219,7 @@ void TIM22_IRQHandler()
 	if ((TIM22->SR & TIM_SR_UIF) == TIM_SR_UIF)
 	{
 		TIM22->SR &= ~TIM_SR_UIF; // Clear interrupt flag
-		if (mode == CYCLE_MODE)
-		{
-			if (r_enable)
-			{
-				// Update direction
-				if (r_pos == R_MIN_POS)
-					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
-				else if (r_pos == R_MAX_POS)
-					gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
-
-				// Update position
-				gpio_pin_state_t direction = gpio_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
-				if (direction == R_COUNTERCLOCKWISE)
-					r_pos--;
-				else
-					r_pos++;
-
-				// Execute step
-				gpio_pin_toggle(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
-			}
-		}
+		motor_r_execute_step();
 	}
 }
 
