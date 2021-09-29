@@ -1,6 +1,11 @@
 #include "main.h"
 #include "stdbool.h"
 
+void delay(uint32_t count)
+{
+	for(uint32_t i = 0; i < count; i++);
+}
+
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings
@@ -20,19 +25,14 @@ int main(void)
 	// Calibrate stepper motors
 	motor_calibrate();
 
-	// Move to center
-	// Initialize target position
-	motor_x_target_pos(X_MAX_POS / 2);
-	motor_y_target_pos(Y_MAX_POS / 2);
-	motor_z_target_pos(Z_MAX_POS / 2);
-	motor_r_target_pos(R_MAX_POS);
+//	// Initialize target position
+//	motor_x_target_pos(X_MAX_POS);
+//	motor_y_target_pos(Y_MAX_POS);
+//	motor_z_target_pos(Z_MAX_POS / 2);
+//	motor_run(); // Initiate motor run
+//	while(motor_system_state() != READY); // Wait for run to complete
 
-	// Run motors to target position
-	motor_run(); // Initiate motor run
-	while(motor_system_state() != READY); // Wait for run to complete
 
-	gpio_pin_set(LED0_GPIO_Port, LED0_Pin);
-	gpio_pin_set(LED1_GPIO_Port, LED1_Pin);
 
 	while(1)
 	{
@@ -112,7 +112,7 @@ void initialize_tim2()
 	 // Configure TIM2 for PWM
 	 TIM2->PSC = 31; // Clock prescalar
 	 TIM2->ARR = 19999; // Auto reload value
-	 TIM2->CCR3 = 1000; // Channel 3 compare value
+	 TIM2->CCR3 = SERVO_PERIOD_IDLE; // Channel 3 compare value
 	 TIM2->CCMR2 |= TIM_CCMR2_OC3M_2 | TIM_CCMR2_OC3M_1 ; // PWM mode 1
 	 TIM2->CCMR2 |= TIM_CCMR2_OC3PE; // Enable output compare 3 preload
 	 TIM2->CCER |= TIM_CCER_CC3E; // Compare 3 output enable
@@ -190,6 +190,11 @@ void initialize_tim22()
 	NVIC_EnableIRQ(TIM22_IRQn);
 	NVIC_SetPriority(TIM22_IRQn, 0);
 	__enable_irq();
+}
+
+void vacuum_actuate(uint16_t pulse_width)
+{
+	 TIM2->CCR3 = pulse_width; // Channel 3 compare value
 }
 
 void USART1_IRQHandler()

@@ -27,8 +27,8 @@ static void update_run_state();
 void initialize_motor()
 {
 	// Initialize state
-	system_state = SLEEP;
-	motor_disable_all();
+	system_state = IDLE;
+	motor_enable_all();
 }
 
 void motor_enable_all()
@@ -57,6 +57,9 @@ void motor_calibrate()
 	system_state = CALIBRATE;
 	motor_enable_all(); // Enable all motors
 
+	// Disable R motor to release rotational tension on the vacuum tube
+	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_LOW);
+
 	// Initialize motor directions
 	gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
 	gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
@@ -83,6 +86,9 @@ void motor_calibrate()
 	y_pos = Y_REF_POS;
 	z_pos = Z_REF_POS;
 	r_pos = R_REF_POS;
+
+	// Enable R motor
+	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
 
 	// Initialize next state
 	system_state = READY;

@@ -25,9 +25,12 @@
 #define LIGHT_Pin GPIO_PIN_9
 #define LIGHT_GPIO_Port GPIOB
 
-// Constants
-#define SERVO_PERIOD_MIN  500 // Pulse high time (us)
-#define SERVO_PERIOD_MAX  2400 // Pulse high time (us)
+// Constant defines
+#define SERVO_PERIOD_MIN  500 // Pulse high time (microseconds)
+#define SERVO_PERIOD_MAX  2400 // Pulse high time (microseconds)
+#define SERVO_PERIOD_RELEASE SERVO_PERIOD_MAX
+#define SERVO_PERIOD_IDLE 2100
+#define SERVO_PERIOD_ACTUATE 1000
 
 // Function prototypes
 void initialize_system();
@@ -37,6 +40,14 @@ void initialize_tim7();
 void initialize_tim21();
 void initialize_tim22();
 void initialize_adc();
+
+/**
+ * Set vacuum actuator actuation degree by through the PWM pulse width.
+ *
+ * @param pulse_width PWM pulse width (microseconds).
+ */
+void vacuum_actuate(uint16_t pulse_width);
+
 void error_handler();
 
 #endif /* MAIN_H_ */
