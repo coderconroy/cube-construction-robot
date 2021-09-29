@@ -87,13 +87,20 @@
 #define R_CLOCKWISE GPIO_PIN_LOW
 #define R_COUNTERCLOCKWISE GPIO_PIN_HIGH
 
-// Motor range defines (max steps for each axis (1/32 microstepping)
-#define X_MAX_POS 65000U
-#define Y_MAX_POS 79000U
-#define Z_MAX_POS 160000U
-#define Z_MIN_POS 9000U
+// Motor range defines (in steps for each axis (1/32 microstepping)
+// The maximum and minimum positions are defined relative to the reference position
+#define X_REF_POS 0
+#define X_MIN_POS X_REF_POS
+#define X_MAX_POS 65000
+#define Y_REF_POS 0
+#define Y_MIN_POS Y_REF_POS
+#define Y_MAX_POS 79000
+#define Z_REF_POS -9000
+#define Z_MIN POS 0
+#define Z_MAX_POS 151000
+#define R_REF_POS 0
+#define R_MIN_POS -5000 // Anti-clockwise
 #define R_MAX_POS 5000 // Clockwise
-#define R_MIN_POS - R_MAX_POS // Anti-clockwise
 
 // Type definitions
 typedef enum
@@ -106,11 +113,20 @@ typedef enum
 
 typedef enum
 {
-	CALIBRATE,
-	RUN
+	SLEEP = 0x1,
+	IDLE = 0x2,
+	CALIBRATE = 0x4,
+	READY = 0x8,
+	RUN = 0x10,
+	DEMO = 0x20
 } motor_sys_state_t;
 
 // Function prototypes
+
+/**
+ * Initialize the stepper motor control system.
+ */
+void initialize_motor();
 
 /**
  * Place all motors in the active state.

@@ -17,8 +17,9 @@ int main(void)
 	initialize_tim7();
 	initialize_tim21();
 	initialize_tim22();
+	initialize_motor();
 
-	motor_calibrate();
+//	motor_calibrate();
 
 	while(1)
 	{
