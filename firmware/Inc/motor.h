@@ -97,16 +97,16 @@
 // The maximum and minimum positions are defined relative to the reference position
 #define X_REF_POS 0
 #define X_MIN_POS X_REF_POS
-#define X_MAX_POS 65000
+#define X_MAX_POS 32500
 #define Y_REF_POS 0
 #define Y_MIN_POS Y_REF_POS
-#define Y_MAX_POS 79000
-#define Z_REF_POS -9000
+#define Y_MAX_POS 39500
+#define Z_REF_POS -4500
 #define Z_MIN_POS 0
-#define Z_MAX_POS 151000
+#define Z_MAX_POS 76500
 #define R_REF_POS 0
-#define R_MIN_POS -5000 // Anti-clockwise
-#define R_MAX_POS 5000 // Clockwise
+#define R_MIN_POS -2500 // Anti-clockwise
+#define R_MAX_POS 2500 // Clockwise
 
 // Type definitions
 typedef enum
@@ -159,33 +159,33 @@ const motor_sys_state_t motor_system_state();
  * Set the target position for the system on the X axis.
  * If the target position is outside of [X_MIN_POS, X_MAX_POS], the value will not be updated
  *
- * @param [in] pos Step position on X axis (1/32 microstepping).
+ * @param [in] pos Step position on X axis (full_steps).
  */
-void motor_x_target_pos(const int pos);
+void motor_x_target_pos(int pos);
 
 /**
  * Set the target position for the system on the Y axis.
  * If the target position is outside of [Y_MIN_POS, Y_MAX_POS], the value will not be updated
  *
- * @param [in] pos Step position on Y axis (1/32 microstepping).
+ * @param [in] pos Step position on Y axis (full_steps).
  */
-void motor_y_target_pos(const int pos);
+void motor_y_target_pos(int pos);
 
 /**
  * Set the target position for the system on the Z axis.
  * If the target position is outside of [Z_MIN_POS, Z_MAX_POS], the value will not be updated
  *
- * @param [in] pos Step position on Z axis (1/32 microstepping).
+ * @param [in] pos Step position on Z axis (full steps).
  */
-void motor_z_target_pos(const int pos);
+void motor_z_target_pos(int pos);
 
 /**
  * Set the target position for the system on the R axis.
  * If the target position is outside of [R_MIN_POS, R_MAX_POS], the value will not be updated
  *
- * @param [in] pos Step position on R axis (1/32 microstepping).
+ * @param [in] pos Step position on R axis (full steps).
  */
-void motor_r_target_pos(const int pos);
+void motor_r_target_pos(int pos);
 
 /**
  * Trigger motor to take next step for the X motor. The nature of the step depends on the motor state and configuration.

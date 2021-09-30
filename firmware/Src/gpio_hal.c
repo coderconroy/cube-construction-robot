@@ -89,7 +89,7 @@ void gpio_pin_reset(GPIO_TypeDef* const port, const gpio_pin_t pin)
 void gpio_pin_toggle(GPIO_TypeDef* const port, const gpio_pin_t pin)
 {
 	// Get pin state
-	gpio_pin_state_t state = gpio_pin_read(port, pin);
+	gpio_pin_state_t state = gpio_output_pin_read(port, pin);
 
 	// Set pin to opposite value
 	if (state == GPIO_PIN_LOW)
@@ -106,11 +106,23 @@ void gpio_pin_write(GPIO_TypeDef* const port, const gpio_pin_t pin, const gpio_p
 		gpio_pin_set(port, pin);
 }
 
-const gpio_pin_state_t gpio_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin)
+const gpio_pin_state_t gpio_input_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin)
 {
 	gpio_pin_state_t state;
 
 	if ((port->IDR & (0x1 << pin)) == (GPIO_PIN_LOW << pin))
+		state = GPIO_PIN_LOW;
+	else
+		state = GPIO_PIN_HIGH;
+
+	return state;
+}
+
+const gpio_pin_state_t gpio_output_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin)
+{
+	gpio_pin_state_t state;
+
+	if ((port->ODR & (0x1 << pin)) == (GPIO_PIN_LOW << pin))
 		state = GPIO_PIN_LOW;
 	else
 		state = GPIO_PIN_HIGH;

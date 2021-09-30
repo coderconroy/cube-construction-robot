@@ -119,6 +119,14 @@ void gpio_pin_write(GPIO_TypeDef* const port, const gpio_pin_t pin, const gpio_p
  * @param [in] port GPIO port of pin
  * @param [in] pin GPIO pin number
  */
-const gpio_pin_state_t gpio_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin);
+const gpio_pin_state_t gpio_input_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin);
+
+/**
+ * Get the current output logic state of the GPIO pin.
+ *
+ * @param [in] port GPIO port of pin
+ * @param [in] pin GPIO pin number
+ */
+const gpio_pin_state_t gpio_output_pin_read(GPIO_TypeDef* const port, const gpio_pin_t pin);
 
 #endif /* GPIO_HAL_H_ */

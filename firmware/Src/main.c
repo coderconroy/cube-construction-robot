@@ -26,13 +26,12 @@ int main(void)
 	motor_calibrate();
 
 //	// Initialize target position
-//	motor_x_target_pos(X_MAX_POS);
-//	motor_y_target_pos(Y_MAX_POS);
-//	motor_z_target_pos(Z_MAX_POS / 2);
+//	motor_x_target_pos(1000);
+//	motor_y_target_pos(1000);
+//	motor_z_target_pos(1000);
 //	motor_run(); // Initiate motor run
+//
 //	while(motor_system_state() != READY); // Wait for run to complete
-
-
 
 	while(1)
 	{
