@@ -1,7 +1,4 @@
-#pragma once
-
-#include <QtWidgets/QWidget>
-#include "ui_SystemController.h"
+#include <QWidget>
 
 class SystemController : public QWidget
 {
@@ -10,6 +7,4 @@ class SystemController : public QWidget
 public:
     SystemController(QWidget *parent = Q_NULLPTR);
 
-private:
-    Ui::SystemControllerClass ui;
 };
