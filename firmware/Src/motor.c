@@ -2,7 +2,7 @@
 #include "math.h"
 
 // State variables
-motor_sys_state_t system_state = SLEEP;
+motor_sys_state_t system_state;
 
 // Calibration step count for each axis (step size defined by the axis step mode)
 int x_cal_count;
@@ -78,6 +78,7 @@ void motor_wake_all()
 
 void motor_sleep_all()
 {
+	system_state = SLEEP;
 	gpio_pin_write(X_MOT_SLEEP_GPIO_Port, X_MOT_SLEEP_Pin, GPIO_PIN_LOW);
 	gpio_pin_write(Y_MOT_SLEEP_GPIO_Port, Y_MOT_SLEEP_Pin, GPIO_PIN_LOW);
 	gpio_pin_write(Z_MOT_SLEEP_GPIO_Port, Z_MOT_SLEEP_Pin, GPIO_PIN_LOW);
@@ -135,6 +136,8 @@ void motor_calibrate()
 
 	// Enable R motor
 	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
+
+	system_state = READY;
 
 	// Initialize initial target position
 	motor_x_target_pos(X_MIN_POS / X_STEP_MODE);
@@ -237,7 +240,7 @@ void motor_x_execute_step()
 			else if (x_pos > x_target_pos)
 				gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
 
-			gpio_pin_state_t step = gpio_output_pin_read(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
+			gpio_pin_state_t step = gpio_output_pin_read(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
 			gpio_pin_state_t direction = gpio_output_pin_read(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin);
 
 			// Update position count if falling edge

@@ -58,12 +58,35 @@ void usart_receive(uint8_t* const data, const uint8_t size)
 {
 	for (uint8_t i = 0; i < size; i++)
 	{
-		// Copy bytes from TX buffer to read destination
+		// Copy bytes from RX buffer to read destination
 		if (usart_bytes_available() > 0)
 			data[i] = rx_buffer[rx_read_index];
 		else
 			data[i] = 0x0;
 		rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
+	}
+}
+
+void usart_transmit_packet(const packet_t* packet)
+{
+	__disable_irq();
+	usart_transmit(&packet->control, 1);
+	usart_transmit((uint8_t*) packet->data, 8);
+	__enable_irq();
+}
+
+void usart_receive_packet(packet_t* const packet)
+{
+	if (usart_packets_available() > 0)
+	{
+		usart_receive(&packet->control, 1);
+		usart_receive((uint8_t*) &packet->data, 8);
+	}
+	else
+	{
+		packet->control = 0x0;
+		for (uint8_t i = 0; i < 4; i++)
+			packet->data[i] = 0x0;
 	}
 }
 
@@ -75,6 +98,16 @@ uint8_t usart_bytes_available()
 uint8_t usart_bytes_waiting()
 {
 	return (((int16_t) tx_write_index) - tx_read_index) % TX_BUFFER_SIZE;
+}
+
+uint8_t usart_packets_available()
+{
+	return usart_bytes_available() / PACKET_SIZE;
+}
+
+uint8_t usart_packets_waiting()
+{
+	return usart_bytes_waiting() / PACKET_SIZE;
 }
 
 void usart_handle_interrupt()

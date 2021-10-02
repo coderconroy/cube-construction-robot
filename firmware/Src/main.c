@@ -6,7 +6,6 @@ void delay(uint32_t count)
 	for(uint32_t i = 0; i < count; i++);
 }
 
-uint8_t temp = 0x69;
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings
@@ -23,23 +22,46 @@ int main(void)
 	initialize_tim22();
 	initialize_motor();
 
-	// Calibrate stepper motors
-	motor_calibrate();
-
-	// Initialize target position
-	motor_x_target_pos(X_MAX_POS / X_STEP_MODE / 2);
-	motor_y_target_pos(Y_MAX_POS / Y_STEP_MODE / 2);
-	motor_z_target_pos(Z_MAX_POS / Z_STEP_MODE / 2);
-	motor_r_target_pos(R_MAX_POS / R_STEP_MODE);
-	motor_run(); // Initiate motor run
-
-	while(motor_system_state() != READY); // Wait for run to complete
-
-	motor_sleep_all();
-
+	packet_t rx_packet;
 	while(1)
 	{
+		delay(1000);
+		if (usart_packets_available() >0)
+		{
+			usart_receive_packet(&rx_packet);
+			switch (rx_packet.control)
+			{
+			// Calibrate motor system
+			case 0x1:
+				if (rx_packet.data[0] == 0x0)
+					motor_sleep_all();
+				else if (rx_packet.data[0] == 0x1)
+					motor_wake_all();
+				break;
+			case 0x2:
+				motor_calibrate();
+				break;
+			// Move to target position
+			case 0x3:
+				// Initialize target position
+				motor_x_target_pos(rx_packet.data[0]);
+				motor_y_target_pos(rx_packet.data[1]);
+				motor_z_target_pos(rx_packet.data[2]);
+				motor_r_target_pos(rx_packet.data[3]);
+				motor_run(); // Initiate motor run
 
+				while(motor_system_state() != READY); // Wait for run to complete
+				break;
+			case 0x4:
+				if (rx_packet.data[0] == 0x0)
+					vacuum_actuate(SERVO_PERIOD_IDLE);
+				else if (rx_packet.data[0] == 0x1)
+					vacuum_actuate(SERVO_PERIOD_ACTUATE);
+				else if (rx_packet.data[0] == 0x2)
+					vacuum_actuate(SERVO_PERIOD_RELEASE);
+				break;
+			}
+		}
 	}
 }
 
