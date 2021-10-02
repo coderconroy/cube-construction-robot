@@ -3,8 +3,13 @@
 
 int main(int argc, char *argv[])
 {
+    // Initialize application
     QApplication app(argc, argv);
+
+    // Initialize window
     SystemController window;
-    window.show();
+    window.showMaximized();
+    
+    // Start application
     return app.exec();
 }

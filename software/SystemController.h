@@ -1,4 +1,6 @@
 #include <QWidget>
+#include <QStackedLayout>
+#include "HomeView.h"
 
 class SystemController : public QWidget
 {
@@ -7,4 +9,7 @@ class SystemController : public QWidget
 public:
     SystemController(QWidget *parent = Q_NULLPTR);
 
+private:
+    QStackedLayout* baseLayout;
+    HomeView* homeView;
 };
