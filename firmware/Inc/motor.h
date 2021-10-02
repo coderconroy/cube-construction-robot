@@ -77,12 +77,6 @@
 #define X_MOT_M0_Pin GPIO_PIN_5
 #define X_MOT_M0_GPIO_Port GPIOB
 
-//// Motor base timer defines
-//#define X_MOT_TIM TIM6
-//#define Y_MOT_TIM TIM7
-//#define Z_MOT_TIM TIM21
-//#define R_MOT_TIM TIM21
-
 // Motor direction defines
 #define X_LEFT GPIO_PIN_LOW
 #define X_RIGHT GPIO_PIN_HIGH
@@ -93,14 +87,20 @@
 #define R_CLOCKWISE GPIO_PIN_LOW
 #define R_COUNTERCLOCKWISE GPIO_PIN_HIGH
 
-// Motor range defines (in steps for each axis (1/32 microstepping)
+// Step mode defines
+#define X_STEP_MODE STEP_MODE_1_32
+#define Y_STEP_MODE STEP_MODE_1_16
+#define Z_STEP_MODE STEP_MODE_1_32
+#define R_STEP_MODE STEP_MODE_1_32
+
+// Motor range defines (in steps for each axis with the step size defined by the axis step mode)
 // The maximum and minimum positions are defined relative to the reference position
 #define X_REF_POS 0
 #define X_MIN_POS X_REF_POS
 #define X_MAX_POS 32500
 #define Y_REF_POS 0
 #define Y_MIN_POS Y_REF_POS
-#define Y_MAX_POS 39500
+#define Y_MAX_POS 18000
 #define Z_REF_POS -4500
 #define Z_MIN_POS 0
 #define Z_MAX_POS 76500
@@ -119,12 +119,22 @@ typedef enum
 
 typedef enum
 {
-	SLEEP = 0x1,
-	IDLE = 0x2,
-	CALIBRATE = 0x4,
-	READY = 0x8,
-	RUN = 0x10
+	SLEEP = 0x1U,
+	IDLE = 0x2U,
+	CALIBRATE = 0x4U,
+	READY = 0x8U,
+	RUN = 0x10U
 } motor_sys_state_t;
+
+typedef enum
+{
+	STEP_MODE_FULL = 0x1U,
+	STEP_MODE_HALF = 0x2U,
+	STEP_MODE_1_4 = 0x4U,
+	STEP_MODE_1_8= 0x8U,
+	STEP_MODE_1_16 = 0x10U,
+	STEP_MODE_1_32 = 0x20U
+} motor_step_mode_t;
 
 // Function prototypes
 
@@ -136,12 +146,12 @@ void initialize_motor();
 /**
  * Place all motors in the active state.
  */
-void motor_enable_all();
+void motor_wake_all();
 
 /**
  * Place all motors in the sleep state.
  */
-void motor_disable_all();
+void motor_sleep_all();
 
 /**
  * Locate the limit switch reference point on each Cartesian axis.

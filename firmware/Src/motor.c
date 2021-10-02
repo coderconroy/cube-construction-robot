@@ -1,31 +1,32 @@
 #include "motor.h"
+#include "math.h"
 
 // State variables
 motor_sys_state_t system_state = SLEEP;
 
-// Calibration step count for each axis (1/32 microstepping)
+// Calibration step count for each axis (step size defined by the axis step mode)
 int x_cal_count;
 int y_cal_count;
 int z_cal_count;
 int r_cal_count;
 
-// Step position for each axis (1/32 microstepping)
+// Step position for each axis (step size defined by the axis step mode)
 int x_pos;
 int y_pos;
 int z_pos;
 int r_pos;
 
-// Target step position for each axis (1/32 microstepping)
+// Target step position for each axis (step size defined by the axis step mode)
 int x_target_pos;
 int y_target_pos;
 int z_target_pos;
 int r_target_pos;
 
-// Motor enable flags
-bool x_enable = false;
-bool y_enable = false;
-bool z_enable = false;
-bool r_enable = false;
+// Motor calibration enable flags
+bool x_cal_enable = false;
+bool y_cal_enable = false;
+bool z_cal_enable = false;
+bool r_cal_enable = false;
 
 // Function prototypes
 static void update_run_state();
@@ -33,12 +34,41 @@ static void reset_step_outputs();
 
 void initialize_motor()
 {
-	// Initialize state
+	// Initialize motor system state
 	system_state = IDLE;
-	motor_enable_all();
+
+	// Initialize step modes
+	uint8_t x_step_mode = (uint8_t) log2(X_STEP_MODE);
+	gpio_pin_write(X_MOT_M0_GPIO_Port, X_MOT_M0_Pin, x_step_mode & 0x1);
+	gpio_pin_write(X_MOT_M1_GPIO_Port, X_MOT_M1_Pin, (x_step_mode & 0x2) >> 1);
+	gpio_pin_write(X_MOT_M2_GPIO_Port, X_MOT_M2_Pin, (x_step_mode & 0x4) >> 2);
+
+	uint8_t y_step_mode = (uint8_t) log2(Y_STEP_MODE);
+	gpio_pin_write(Y_MOT_M0_GPIO_Port, Y_MOT_M0_Pin, y_step_mode & 0x1); // Non-functional
+	gpio_pin_write(Y_MOT_M1_GPIO_Port, Y_MOT_M1_Pin,  (y_step_mode & 0x2) >> 1); // Non-functional
+	gpio_pin_write(Y_MOT_M2_GPIO_Port, Y_MOT_M2_Pin, (y_step_mode & 0x4) >> 2);
+
+	uint8_t z_step_mode = (uint8_t) log2(Z_STEP_MODE);
+	gpio_pin_write(Z_MOT_M0_GPIO_Port, Z_MOT_M0_Pin, z_step_mode & 0x1);
+	gpio_pin_write(Z_MOT_M1_GPIO_Port, Z_MOT_M1_Pin, (z_step_mode & 0x2) >> 1);
+	gpio_pin_write(Z_MOT_M2_GPIO_Port, Z_MOT_M2_Pin, (z_step_mode & 0x4) >> 2);
+
+	uint8_t r_step_mode = (uint8_t) log2(R_STEP_MODE);
+	gpio_pin_write(R_MOT_M0_GPIO_Port, R_MOT_M0_Pin, r_step_mode & 0x1);
+	gpio_pin_write(R_MOT_M1_GPIO_Port, R_MOT_M1_Pin, (r_step_mode & 0x2) >> 1);
+	gpio_pin_write(R_MOT_M2_GPIO_Port, R_MOT_M2_Pin, (r_step_mode & 0x4) >> 2);
+
+	// Remove motors from sleep mode
+	motor_wake_all();
+
+	// Remove motors from reset state
+	gpio_pin_set(X_MOT_RESET_GPIO_Port, X_MOT_RESET_Pin);
+	gpio_pin_set(Y_MOT_RESET_GPIO_Port, Y_MOT_RESET_Pin);
+	gpio_pin_set(Z_MOT_RESET_GPIO_Port, Z_MOT_RESET_Pin);
+	gpio_pin_set(R_MOT_RESET_GPIO_Port, R_MOT_RESET_Pin);
 }
 
-void motor_enable_all()
+void motor_wake_all()
 {
 	gpio_pin_write(X_MOT_SLEEP_GPIO_Port, X_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
 	gpio_pin_write(Y_MOT_SLEEP_GPIO_Port, Y_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
@@ -46,7 +76,7 @@ void motor_enable_all()
 	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
 }
 
-void motor_disable_all()
+void motor_sleep_all()
 {
 	gpio_pin_write(X_MOT_SLEEP_GPIO_Port, X_MOT_SLEEP_Pin, GPIO_PIN_LOW);
 	gpio_pin_write(Y_MOT_SLEEP_GPIO_Port, Y_MOT_SLEEP_Pin, GPIO_PIN_LOW);
@@ -62,7 +92,7 @@ void motor_calibrate()
 
 	// Initialize state
 	system_state = CALIBRATE;
-	motor_enable_all(); // Enable all motors
+	motor_wake_all(); // Enable all motors
 
 	// Disable R motor to release rotational tension on the vacuum tube
 	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_LOW);
@@ -83,19 +113,19 @@ void motor_calibrate()
 	r_cal_count = 0;
 
 	// Find position zero for X axis
-	x_enable = true;
+	x_cal_enable = true;
 	while (gpio_input_pin_read(X_LIM_GPIO_Port, X_LIM_Pin)); // Wait for limit switch activation
-	x_enable = false;
+	x_cal_enable = false;
 
 	// Find position zero for Y axis
-	y_enable = true;
+	y_cal_enable = true;
 	while (gpio_input_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin)); // Wait for limit switch activation
-	y_enable = false;
+	y_cal_enable = false;
 
 	// Find position zero for Z axis
-	z_enable = true;
+	z_cal_enable = true;
 	while (gpio_input_pin_read(Z_LIM_GPIO_Port, Z_LIM_Pin)); // Wait for limit switch activation
-	z_enable = false;
+	z_cal_enable = false;
 
 	// Initialize position state
 	x_pos = X_REF_POS;
@@ -106,11 +136,11 @@ void motor_calibrate()
 	// Enable R motor
 	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_HIGH);
 
-	// Initialize target position
-	motor_x_target_pos(X_MIN_POS / 32);
-	motor_y_target_pos(Y_MIN_POS / 32);
-	motor_z_target_pos(Z_MIN_POS / 32);
-	motor_r_target_pos(R_REF_POS / 32);
+	// Initialize initial target position
+	motor_x_target_pos(X_MIN_POS / X_STEP_MODE);
+	motor_y_target_pos(Y_MIN_POS / Y_STEP_MODE);
+	motor_z_target_pos(Z_MIN_POS / Z_STEP_MODE);
+	motor_r_target_pos(R_REF_POS / R_STEP_MODE);
 
 	// Run motors to initial target position
 	motor_run();
@@ -130,8 +160,8 @@ void motor_x_target_pos(int pos)
 	if ((system_state & READY) == 0)
 		return;
 
-	// Convert full steps to 1/32 microsteps
-	pos *= 32;
+	// Convert full steps to step size used on axis
+	pos *= X_STEP_MODE;
 
 	//Update target position if valid
 	if (pos >= X_MIN_POS && pos <= X_MAX_POS)
@@ -144,8 +174,8 @@ void motor_y_target_pos(int pos)
 	if ((system_state & READY) == 0)
 		return;
 
-	// Convert full steps to 1/32 microsteps
-	pos *= 32;
+	// Convert full steps to step size used on axis
+	pos *= Y_STEP_MODE;
 
 	//Update target position if valid
 	if (pos >= Y_MIN_POS && pos <= Y_MAX_POS)
@@ -158,8 +188,8 @@ void motor_z_target_pos(int pos)
 	if ((system_state & READY) == 0)
 		return;
 
-	// Convert full steps to 1/32 microsteps
-	pos *= 32;
+	// Convert full steps to step size used on axis
+	pos *= Z_STEP_MODE;
 
 	//Update target position if valid
 	if (pos >= Z_MIN_POS && pos <= Z_MAX_POS)
@@ -172,8 +202,8 @@ void motor_r_target_pos(int pos)
 	if ((system_state & READY) == 0)
 		return;
 
-	// Convert full steps to 1/32 microsteps
-	pos *= 32;
+	// Convert full steps to step size used on axis
+	pos *= R_STEP_MODE;
 
 	//Update target position if valid
 	if (pos >= R_MIN_POS && pos <= R_MAX_POS)
@@ -184,8 +214,8 @@ void motor_x_execute_step()
 {
 	if (system_state == CALIBRATE)
 	{
-		bool full_step_pos = (x_cal_count % 32 == 0); // Check if in full step position
-		if ((x_enable && gpio_input_pin_read(X_LIM_GPIO_Port, X_LIM_Pin)) || !full_step_pos)
+		bool full_step_pos = (x_cal_count % X_STEP_MODE == 0); // Check if in full step position
+		if ((x_cal_enable && gpio_input_pin_read(X_LIM_GPIO_Port, X_LIM_Pin)) || !full_step_pos)
 		{
 			// Update calibration step count on falling edge
 			gpio_pin_state_t step_state = gpio_output_pin_read(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
@@ -233,8 +263,8 @@ void motor_y_execute_step()
 {
 	if (system_state == CALIBRATE)
 	{
-		bool full_step_pos = (y_cal_count % 32 == 0); // Check if in full step position
-		if ((y_enable && gpio_input_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin)) || !full_step_pos)
+		bool full_step_pos = (y_cal_count % Y_STEP_MODE == 0); // Check if in full step position
+		if ((y_cal_enable && gpio_input_pin_read(Y_LIM_GPIO_Port, Y_LIM_Pin)) || !full_step_pos)
 		{
 			// Update calibration step count on falling edge
 			gpio_pin_state_t step_state = gpio_output_pin_read(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
@@ -282,8 +312,8 @@ void motor_z_execute_step()
 {
 	if (system_state == CALIBRATE)
 	{
-		bool full_step_pos = (z_cal_count % 32 == 0); // Check if in full step position
-		if ((z_enable && gpio_input_pin_read(Z_LIM_GPIO_Port, Z_LIM_Pin)) || !full_step_pos)
+		bool full_step_pos = (z_cal_count % Z_STEP_MODE == 0); // Check if in full step position
+		if ((z_cal_enable && gpio_input_pin_read(Z_LIM_GPIO_Port, Z_LIM_Pin)) || !full_step_pos)
 		{
 			// Update calibration step count on falling edge
 			gpio_pin_state_t step_state = gpio_output_pin_read(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);

@@ -6,6 +6,7 @@ void delay(uint32_t count)
 	for(uint32_t i = 0; i < count; i++);
 }
 
+uint8_t temp = 0x69;
 int main(void)
 {
 	// Configure the system clock, flash memory and power settings
@@ -25,13 +26,16 @@ int main(void)
 	// Calibrate stepper motors
 	motor_calibrate();
 
-//	// Initialize target position
-//	motor_x_target_pos(1000);
-//	motor_y_target_pos(1000);
-//	motor_z_target_pos(1000);
-//	motor_run(); // Initiate motor run
-//
-//	while(motor_system_state() != READY); // Wait for run to complete
+	// Initialize target position
+	motor_x_target_pos(X_MAX_POS / X_STEP_MODE / 2);
+	motor_y_target_pos(Y_MAX_POS / Y_STEP_MODE / 2);
+	motor_z_target_pos(Z_MAX_POS / Z_STEP_MODE / 2);
+	motor_r_target_pos(R_MAX_POS / R_STEP_MODE);
+	motor_run(); // Initiate motor run
+
+	while(motor_system_state() != READY); // Wait for run to complete
+
+	motor_sleep_all();
 
 	while(1)
 	{
@@ -144,7 +148,7 @@ void initialize_tim7()
 
 	// Configure TIM7
 	TIM7->PSC = (uint16_t) 31; // Set prescalar
-	TIM7->ARR = (uint16_t) 199; // Set auto-reload register value
+	TIM7->ARR = (uint16_t) 399; // Set auto-reload register value
 	TIM7->DIER |= TIM_DIER_UIE; // Enable update interrupt
 	TIM7->CR1 |= TIM_CR1_CEN; // Enable counter
 
