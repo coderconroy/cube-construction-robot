@@ -5,29 +5,56 @@
 
 HomeView::HomeView(QWidget* parent) : QWidget(parent)
 {
+    // Initialize stylesheets
+    QString headingStyleSheet = 
+        "font-size: 30px;"
+        "font-family: Calibri, sans-serif";
+
     // Initialize camera feed
+    cameraHeading = new QLabel("Camera Connection");
+    cameraHeading->setStyleSheet(headingStyleSheet);
     cameraFeed = new QLabel();
 
-    // Initialize available serial ports list
-    portListLabel = new QLabel(tr("Available Ports:"));
+    // Initialize robotic system connection widgets
+    robotHeading = new QLabel("Robot Connection");
+    robotHeading->setStyleSheet(headingStyleSheet);
+    portListLabel = new QLabel("Available Ports:");
     portList = new QListWidget();
+    refreshButton = new QPushButton("Refresh Ports");
+    connectButton = new QPushButton("Connect to Robot");
+    connectButton->setEnabled(false);
 
-    // Populate available serial ports
     refreshAvailablePorts();
 
-    // Initialize serial port layout
-    portLayout = new QVBoxLayout();
-    portLayout->addWidget(portListLabel);
-    portLayout->addWidget(portList);
+    connect(portList, &QListWidget::itemSelectionChanged, this, &HomeView::portListSelectionChange);
+    connect(refreshButton, &QPushButton::clicked, this, &HomeView::refreshAvailablePorts);
+    connect(connectButton, &QPushButton::clicked, this, &HomeView::connectToRobot);
+
+    // Initialize camera connection layout
+    cameraLayout = new QVBoxLayout();
+    cameraLayout->addWidget(cameraHeading);
+    cameraLayout->addWidget(cameraFeed);
+
+    // Initialize robotic subsystem connection layout
+    robotLayout = new QVBoxLayout();
+    robotLayout->setSpacing(10);
+    robotLayout->addWidget(robotHeading);
+    robotLayout->addWidget(portListLabel);
+    robotLayout->addWidget(portList);
+    robotLayout->addWidget(refreshButton);
+    robotLayout->addWidget(connectButton);
 
     // Initialize hardware layout
     hardwareLayout = new QHBoxLayout();
-    hardwareLayout->addWidget(cameraFeed);
-    hardwareLayout->addLayout(portLayout);
+    hardwareLayout->addLayout(cameraLayout);
+    hardwareLayout->addSpacing(20);
+    hardwareLayout->addLayout(robotLayout);
 
     // Initialize base layout
     baseLayout = new QVBoxLayout();
+    baseLayout->addStretch();
     baseLayout->addLayout(hardwareLayout);
+    baseLayout->addStretch();
 
     // Add base layout to view
     setLayout(baseLayout);
@@ -50,7 +77,10 @@ HomeView::~HomeView()
 
 void HomeView::refreshAvailablePorts()
 {
+    // Clear existing ports in list
     portList->clear();
+
+    // Populate list with name and description of all available ports
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
     for (int i = 0; i < serialPorts.length(); i++)
     {
@@ -58,6 +88,9 @@ void HomeView::refreshAvailablePorts()
         QString description = port.portName() + ": " + port.description();
         new QListWidgetItem(description, portList);
     }
+
+    // Update home screen state
+    connectButton->setEnabled(false);
 }
 
 void HomeView::updateCameraFeed()
@@ -67,7 +100,17 @@ void HomeView::updateCameraFeed()
     *camera >> frame;
 
     // Display image in camera feed
-    cvtColor(frame, frame, cv::COLOR_BGR2RGB); // COnvert from BGR to RGB
+    cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
     QImage cameraFeedImage = QImage((uchar*) frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
     cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
+}
+
+void HomeView::connectToRobot()
+{
+
+}
+
+void HomeView::portListSelectionChange()
+{
+    connectButton->setEnabled(portList->currentItem() != NULL);
 }
