@@ -1,5 +1,6 @@
 #include "HomeView.h"
 #include "iostream"
+#include <QSerialPort>
 
 HomeView::HomeView(QWidget* parent) : QWidget(parent)
 {
