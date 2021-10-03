@@ -1,20 +1,36 @@
 #include "HomeView.h"
 #include "iostream"
-#include <QSerialPort>
+#include <QSerialPortInfo>
+#include <QList>
 
 HomeView::HomeView(QWidget* parent) : QWidget(parent)
 {
-    // Initialize camera feed label
-    cameraFeed = new QLabel(this);
+    // Initialize camera feed
+    cameraFeed = new QLabel();
 
-    // Initialize layout
-    layout = new QVBoxLayout(this);
+    // Initialize available serial ports list
+    portListLabel = new QLabel(tr("Available Ports:"));
+    portList = new QListWidget();
 
-    // Add camera label to layout
-    layout->addWidget(cameraFeed);
+    // Populate available serial ports
+    refreshAvailablePorts();
 
-    // Add layout to view
-    setLayout(layout);
+    // Initialize serial port layout
+    portLayout = new QVBoxLayout();
+    portLayout->addWidget(portListLabel);
+    portLayout->addWidget(portList);
+
+    // Initialize hardware layout
+    hardwareLayout = new QHBoxLayout();
+    hardwareLayout->addWidget(cameraFeed);
+    hardwareLayout->addLayout(portLayout);
+
+    // Initialize base layout
+    baseLayout = new QVBoxLayout();
+    baseLayout->addLayout(hardwareLayout);
+
+    // Add base layout to view
+    setLayout(baseLayout);
 
     // Initialize camera
     camera = new cv::VideoCapture(0);
@@ -30,6 +46,18 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
 HomeView::~HomeView()
 {
     delete camera;
+}
+
+void HomeView::refreshAvailablePorts()
+{
+    portList->clear();
+    QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
+    for (int i = 0; i < serialPorts.length(); i++)
+    {
+        QSerialPortInfo port = serialPorts[i];
+        QString description = port.portName() + ": " + port.description();
+        new QListWidgetItem(description, portList);
+    }
 }
 
 void HomeView::updateCameraFeed()
