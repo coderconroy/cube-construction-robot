@@ -1,3 +1,4 @@
+#include "Robot.h"
 #include <QWidget>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -5,6 +6,8 @@
 #include <QTimer>
 #include <QListWidget>
 #include <QPushButton>
+#include <QSerialPortInfo>
+#include <QMap>
 #include "opencv2/opencv.hpp"
 
 /*!
@@ -38,13 +41,17 @@ private:
     QHBoxLayout* hardwareLayout; /*! Layout for hardware connection widgets */
     QPushButton* refreshButton; /*! Refresh the available ports list */
     QPushButton* connectButton; /*! Trigger robot connection attempt */
+    QPushButton* disconnectButton; /*! Disconnect from robot */
     QLabel* cameraFeed; /*! Display live images captured by camera */
     QLabel* portListLabel; /*! Label for available serial ports */
     QLabel* cameraHeading; /*! Heading for camera connection seciton */
     QLabel* robotHeading; /*! Heading for robot connection section */
     QListWidget* portList; /*! List of available serial ports */
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
-    cv::VideoCapture* camera; /*! Source of live camera images */
+    QMap<QString, QSerialPortInfo>* portInfoMap; /*! Map of items in serial port list to serial ports*/
+    QSerialPort* port; /*! Serial port for UART communication with robot */
+    cv::VideoCapture* camera = nullptr; /*! Source of live camera images */
+    Robot* robot = nullptr; /*! Interface with the robotic subsystem */
 
     /*!
     * Update list of serial ports available.

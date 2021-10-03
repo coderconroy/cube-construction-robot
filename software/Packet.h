@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 
 /*!
@@ -31,14 +32,14 @@ public:
 	* \param [in] word Index of data word to be retrieved.
 	* \return Data word.
 	*/
-	uint16_t getDataWord(const uint8_t word) const;
+	uint16_t getDataWord(const int word) const;
 
 	/*!
 	* Set packet data word (with word size of 16 bits)
 	* \param [in] word Index of data word to be set.
 	* \param [in] value Value of data word.
 	*/
-	void setDataWord(const uint8_t word, const uint16_t value);
+	void setDataWord(const int word, const uint16_t value);
 
 	/*!
 	* Get packet data (with word size of 16 bits) for all 4 data words.
@@ -52,6 +53,18 @@ public:
 	* \param [in] Source of data words
 	*/
 	void setData(const uint16_t* data);
+
+	/*!
+	* Get packet in form of char array structured for UART transmission.
+	* \param [out] Detination array for packet information.
+	*/
+	void getTransmissionData(char* const data);
+
+	/*!
+	* Get the number of bytes in the packet.
+	* \return Packet byte size.
+	*/
+	int getSize();
 
 private:
 	uint8_t control; /*! Packet control byte */

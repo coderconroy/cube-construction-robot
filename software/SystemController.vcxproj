@@ -110,6 +110,7 @@
     <QtMoc Include="SystemController.h" />
     <ClCompile Include="HomeView.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="Robot.cpp" />
     <ClCompile Include="SystemController.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -121,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="Robot.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

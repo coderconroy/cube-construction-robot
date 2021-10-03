@@ -1,6 +1,7 @@
 #include "HomeView.h"
 #include "iostream"
-#include <QSerialPortInfo>
+#include "Packet.h"
+#include <QSerialPort>
 #include <QList>
 
 HomeView::HomeView(QWidget* parent) : QWidget(parent)
@@ -11,24 +12,28 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
         "font-family: Calibri, sans-serif";
 
     // Initialize camera feed
-    cameraHeading = new QLabel("Camera Connection");
+    cameraHeading = new QLabel("Camera");
     cameraHeading->setStyleSheet(headingStyleSheet);
     cameraFeed = new QLabel();
 
     // Initialize robotic system connection widgets
-    robotHeading = new QLabel("Robot Connection");
+    robotHeading = new QLabel("Robot");
     robotHeading->setStyleSheet(headingStyleSheet);
     portListLabel = new QLabel("Available Ports:");
     portList = new QListWidget();
     refreshButton = new QPushButton("Refresh Ports");
     connectButton = new QPushButton("Connect to Robot");
     connectButton->setEnabled(false);
-
-    refreshAvailablePorts();
-
+    disconnectButton = new QPushButton("Disconnect from Robot");
+    
     connect(portList, &QListWidget::itemSelectionChanged, this, &HomeView::portListSelectionChange);
     connect(refreshButton, &QPushButton::clicked, this, &HomeView::refreshAvailablePorts);
     connect(connectButton, &QPushButton::clicked, this, &HomeView::connectToRobot);
+
+    // Initialize map of ports in list to port info
+    portInfoMap = new QMap<QString, QSerialPortInfo>();
+
+    refreshAvailablePorts();
 
     // Initialize camera connection layout
     cameraLayout = new QVBoxLayout();
@@ -73,12 +78,14 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
 HomeView::~HomeView()
 {
     delete camera;
+    delete robot;
 }
 
 void HomeView::refreshAvailablePorts()
 {
     // Clear existing ports in list
     portList->clear();
+    portInfoMap->clear();
 
     // Populate list with name and description of all available ports
     QList<QSerialPortInfo> serialPorts = QSerialPortInfo::availablePorts();
@@ -87,6 +94,7 @@ void HomeView::refreshAvailablePorts()
         QSerialPortInfo port = serialPorts[i];
         QString description = port.portName() + ": " + port.description();
         new QListWidgetItem(description, portList);
+        portInfoMap->insert(description, port);
     }
 
     // Update home screen state
@@ -107,7 +115,33 @@ void HomeView::updateCameraFeed()
 
 void HomeView::connectToRobot()
 {
+    // Get selected serial port
+    QString selectedPort = portList->currentItem()->text();
+    QSerialPortInfo selectedPortInfo = portInfoMap->value(selectedPort);
+    port = new QSerialPort(selectedPortInfo, this);
 
+    // Initialize port
+    port->setBaudRate(QSerialPort::Baud115200);
+    port->setDataBits(QSerialPort::Data8);
+    port->setParity(QSerialPort::NoParity);
+    port->setStopBits(QSerialPort::OneStop);
+    port->setFlowControl(QSerialPort::NoFlowControl);
+
+    // Open port
+    if (port->open(QIODevice::ReadWrite))
+    {
+        // TODO: Verify connection with robot
+        // Update home screen state if connection successful
+        portList->setEnabled(false);
+        refreshButton->setEnabled(false);
+        robotLayout->replaceWidget(connectButton, disconnectButton);
+
+        // Initialize robot interface
+        robot = new Robot(port);
+
+        // Initialize calibrate robot
+        robot->calibrate();
+    }
 }
 
 void HomeView::portListSelectionChange()
