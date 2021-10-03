@@ -7,7 +7,7 @@
 
 // Defines
 #define TX_BUFFER_SIZE 256 // Size of buffer to store bytes waiting to be transmitted
-#define RX_BUFFER_SIZE 256 // Size of buffer to store received bytes before they are read
+#define RX_BUFFER_SIZE 1000 // Size of buffer to store received bytes before they are read
 
 // Function prototypes
 
@@ -54,28 +54,28 @@ void usart_receive_packet(packet_t* const data);
  *
  * @return Number of bytes available.
  */
-uint8_t usart_bytes_available();
+uint16_t usart_bytes_available();
 
 /**
  * Get the number of bytes that are in queue for waiting for transmission.
  *
  * @return Number of bytes waiting.
  */
-uint8_t usart_bytes_waiting();
+uint16_t usart_bytes_waiting();
 
 /**
  * Get the number of received packets available.
  *
  * @return Number of packets available.
  */
-uint8_t usart_packets_available();
+uint16_t usart_packets_available();
 
 /**
  * Get the number of packets that are in queue for waiting for transmission.
  *
  * @return Number of packets waiting.
  */
-uint8_t usart_packets_waiting();
+uint16_t usart_packets_waiting();
 
 
 /**

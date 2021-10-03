@@ -2,13 +2,13 @@
 
 // USART TX state variables
 uint8_t tx_buffer[TX_BUFFER_SIZE]; // Bytes to be transmitted
-uint8_t tx_read_index = 0; // Index of next byte to be transmitted in TX buffer
-uint8_t tx_write_index = 0; // Index of position in TX buffer next byte will be written to
+uint16_t tx_read_index = 0; // Index of next byte to be transmitted in TX buffer
+uint16_t tx_write_index = 0; // Index of position in TX buffer next byte will be written to
 
 // USART RX state variables
 uint8_t rx_buffer[RX_BUFFER_SIZE]; // Buffer to store received bytes
-uint8_t rx_read_index = 0; // Index of next byte to be read in RX buffer
-uint8_t rx_write_index = 0; // Index of position in RX buffer next byte will be written to
+uint16_t rx_read_index = 0; // Index of next byte to be read in RX buffer
+uint16_t rx_write_index = 0; // Index of position in RX buffer next byte will be written to
 
 void initialize_usart_hal()
 {
@@ -90,22 +90,22 @@ void usart_receive_packet(packet_t* const packet)
 	}
 }
 
-uint8_t usart_bytes_available()
+uint16_t usart_bytes_available()
 {
 	return (((int16_t) rx_write_index) - rx_read_index) % RX_BUFFER_SIZE;
 }
 
-uint8_t usart_bytes_waiting()
+uint16_t usart_bytes_waiting()
 {
 	return (((int16_t) tx_write_index) - tx_read_index) % TX_BUFFER_SIZE;
 }
 
-uint8_t usart_packets_available()
+uint16_t usart_packets_available()
 {
 	return usart_bytes_available() / PACKET_SIZE;
 }
 
-uint8_t usart_packets_waiting()
+uint16_t usart_packets_waiting()
 {
 	return usart_bytes_waiting() / PACKET_SIZE;
 }

@@ -60,6 +60,9 @@ int main(void)
 				else if (rx_packet.data[0] == 0x2)
 					vacuum_actuate(SERVO_PERIOD_RELEASE);
 				break;
+			case 0x5:
+				delay(2000000);
+				break;
 			}
 		}
 	}
