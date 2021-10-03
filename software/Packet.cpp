@@ -45,7 +45,7 @@ void Packet::setData(const uint16_t* data)
 		this->data[i] = data[i];
 }
 
-void Packet::getTransmissionData(char* const data)
+void Packet::getTransmissionData(char* const data) const
 {
 	// Copy packet data to destination array
 	data[0] = control;
@@ -59,7 +59,7 @@ void Packet::getTransmissionData(char* const data)
 	data[8] = this->data[3] >> 8;
 }
 
-int Packet::getSize()
+int Packet::getSize() const
 {
 	return 9;
 }

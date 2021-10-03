@@ -58,13 +58,13 @@ public:
 	* Get packet in form of char array structured for UART transmission.
 	* \param [out] Detination array for packet information.
 	*/
-	void getTransmissionData(char* const data);
+	void getTransmissionData(char* const data) const;
 
 	/*!
 	* Get the number of bytes in the packet.
 	* \return Packet byte size.
 	*/
-	int getSize();
+	int getSize() const;
 
 private:
 	uint8_t control; /*! Packet control byte */

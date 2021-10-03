@@ -56,7 +56,18 @@ public:
 	*/
 	void resetGripper();
 
+	/*!
+	* Pause briefly before continuing with next action
+	*/
+	void delay();
+
 private:
 	QSerialPort* port; /*! Serial port for communication with robot */
+
+	/*!
+	* Transmit the packet over the serial port instance.
+	* \param [in] packet Packet to transmit.
+	*/
+	void transmitPacket(const Packet &packet);
 };
 

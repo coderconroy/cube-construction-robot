@@ -141,6 +141,15 @@ void HomeView::connectToRobot()
 
         // Initialize calibrate robot
         robot->calibrate();
+        robot->setPosition(500, 500, 500, 10);
+        robot->actuateGripper();
+        robot->delay();
+        robot->setPosition(100, 100, 100, 0);
+        robot->releaseGripper();
+        robot->delay();
+        robot->resetGripper();
+        robot->setPosition(500, 500, 500, 10);
+        robot->sleep();
     }
 }
 
