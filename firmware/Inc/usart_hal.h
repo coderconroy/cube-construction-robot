@@ -7,7 +7,7 @@
 
 // Defines
 #define TX_BUFFER_SIZE 256 // Size of buffer to store bytes waiting to be transmitted
-#define RX_BUFFER_SIZE 1000 // Size of buffer to store received bytes before they are read
+#define RX_BUFFER_SIZE 4000 // Size of buffer to store received bytes before they are read
 
 // Function prototypes
 

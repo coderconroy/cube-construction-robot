@@ -5,7 +5,7 @@
 /*!
 * Defines an interface for interfacing with the robotic subsystem that abstracts the serial communication mechanism.
 */
-class Robot
+class Robot: public QObject
 {
 public:
 	/*!

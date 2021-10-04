@@ -63,6 +63,7 @@ private:
     QPushButton* idleRobotActuator;
     QPushButton* actuateRobotActuator;
     QPushButton* releaseRobotActuator;
+    QPushButton* demo;
     QLabel* xPositionLabel;
     QLabel* yPositionLabel;
     QLabel* zPositionLabel;
@@ -93,11 +94,11 @@ private:
     void portListSelectionChange();
 
     void sleepRobotClicked();
-    void wakeRoobtClicked();
+    void wakeRobotClicked();
     void calibrateRobotClicked();
     void setRobotPositionClicked();
     void idleRobotActuatorClicked();
     void actuateRobotActuatorClicked();
     void releaseRobotActuatorClicked();
-
+    void performDemo();
 };

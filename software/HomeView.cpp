@@ -61,6 +61,15 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     idleRobotActuator = new QPushButton("Actuator->Idle");
     actuateRobotActuator = new QPushButton("Actuator->Actuate");
     releaseRobotActuator = new QPushButton("Actuator->Release");
+    demo = new QPushButton("Perform Demo");
+
+    connect(sleepRobot, &QPushButton::clicked, this, &HomeView::sleepRobotClicked);
+    connect(wakeRobot, &QPushButton::clicked, this, &HomeView::wakeRobotClicked);
+    connect(calibrateRobot, &QPushButton::clicked, this, &HomeView::calibrateRobotClicked);
+    connect(idleRobotActuator, &QPushButton::clicked, this, &HomeView::idleRobotActuatorClicked);
+    connect(actuateRobotActuator, &QPushButton::clicked, this, &HomeView::actuateRobotActuatorClicked);
+    connect(releaseRobotActuator, &QPushButton::clicked, this, &HomeView::releaseRobotActuatorClicked);
+    connect(demo, &QPushButton::clicked, this, &HomeView::performDemo);
 
     robotControlLayout = new QHBoxLayout();
     robotControlLayout->addStretch();
@@ -70,13 +79,14 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     robotControlLayout->addWidget(idleRobotActuator);
     robotControlLayout->addWidget(actuateRobotActuator);
     robotControlLayout->addWidget(releaseRobotActuator);
+    robotControlLayout->addWidget(demo);
     robotControlLayout->addStretch();
 
     // Initialize robot position control
-    xPositionLabel = new QLabel("X steps");
-    yPositionLabel = new QLabel("Y steps");
-    zPositionLabel = new QLabel("Z steps");
-    rPositionLabel = new QLabel("R steps");
+    xPositionLabel = new QLabel("X steps: [0, 1015]");
+    yPositionLabel = new QLabel("Y steps: [0, 1125]");
+    zPositionLabel = new QLabel("Z steps: [0, 2390]");
+    rPositionLabel = new QLabel("R steps: [-78, 78]");
     xPosition = new QSpinBox();
     yPosition = new QSpinBox();
     zPosition = new QSpinBox();
@@ -84,13 +94,15 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     setRobotPosition = new QPushButton("Initiate Move");
 
     xPosition->setMinimum(0);
-    xPosition->setMaximum(2000);
+    xPosition->setMaximum(1015);
     yPosition->setMinimum(0);
-    yPosition->setMaximum(2000);
+    yPosition->setMaximum(1125);
     zPosition->setMinimum(0);
-    zPosition->setMaximum(2000);
-    rPosition->setMinimum(-500);
-    rPosition->setMaximum(500);
+    zPosition->setMaximum(2390);
+    rPosition->setMinimum(-78);
+    rPosition->setMaximum(78);
+
+    connect(setRobotPosition, &QPushButton::clicked, this, &HomeView::setRobotPositionClicked);
 
     robotPositionLayout = new QHBoxLayout();
     robotPositionLayout->addStretch();
@@ -203,35 +215,77 @@ void HomeView::portListSelectionChange()
 
 void HomeView::sleepRobotClicked()
 {
-
+    robot->sleep();
 }
 
-void HomeView::wakeRoobtClicked()
+void HomeView::wakeRobotClicked()
 {
-
+    robot->wake();
 }
 
 void HomeView::calibrateRobotClicked()
 {
-
+    robot->calibrate();
 }
 
 void HomeView::setRobotPositionClicked()
 {
-
+    robot->setPosition(xPosition->value(), yPosition->value(), zPosition->value(), rPosition->value());
 }
 
 void HomeView::idleRobotActuatorClicked()
 {
-
+    robot->resetGripper();
 }
 
 void HomeView::actuateRobotActuatorClicked()
 {
-
+    robot->actuateGripper();
 }
 
-void releaseRobotActuatorClicked()
+void HomeView::releaseRobotActuatorClicked()
 {
+    robot->releaseGripper();
+}
 
+const int cubeHeight = 318;
+const int cubeWidth = 64;
+const int baseLayer = 180;
+const int bufferAction = 50;
+const int moveOffset = 200;
+const int cubePadding = 8;
+const int numCubes = 14;
+int centreSpacing = cubeWidth + 2 * cubePadding;
+void HomeView::performDemo()
+{
+    int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620 };
+    int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045 };
+    int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
+
+    int xDest[numCubes] = {500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500, 500 + centreSpacing, 500 + 2 *centreSpacing, 
+        500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2, 500 + centreSpacing / 2, 
+        500 + 3 * centreSpacing / 2, 500 + centreSpacing};
+    int yDest[numCubes] = {500, 500, 500, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + 2 * centreSpacing, 
+        500 + 2 * centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2,
+        500 + 3 * centreSpacing / 2, 500 + centreSpacing};
+    int zDest[numCubes] = {baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer,
+    baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + 2 * cubeHeight};
+
+    for (int i = 0; i < numCubes; i++)
+    {
+        // Pick up cube at source 
+        robot->setPosition(xSrc[i], ySrc[i], zSrc[i] + moveOffset, 0);
+        robot->setPosition(xSrc[i], ySrc[i], zSrc[i] - bufferAction, 0);
+        robot->actuateGripper();
+        robot->delay();
+        robot->setPosition(xSrc[i], ySrc[i], zDest[i] + moveOffset + cubeHeight, 0);
+
+        // Place cube at destination
+        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, 0);
+        robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, 0);
+        robot->releaseGripper();
+        robot->delay();
+        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, 0);
+        robot->resetGripper();
+    }
 }
