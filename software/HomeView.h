@@ -7,6 +7,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QSerialPortInfo>
+#include <QSpinBox>
 #include <QMap>
 #include "opencv2/opencv.hpp"
 
@@ -53,6 +54,24 @@ private:
     cv::VideoCapture* camera = nullptr; /*! Source of live camera images */
     Robot* robot = nullptr; /*! Interface with the robotic subsystem */
 
+    QHBoxLayout* robotPositionLayout;
+    QHBoxLayout* robotControlLayout;
+    QPushButton* sleepRobot;
+    QPushButton* wakeRobot;
+    QPushButton* calibrateRobot;
+    QPushButton* setRobotPosition;
+    QPushButton* idleRobotActuator;
+    QPushButton* actuateRobotActuator;
+    QPushButton* releaseRobotActuator;
+    QLabel* xPositionLabel;
+    QLabel* yPositionLabel;
+    QLabel* zPositionLabel;
+    QLabel* rPositionLabel;
+    QSpinBox* xPosition;
+    QSpinBox* yPosition;
+    QSpinBox* zPosition;
+    QSpinBox* rPosition;
+
     /*!
     * Update list of serial ports available.
     */
@@ -72,4 +91,13 @@ private:
     * Update home screen state when the serial port selection changes
     */
     void portListSelectionChange();
+
+    void sleepRobotClicked();
+    void wakeRoobtClicked();
+    void calibrateRobotClicked();
+    void setRobotPositionClicked();
+    void idleRobotActuatorClicked();
+    void actuateRobotActuatorClicked();
+    void releaseRobotActuatorClicked();
+
 };

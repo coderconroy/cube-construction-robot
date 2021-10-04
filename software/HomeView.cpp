@@ -16,6 +16,11 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     cameraHeading->setStyleSheet(headingStyleSheet);
     cameraFeed = new QLabel();
 
+    // Initialize camera connection layout
+    cameraLayout = new QVBoxLayout();
+    cameraLayout->addWidget(cameraHeading);
+    cameraLayout->addWidget(cameraFeed);
+
     // Initialize robotic system connection widgets
     robotHeading = new QLabel("Robot");
     robotHeading->setStyleSheet(headingStyleSheet);
@@ -32,13 +37,7 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
 
     // Initialize map of ports in list to port info
     portInfoMap = new QMap<QString, QSerialPortInfo>();
-
     refreshAvailablePorts();
-
-    // Initialize camera connection layout
-    cameraLayout = new QVBoxLayout();
-    cameraLayout->addWidget(cameraHeading);
-    cameraLayout->addWidget(cameraFeed);
 
     // Initialize robotic subsystem connection layout
     robotLayout = new QVBoxLayout();
@@ -54,6 +53,57 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     hardwareLayout->addLayout(cameraLayout);
     hardwareLayout->addSpacing(20);
     hardwareLayout->addLayout(robotLayout);
+
+    // Initialize general robot controls
+    sleepRobot = new QPushButton("Sleep");
+    wakeRobot = new QPushButton("Wake");
+    calibrateRobot = new QPushButton("Calibrate");
+    idleRobotActuator = new QPushButton("Actuator->Idle");
+    actuateRobotActuator = new QPushButton("Actuator->Actuate");
+    releaseRobotActuator = new QPushButton("Actuator->Release");
+
+    robotControlLayout = new QHBoxLayout();
+    robotControlLayout->addStretch();
+    robotControlLayout->addWidget(sleepRobot);
+    robotControlLayout->addWidget(wakeRobot);
+    robotControlLayout->addWidget(calibrateRobot);
+    robotControlLayout->addWidget(idleRobotActuator);
+    robotControlLayout->addWidget(actuateRobotActuator);
+    robotControlLayout->addWidget(releaseRobotActuator);
+    robotControlLayout->addStretch();
+
+    // Initialize robot position control
+    xPositionLabel = new QLabel("X steps");
+    yPositionLabel = new QLabel("Y steps");
+    zPositionLabel = new QLabel("Z steps");
+    rPositionLabel = new QLabel("R steps");
+    xPosition = new QSpinBox();
+    yPosition = new QSpinBox();
+    zPosition = new QSpinBox();
+    rPosition = new QSpinBox();
+    setRobotPosition = new QPushButton("Initiate Move");
+
+    xPosition->setMinimum(0);
+    xPosition->setMaximum(2000);
+    yPosition->setMinimum(0);
+    yPosition->setMaximum(2000);
+    zPosition->setMinimum(0);
+    zPosition->setMaximum(2000);
+    rPosition->setMinimum(-500);
+    rPosition->setMaximum(500);
+
+    robotPositionLayout = new QHBoxLayout();
+    robotPositionLayout->addStretch();
+    robotPositionLayout->addWidget(xPositionLabel);
+    robotPositionLayout->addWidget(xPosition);
+    robotPositionLayout->addWidget(yPositionLabel);
+    robotPositionLayout->addWidget(yPosition);
+    robotPositionLayout->addWidget(zPositionLabel);
+    robotPositionLayout->addWidget(zPosition);
+    robotPositionLayout->addWidget(rPositionLabel);
+    robotPositionLayout->addWidget(rPosition);
+    robotPositionLayout->addWidget(setRobotPosition);
+    robotPositionLayout->addStretch();
 
     // Initialize base layout
     baseLayout = new QVBoxLayout();
@@ -132,28 +182,56 @@ void HomeView::connectToRobot()
     {
         // TODO: Verify connection with robot
         // Update home screen state if connection successful
+        baseLayout->addLayout(robotControlLayout);
+        baseLayout->addSpacing(20);
+        baseLayout->addLayout(robotPositionLayout);
+        baseLayout->addStretch();
         portList->setEnabled(false);
         refreshButton->setEnabled(false);
         robotLayout->replaceWidget(connectButton, disconnectButton);
-
+        delete connectButton;
+        
         // Initialize robot interface
         robot = new Robot(port);
-
-        // Initialize calibrate robot
-        robot->calibrate();
-        robot->setPosition(500, 500, 500, 10);
-        robot->actuateGripper();
-        robot->delay();
-        robot->setPosition(100, 100, 100, 0);
-        robot->releaseGripper();
-        robot->delay();
-        robot->resetGripper();
-        robot->setPosition(500, 500, 500, 10);
-        robot->sleep();
     }
 }
 
 void HomeView::portListSelectionChange()
 {
     connectButton->setEnabled(portList->currentItem() != NULL);
+}
+
+void HomeView::sleepRobotClicked()
+{
+
+}
+
+void HomeView::wakeRoobtClicked()
+{
+
+}
+
+void HomeView::calibrateRobotClicked()
+{
+
+}
+
+void HomeView::setRobotPositionClicked()
+{
+
+}
+
+void HomeView::idleRobotActuatorClicked()
+{
+
+}
+
+void HomeView::actuateRobotActuatorClicked()
+{
+
+}
+
+void releaseRobotActuatorClicked()
+{
+
 }
