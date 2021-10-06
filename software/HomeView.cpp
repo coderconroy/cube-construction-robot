@@ -254,22 +254,24 @@ const int baseLayer = 180;
 const int bufferAction = 50;
 const int moveOffset = 200;
 const int cubePadding = 8;
-const int numCubes = 14;
+const int numCubes = 17;
 int centreSpacing = cubeWidth + 2 * cubePadding;
 void HomeView::performDemo()
 {
-    int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620 };
-    int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045 };
-    int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
+    int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873 };
+    int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045, 983, 983, 983 };
+    int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
 
     int xDest[numCubes] = {500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500, 500 + centreSpacing, 500 + 2 *centreSpacing, 
         500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2, 500 + centreSpacing / 2, 
-        500 + 3 * centreSpacing / 2, 500 + centreSpacing};
+        500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
     int yDest[numCubes] = {500, 500, 500, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + 2 * centreSpacing, 
         500 + 2 * centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2,
-        500 + 3 * centreSpacing / 2, 500 + centreSpacing};
+        500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
     int zDest[numCubes] = {baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer,
-    baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + 2 * cubeHeight};
+    baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + 2 * cubeHeight,
+    baseLayer + 3 * cubeHeight, baseLayer + 4 * cubeHeight, baseLayer + 5 * cubeHeight };
+    int rDest[numCubes] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 40, 60 };
 
     for (int i = 0; i < numCubes; i++)
     {
@@ -281,11 +283,11 @@ void HomeView::performDemo()
         robot->setPosition(xSrc[i], ySrc[i], zDest[i] + moveOffset + cubeHeight, 0);
 
         // Place cube at destination
-        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, 0);
-        robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, 0);
+        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, rDest[i]);
+        robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, rDest[i]);
         robot->releaseGripper();
         robot->delay();
-        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, 0);
+        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, rDest[i]);
         robot->resetGripper();
     }
 }
