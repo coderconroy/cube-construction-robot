@@ -1,5 +1,6 @@
 #include "OpenGLView.h"
 #include "iostream"
+#include <glm/glm.hpp>
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"

@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>C:\opencv\build\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\inc;C:\opencv\build\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -107,26 +107,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <QtRcc Include="SystemController.qrc" />
-    <QtMoc Include="SystemController.h" />
-    <ClCompile Include="DesignView.cpp" />
-    <ClCompile Include="HomeView.cpp" />
-    <ClCompile Include="OpenGLView.cpp" />
-    <ClCompile Include="Packet.cpp" />
-    <ClCompile Include="Robot.cpp" />
-    <ClCompile Include="SystemController.cpp" />
-    <ClCompile Include="main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtMoc Include="HomeView.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="DesignView.h" />
-    <ClInclude Include="OpenGLView.h" />
-    <ClInclude Include="Packet.h" />
-    <ClInclude Include="Robot.h" />
+    <QtMoc Include="inc\DesignView.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="inc\HomeView.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\OpenGLView.h" />
+    <ClInclude Include="inc\Packet.h" />
+    <ClInclude Include="inc\Robot.h" />
+    <QtMoc Include="inc\SystemController.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DesignView.cpp" />
+    <ClCompile Include="src\HomeView.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OpenGLView.cpp" />
+    <ClCompile Include="src\Packet.cpp" />
+    <ClCompile Include="src\Robot.cpp" />
+    <ClCompile Include="src\SystemController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
