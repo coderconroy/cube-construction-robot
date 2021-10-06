@@ -32,12 +32,12 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.2.0_msvc2019_64</QtInstall>
-    <QtModules>core;gui;serialport;widgets</QtModules>
+    <QtModules>core;gui;opengl;serialport;widgets;openglwidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.0.3_msvc2019_64</QtInstall>
-    <QtModules>core;gui;widgets</QtModules>
+    <QtInstall>6.2.0_msvc2019_64</QtInstall>
+    <QtModules>core;gui;opengl;serialport;widgets;openglwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
@@ -108,7 +108,9 @@
   <ItemGroup>
     <QtRcc Include="SystemController.qrc" />
     <QtMoc Include="SystemController.h" />
+    <ClCompile Include="DesignView.cpp" />
     <ClCompile Include="HomeView.cpp" />
+    <ClCompile Include="OpenGLView.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="Robot.cpp" />
     <ClCompile Include="SystemController.cpp" />
@@ -121,6 +123,8 @@
     <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="DesignView.h" />
+    <ClInclude Include="OpenGLView.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="Robot.h" />
   </ItemGroup>

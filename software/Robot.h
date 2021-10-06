@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Packet.h"
 #include <QSerialPort>
 

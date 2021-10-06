@@ -1,8 +1,9 @@
 #include <QWidget>
 #include <QStackedLayout>
 #include "HomeView.h"
+#include "DesignView.h"
 
-class SystemController : public QWidget
+class SystemController: public QWidget
 {
     Q_OBJECT
 
@@ -12,4 +13,5 @@ public:
 private:
     QStackedLayout* baseLayout;
     HomeView* homeView;
+    DesignView* designView;
 };

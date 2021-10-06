@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Robot.h"
 #include <QWidget>
 #include <QLabel>
@@ -20,7 +22,7 @@
 * and qualification testing components.
 */
 
-class HomeView : public QWidget
+class HomeView: public QWidget
 {
     Q_OBJECT
 
