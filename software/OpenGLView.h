@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 
-class OpenGLView: public QOpenGLWidget
+class OpenGLView: public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
 public:
     OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {};
