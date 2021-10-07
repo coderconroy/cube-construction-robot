@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\inc;C:\opencv\build\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\inc;C:\opencv\build\include;C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\lib;$(IncludePath)</IncludePath>
     <LibraryPath>C:\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -134,6 +134,7 @@
     <ClCompile Include="src\Packet.cpp" />
     <ClCompile Include="src\Robot.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\SystemController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

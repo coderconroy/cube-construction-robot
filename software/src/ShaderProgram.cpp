@@ -48,10 +48,22 @@ void ShaderProgram::useProgram()
 	f->glUseProgram(shaderProgramID);
 }
 
+void ShaderProgram::setUniformInt(const std::string& uniformName, int value) const
+{
+	auto f = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_3_Core>(context);
+	f->glUniform1i(f->glGetUniformLocation(shaderProgramID, uniformName.c_str()), value);
+}
+
 void ShaderProgram::setUniformFloat(const std::string& uniformName, float value) const
 {
 	auto f = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_3_Core>(context);
 	f->glUniform1f(f->glGetUniformLocation(shaderProgramID, uniformName.c_str()), value);
+}
+
+void ShaderProgram::setUniformMat4(const std::string& uniformName, const glm::mat4& mat) const
+{
+	auto f = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_3_Core>(context);
+	f->glUniformMatrix4fv(f->glGetUniformLocation(shaderProgramID, uniformName.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
 std::string ShaderProgram::readFile(const std::string& filePath)

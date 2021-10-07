@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QOpenGLFunctions_3_3_Core>
 #include <sstream>
+#include <glm/glm.hpp>
 
 class ShaderProgram : public QObject, protected QOpenGLFunctions_3_3_Core
 {
@@ -24,11 +25,25 @@ public:
 	void useProgram();
 
 	/*!
+	* Set the integer value for the uniform in the shader program.
+	* \param [in] uniformName Identifier of uniform to be set.
+	* \param [in] value New value of uniform.
+	*/
+	void setUniformInt(const std::string& uniformName, int value) const;
+
+	/*!
 	* Set the float value for the uniform in the shader program.
 	* \param [in] uniformName Identifier of uniform to be set.
 	* \param [in] value New value of uniform.
 	*/
 	void setUniformFloat(const std::string& uniformName, float value) const;
+
+	/*!
+	* Set the float value for the uniform in the shader program.
+	* \param [in] uniformName Identifier of uniform to be set.
+	* \param [in] mat New value of uniform.
+	*/
+	void setUniformMat4(const std::string& uniformName, const glm::mat4& mat) const;
 
 signals:
 	/*!
