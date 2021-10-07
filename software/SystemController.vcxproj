@@ -110,6 +110,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
+    <None Include="src\shaders\shader.frag" />
+    <None Include="src\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="inc\DesignView.h" />
@@ -118,9 +120,10 @@
     <QtMoc Include="inc\HomeView.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\OpenGLView.h" />
+    <QtMoc Include="inc\OpenGLView.h" />
     <ClInclude Include="inc\Packet.h" />
     <ClInclude Include="inc\Robot.h" />
+    <QtMoc Include="inc\ShaderProgram.h" />
     <QtMoc Include="inc\SystemController.h" />
   </ItemGroup>
   <ItemGroup>
@@ -130,6 +133,7 @@
     <ClCompile Include="src\OpenGLView.cpp" />
     <ClCompile Include="src\Packet.cpp" />
     <ClCompile Include="src\Robot.cpp" />
+    <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\SystemController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -14,4 +14,15 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	baseLayout->addWidget(shapeView);
 
 	setLayout(baseLayout);
+
+	// Initialize OpenGL shape view timer
+	// TODO: Review if this timer is necessary when other events trigger a shape view update
+	openGLTimer = new QTimer(this);
+	connect(openGLTimer, &QTimer::timeout, this, &DesignView::updateShapeView);
+	openGLTimer->start(20); // Update feed every 20ms
+}
+
+void DesignView::updateShapeView()
+{
+	shapeView->update();
 }
