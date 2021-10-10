@@ -121,7 +121,7 @@ void OpenGLView::resizeGL(int width, int height)
 void OpenGLView::paintGL()
 {
     // Reset the background color and depth buffer
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.67f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind cube texture to texture unit

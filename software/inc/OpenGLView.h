@@ -71,6 +71,6 @@ private:
     const std::string FRAG_SHADER_PATH = "src/shaders/shader.frag";
 
     // Texture resource paths
-    const char* CUBE_TEXTURE_PATH = "container.jpg";
+    const char* CUBE_TEXTURE_PATH = "cube-texture.jpg";
 };
 
