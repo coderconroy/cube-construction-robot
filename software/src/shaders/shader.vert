@@ -1,15 +1,20 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
+
+layout (location = 0) in vec3 positionAttr;
+layout (location = 1) in vec2 texCoordAttr;
 
 out vec2 TexCoord;
 
+// Transformation matrices
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
 void main()
 {
-    gl_Position = projection * view * model * vec4(aPos, 1.0f);
-    TexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
+    // Compute vertex position
+    gl_Position = projection * view * model * vec4(positionAttr, 1.0f);
+
+    // Pass texture coordinates to fragment shader
+    TexCoord = vec2(texCoordAttr.x, 1.0 - texCoordAttr.y);
 }

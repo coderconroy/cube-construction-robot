@@ -22,7 +22,7 @@ public:
 	void calibrate();
 
 	/*!
-	* Places all of the robotic subsystem motors in sleep mode. Note the robot must be recalibrated after performing this step
+	* Places all of the robotic subsystem motors in sleep mode. Note the robot must be recalibrated after performing this step.
 	*/
 	void sleep();
 

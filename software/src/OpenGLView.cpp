@@ -5,43 +5,20 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb-image/stb_image.h>
 
-// Shader path defines
-#define VERT_SHADER_PATH "src/shaders/shader.vert"
-#define FRAG_SHADER_PATH "src/shaders/shader.frag"
-
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-unsigned int texture1, texture2;
-
-// world space positions of our cubes
-glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f,  0.0f,  0.0f),
-    glm::vec3(2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3(2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3(1.3f, -2.0f, -2.5f),
-    glm::vec3(1.5f,  2.0f, -2.5f),
-    glm::vec3(1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-};
+OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {};
 
 void OpenGLView::initializeGL()
 {
     // Initialize the OpenGL function pointers
     initializeOpenGLFunctions();
 
-    // configure global opengl state
-// -----------------------------
+    // Enable depth testing
     glEnable(GL_DEPTH_TEST);
     
     // Initialize shaders and shader program
     shaderProgram = new ShaderProgram(VERT_SHADER_PATH, FRAG_SHADER_PATH, context(), this);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
+    // Initialize cube vertex data
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -86,65 +63,37 @@ void OpenGLView::initializeGL()
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    unsigned int VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    // Initialize vertex array and vertex buffer objects
+    unsigned int vertBufferObj;
+    glGenBuffers(1, &vertBufferObj);
+    glGenVertexArrays(1, &vertArrayObj);
 
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // Bind vertex array object and vertex buffer object to current context
+    glBindVertexArray(vertArrayObj);
+    glBindBuffer(GL_ARRAY_BUFFER, vertBufferObj);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    // Initialize vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0); // Position attribute
     glEnableVertexAttribArray(0);
-    // texture coord attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))); // Texture coordinate attribute
     glEnableVertexAttribArray(1);
 
+    // Initialize cube texture
+    glGenTextures(1, &cubeTexture);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture); // Bind texture to current context
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Texture mapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Texture filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // load and create a texture 
-    // -------------------------
-    // texture 1
-    // ---------
-    glGenTextures(1, &texture1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    // Load texture source image
+    int imgWidth, imgHeight, imgChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load(CUBE_TEXTURE_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-    // texture 2
-    // ---------
-    glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -153,54 +102,61 @@ void OpenGLView::initializeGL()
     }
     stbi_image_free(data);
 
-    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    // -------------------------------------------------------------------------------------------
+    // Initialize the shader program's texture sampler's
     shaderProgram->useProgram();
-    shaderProgram->setUniformInt("texture1", 0);
-    shaderProgram->setUniformInt("texture2", 1);
+    shaderProgram->setUniformInt("cubeTexture", 0);
 }
 
-void OpenGLView::resizeGL(int w, int h)
+void OpenGLView::resizeGL(int width, int height)
 {
-    glViewport(0, 0, w, h);
+    // Update OpenGL viewport size
+    glViewport(0, 0, width, height);
 }
 
 void OpenGLView::paintGL()
 {
-    // render
-// ------
+    // Reset the background color and depth buffer
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-     // bind textures on corresponding texture units
+    // Bind cube texture to texture unit
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture);
 
-    // activate shader
+    // Set the active shader program for the current context
     shaderProgram->useProgram();
 
-    // create transformations
-    glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    // pass transformation matrices to the shader
-    shaderProgram->setUniformMat4("projection", projection); // note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
-    shaderProgram->setUniformMat4("view", view);
+    // Comput the view and projection matrices
+    float frustumAngle = 45; // Perspective angle of frustum
+    glm::mat4 view = glm::mat4(1.0f); // The view matrix transforms the world frame to the cameras frame
+    glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
-    // render boxes
-    glBindVertexArray(VAO);
-    for (unsigned int i = 0; i < 10; i++)
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    projection = glm::perspective(glm::radians(frustumAngle), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 100.0f);
+
+    // Update the shader program's view and projection matrices
+    shaderProgram->setUniformMat4("view", view);
+    shaderProgram->setUniformMat4("projection", projection);
+
+    // Render cubes
+    glBindVertexArray(vertArrayObj); // Bind to vertex array object containing the cube defintion
+    for (unsigned int i = 0; i < cubePositions.size(); i++)
     {
-        // calculate the model matrix for each object and pass it to shader before drawing
-        glm::mat4 model = glm::mat4(1.0f);
+        // Compute model matrix
+        glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
         model = glm::translate(model, cubePositions[i]);
         float angle = 20.0f * i;
         model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+        // Update the shader program's model matrix
         shaderProgram->setUniformMat4("model", model);
 
+        // Draw the cube
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+}
+
+void OpenGLView::insertCube(unsigned int id, glm::vec3 position)
+{
+
 }
