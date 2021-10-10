@@ -7,7 +7,7 @@
 
 float angle = 0;
 
-OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {};
+OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {}
 
 void OpenGLView::initializeGL()
 {
