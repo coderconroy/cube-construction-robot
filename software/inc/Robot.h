@@ -32,7 +32,7 @@ public:
 	void wake();
 
 	/*!
-	* Instructs the robot to move the end effector to specified position and pose.
+	* Instructs the robot to move the end effector to specified position and orientation.
 	* \param [in] xPos X axis position (in full steps)
 	* \param [in] yPos Y axis position (in full steps)
 	* \param [in] zPos Z axis position (in full steps)
