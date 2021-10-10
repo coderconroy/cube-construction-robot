@@ -158,5 +158,5 @@ void OpenGLView::paintGL()
 
 void OpenGLView::insertCube(unsigned int id, glm::vec3 position)
 {
-
+    cubePositions.push_back(position);
 }
