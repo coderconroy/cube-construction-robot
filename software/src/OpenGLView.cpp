@@ -5,9 +5,16 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb-image/stb_image.h>
 
-float angle = 0;
+OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) 
+{
+    // Set focus policy to ensure the widget receives keyboard events
+    setFocusPolicy(Qt::ClickFocus);
+}
 
-OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {}
+void OpenGLView::setCubes(const std::vector<Cube*>* cubes)
+{
+    this->cubes = cubes;
+}
 
 void OpenGLView::initializeGL()
 {
@@ -118,6 +125,10 @@ void OpenGLView::resizeGL(int width, int height)
     screen_height = height;
 }
 
+float angle = 0;
+float xPos = 0;
+float yPos = 0;
+float zPos = 0;
 void OpenGLView::paintGL()
 {
     // Reset the background color and depth buffer
@@ -136,7 +147,9 @@ void OpenGLView::paintGL()
     glm::mat4 view = glm::mat4(1.0f); // The view matrix transforms the world frame to the cameras frame
     glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    view = glm::translate(view, glm::vec3(xPos, yPos, zPos -3.0f));
+    view = glm::rotate(view, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 100.0f);
 
     // Update the shader program's view and projection matrices
@@ -144,39 +157,59 @@ void OpenGLView::paintGL()
     shaderProgram->setUniformMat4("projection", projection);
 
     // Render cubes
-    glBindVertexArray(vertArrayObj); // Bind to vertex array object containing the cube defintion
-    for (unsigned int i = 0; i < cubePositions.size(); i++)
+    if (cubes)
     {
-        // Compute model matrix
-        glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
-        model = glm::translate(model, cubePositions[i]);
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 0.0f));
+        glBindVertexArray(vertArrayObj); // Bind to vertex array object containing the cube defintion
+        for (unsigned int i = 0; i < cubes->size(); i++)
+        {
+            // Get cube to render
+            Cube* cube = cubes->at(i);
 
-        // Update the shader program's model matrix
-        shaderProgram->setUniformMat4("model", model);
+            // Compute model matrix
+            glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
+            model = glm::translate(model, cube->getPosition());
+            model = glm::rotate(model, cube->getYaw(), glm::vec3(1.0f, 1.0f, 0.0f));
 
-        // Draw the cube
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            // Update the shader program's model matrix
+            shaderProgram->setUniformMat4("model", model);
+
+            // Draw the cube
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
     }
 }
 
 void OpenGLView::mousePressEvent(QMouseEvent* event)
 {
-    angle += 5;
+    if (event->buttons() == Qt::RightButton)
+        angle += 2;
+    else if (event->buttons() == Qt::LeftButton)
+        angle -= 2;
 }
 
 void OpenGLView::mouseMoveEvent(QMouseEvent* event)
 {
-    if (event->buttons() == Qt::RightButton)
-        angle += 5;
+
 }
 
 void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
 {
-    angle += 5;
+
 }
 
-void OpenGLView::insertCube(glm::vec3 position)
+void OpenGLView::keyPressEvent(QKeyEvent* event)
 {
-    cubePositions.push_back(position);
+    if (event->key() == Qt::Key_Left)
+        xPos += 0.2;
+    else if (event->key() == Qt::Key_Right)
+        xPos -= 0.2;
+    else if (event->key() == Qt::Key_Up)
+        yPos -= 0.2;
+    else if (event->key() == Qt::Key_Down)
+        yPos += 0.2;
+}
+
+void OpenGLView::keyReleaseEvent(QKeyEvent* event)
+{
+
 }

@@ -16,9 +16,9 @@ public:
 	/*!
 	* Class constructor.
 	* \param [in] sideLength Length of the cube edges in terms of steps.
-	* \param [in] parent Parent widget.
+	* \param [in] parent Parent \class QObject.
 	*/
-	Cube(unsigned int& sideLength, QObject* parent);
+	Cube(unsigned int sideLength, QObject* parent);
 
 	/*!
 	* Cube position setter.
@@ -49,6 +49,24 @@ public:
 	* \return Orientation of cube parameterized using Euler angles (phi, theta, psi) in radians.
 	*/
 	glm::vec3 getOrientation() const;
+
+	/*!
+	* Getter for the cube's rotation about the x-axis (roll) in radians.
+	* \return phi
+	*/
+	float getRoll() const;
+
+	/*!
+	* Getter for the cube's rotation about the y-axis (pitch) in radians.
+	* \return theta
+	*/
+	float getPitch() const;
+
+	/*!
+	* Getter for the cube's rotation about the z-axis (yaw) in radians.
+	* \return psi
+	*/
+	float getYaw() const;
 
 private:
 	unsigned int sideLength; /*! Length of the cube edges in terms of steps */

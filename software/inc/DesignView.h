@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OpenGLView.h"
+#include "CubeWorldModel.h"
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QTimer>
@@ -13,6 +14,7 @@ public:
 private:
     QVBoxLayout* baseLayout;
     OpenGLView* shapeView;
+    CubeWorldModel* cubeWorldModel;
     QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
 
     /*!

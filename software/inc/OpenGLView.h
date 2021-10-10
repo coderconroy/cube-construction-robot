@@ -1,9 +1,11 @@
 #pragma once
 
 #include "ShaderProgram.h"
+#include "Cube.h"
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <vector>
 
 class OpenGLView: public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
@@ -16,9 +18,10 @@ public:
     OpenGLView(QWidget* parent);
     
     /*!
-    * Insert cube into the scene at the given position
+    * Setter for list of cubes in the world reference frame that need to be rendered.
+    * \param cubes Cubes to be rendered.
     */
-    void insertCube(glm::vec3 position);
+    void setCubes(const std::vector<Cube*>* cubes);
 
 protected:
     /*!
@@ -56,11 +59,23 @@ protected:
     */
     void mouseReleaseEvent(QMouseEvent* event) override;
 
+    /*!
+    * Event handler for when the key is pressed.
+    * \param [in] Key event description.
+    */
+    void keyPressEvent(QKeyEvent* event) override;
+
+    /*!
+     * Event handler for when the key is released.
+     * \param [in] Key event description.
+     */
+    void keyReleaseEvent(QKeyEvent* event) override;
+
 private:
     ShaderProgram* shaderProgram; /*! Shader program from vertex and fragment shaders */
     unsigned int vertArrayObj; /*! Vertex array buffer object ID */
     unsigned int cubeTexture; /*! Texture applied to each cube face */
-    std::vector<glm::vec3> cubePositions; /*! Cube positions in the world reference frame */
+    const std::vector<Cube*>* cubes = nullptr; /*! Cubes in the world reference frame to be rendered */
 
     // Viewport parameters
     unsigned int screen_width; /*! OpenGL viewport width */

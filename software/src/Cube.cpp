@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(unsigned int& sideLength, QObject* parent) : QObject(parent)
+Cube::Cube(unsigned int sideLength, QObject* parent) : QObject(parent)
 {
 	// Initialize member variables
 	this->sideLength = sideLength;
@@ -31,4 +31,19 @@ glm::vec3 Cube::getPosition() const
 glm::vec3 Cube::getOrientation() const
 {
 	return orientation;
+}
+
+float Cube::getRoll() const
+{
+	return orientation[0];
+}
+
+float Cube::getPitch() const
+{
+	return orientation[1];
+}
+
+float Cube::getYaw() const
+{
+	return orientation[2];
 }
