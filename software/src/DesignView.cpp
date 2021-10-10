@@ -1,4 +1,5 @@
 #include "DesignView.h"
+#include <glm/glm.hpp>;
 
 DesignView::DesignView(QWidget* parent): QWidget(parent) 
 {
@@ -8,6 +9,9 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	format.setVersion(3, 3);
 	format.setProfile(QSurfaceFormat::CoreProfile);
 	shapeView->setFormat(format);
+
+	// Add cubes to shape view
+	shapeView->insertCube(glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Initialize design view layout
 	baseLayout = new QVBoxLayout();

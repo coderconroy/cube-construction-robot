@@ -121,12 +121,14 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="inc\OpenGLView.h" />
+    <QtMoc Include="CubeWorldModel.h" />
     <ClInclude Include="inc\Packet.h" />
     <ClInclude Include="inc\Robot.h" />
     <QtMoc Include="inc\ShaderProgram.h" />
     <QtMoc Include="inc\SystemController.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CubeWorldModel.cpp" />
     <ClCompile Include="src\DesignView.cpp" />
     <ClCompile Include="src\HomeView.cpp" />
     <ClCompile Include="src\main.cpp" />

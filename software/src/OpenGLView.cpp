@@ -5,6 +5,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb-image/stb_image.h>
 
+float angle = 0;
+
 OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) {};
 
 void OpenGLView::initializeGL()
@@ -110,7 +112,10 @@ void OpenGLView::initializeGL()
 void OpenGLView::resizeGL(int width, int height)
 {
     // Update OpenGL viewport size
-    glViewport(0, 0, width, height);
+    // TODO: Identify if any code is required here
+    // glViewport(0, 0, width, height);
+    screen_width = width;
+    screen_height = height;
 }
 
 void OpenGLView::paintGL()
@@ -132,7 +137,7 @@ void OpenGLView::paintGL()
     glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    projection = glm::perspective(glm::radians(frustumAngle), (float) SCREEN_WIDTH / (float) SCREEN_HEIGHT, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 100.0f);
 
     // Update the shader program's view and projection matrices
     shaderProgram->setUniformMat4("view", view);
@@ -145,8 +150,7 @@ void OpenGLView::paintGL()
         // Compute model matrix
         glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
         model = glm::translate(model, cubePositions[i]);
-        float angle = 20.0f * i;
-        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 1.0f, 0.0f));
 
         // Update the shader program's model matrix
         shaderProgram->setUniformMat4("model", model);
@@ -156,7 +160,23 @@ void OpenGLView::paintGL()
     }
 }
 
-void OpenGLView::insertCube(unsigned int id, glm::vec3 position)
+void OpenGLView::mousePressEvent(QMouseEvent* event)
+{
+    angle += 5;
+}
+
+void OpenGLView::mouseMoveEvent(QMouseEvent* event)
+{
+    if (event->buttons() == Qt::RightButton)
+        angle += 5;
+}
+
+void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
+{
+    angle += 5;
+}
+
+void OpenGLView::insertCube(glm::vec3 position)
 {
     cubePositions.push_back(position);
 }
