@@ -10,8 +10,8 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	baseLayout = new QStackedLayout();
 
 	// Add Home view to base layout
-	//baseLayout->addWidget(homeView);
-	baseLayout->addWidget(designView);
+	baseLayout->addWidget(homeView);
+	//baseLayout->addWidget(designView);
 
 	// Add base layout to window
 	setLayout(baseLayout);
