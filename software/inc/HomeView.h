@@ -53,8 +53,8 @@ private:
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
     QMap<QString, QSerialPortInfo>* portInfoMap; /*! Map of items in serial port list to serial ports*/
     QSerialPort* port; /*! Serial port for UART communication with robot */
-    cv::VideoCapture* camera = nullptr; /*! Source of live camera images */
-    Robot* robot = nullptr; /*! Interface with the robotic subsystem */
+    cv::VideoCapture* camera = Q_NULLPTR; /*! Source of live camera images */
+    Robot* robot = Q_NULLPTR; /*! Interface with the robotic subsystem */
 
     QHBoxLayout* robotPositionLayout;
     QHBoxLayout* robotControlLayout;
