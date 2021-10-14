@@ -23,6 +23,7 @@ private:
     DesignView* designView; /*! 3D shape definition view */
     QPushButton* homeViewLink; /*! Navigation link for home view */
     QPushButton* designViewLink; /*! Navigation link for design view */
+    QPushButton* constructionViewLink; /*! Navigation link for construction view */
 
     /*!
     * Set the current primary view based on which link button was clicked.
