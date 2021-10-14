@@ -29,6 +29,7 @@ private:
     QPushButton* homeViewLink; /*! Navigation link for home view */
     QPushButton* designViewLink; /*! Navigation link for design view */
     QPushButton* constructionViewLink; /*! Navigation link for construction view */
+    QPushButton* showMessageLog; /*! Show message log button */
 
     Logger* messageLog; /*! Display for all messages logged by various software components */
 
@@ -36,4 +37,14 @@ private:
     * Set the current primary view based on which link button was clicked.
     */
     void setView();
+
+    /*!
+    * Hide the message log widget.
+    */
+    void hideMessageLog();
+
+    /*!
+    * Show the message log widget.
+    */
+    void showMessageLogClick();
 };
