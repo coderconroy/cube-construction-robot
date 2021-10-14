@@ -4,6 +4,8 @@
 #include <QStackedLayout>
 #include "HomeView.h"
 #include "DesignView.h"
+#include "ConstructionView.h"
+
 
 class SystemController: public QWidget
 {
@@ -21,6 +23,7 @@ private:
     QStackedLayout* viewLayout; /* Layout container for the current primary view */
     HomeView* homeView; /*! Initial view to establish hardware connections */
     DesignView* designView; /*! 3D shape definition view */
+    ConstructionView* constructionView; /*! View to initiate and monitor the construction of the 3D shape */
     QPushButton* homeViewLink; /*! Navigation link for home view */
     QPushButton* designViewLink; /*! Navigation link for design view */
     QPushButton* constructionViewLink; /*! Navigation link for construction view */
