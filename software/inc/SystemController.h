@@ -5,6 +5,7 @@
 #include "HomeView.h"
 #include "DesignView.h"
 #include "ConstructionView.h"
+#include "Logger.h"
 
 
 class SystemController: public QWidget
@@ -29,7 +30,7 @@ private:
     QPushButton* designViewLink; /*! Navigation link for design view */
     QPushButton* constructionViewLink; /*! Navigation link for construction view */
 
-    QTextEdit* messageLog; /*! Display for all messages logged by various software components */
+    Logger* messageLog; /*! Display for all messages logged by various software components */
 
     /*!
     * Set the current primary view based on which link button was clicked.
