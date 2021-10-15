@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(unsigned int& cubeID, unsigned int& sideLength, QObject* parent) : QObject(parent)
+Cube::Cube(const unsigned int cubeID, const unsigned int sideLength, QObject* parent) : QObject(parent)
 {
 	// Initialize member variables
 	state = CubeState::VALID;
@@ -30,7 +30,7 @@ unsigned int Cube::getCubeID() const
 	return cubeID;
 }
 
-unsigned int Cube::getSideLength()
+unsigned int Cube::getSideLength() const
 {
 	return sideLength;
 }

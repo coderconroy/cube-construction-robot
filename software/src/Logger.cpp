@@ -80,7 +80,7 @@ void Logger::log(const Message& message)
 	}
 
 	// Display message source and content
-	display->insertHtml("<em>" + message.source + "</em> - " + message.content + "<br>");
+	display->insertHtml("<em>" + message.source + "</em> : " + message.content + "<br>");
 }
 
 void Logger::clearLog()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Cube.h"
+#include "Logger.h"
 #include <QObject>
 #include <QList>
 #include <glm/glm.hpp>
@@ -12,8 +13,10 @@ public:
 	/*!
 	* Class constructor.
 	* \param [in] parent Parent \class QObject.
+	* \param [in] sideLength Side length of cubes in this model in steps.
+	* \param [in] cubeMargin Size of margin in steps between cubes in the horizonal plane.
 	*/
-	CubeWorldModel(QObject* parent);
+	CubeWorldModel(unsigned int cubeSideLength, unsigned int cubeMargin, QObject* parent);
 
 	/*!
 	* Class destructor. Frees the memory dynamically allocated to the cubes.
@@ -29,9 +32,8 @@ public:
 	/*!
 	* Insert cube into the cube world at the specified position relative to the world origin.
 	* The inserted cube has a yaw of 0 radians about the z-axis.
-	* \param [in] position Cartesian position of the cube centre (x, y, z) in steps.
 	*/
-	const Cube* insertCube(glm::vec3& position);
+	const Cube* insertCube();
 
 	/*!
 	* Remove cube from the cube world.
@@ -57,14 +59,37 @@ public:
 	int getCubeCount() const;
 
 	/*!
-	* Updates the position of the selected cube.
-	* \param [in] deltaX Position change along x-axis from current x-axis position.
-	* \param [in] deltaZ Position change along z-axis from current z-axis position.
-	* \param [in] deltaLayer Position change in layers from current layer position.
+	* Get the layer number the cube is placed in. Layers are zero-indexed.
+	* \param [in] cube Cube layer information is requested about.
+	* \return Layer the cube is found in.
 	*/
-	void updateSelectedCubePosition(const int deltaX, const int deltaZ, const int deltaLayer);
+	int getCubeLayer(const Cube& cube) const;
+
+	/*!
+	* Updates the position of the selected cube.
+	* \param [in] deltaX Position change along x-axis from current x-axis position in steps.
+	* \param [in] deltaZ Position change along z-axis from current z-axis position in steps.
+	* \param [in] deltaLayer Position change in layers from current layer position in steps.
+	*/
+	void updateSelectedCubePosition(int deltaX, int deltaZ, int deltaLayer);
+
+	/*!
+	* Updates the orientation of the selected cube.
+	* \param [in] angleSteps Cube rotation change about the vertical y-axis in steps of the rotation angle resolution.
+	*/
+	void updateSelectedCubeOrientation(int angleSteps);
+
+signals:
+	/*!
+	* Signal generated when a message is logged by an \class OpenGLView instance.
+	*/
+	void log(Message message) const;
 
 private:
+	unsigned int cubeSideLength; /*! Side length of cubes in this model in steps */
+	unsigned int cubeMargin; /*! Size of margin in steps between cubes in the horizonal plane */
+	unsigned int numLayers = 6; /*! Number of vertical layers cubes may be placed in */
+	float rotationAngleResolution = 1.8; /*! Resolution of one rotation step about the vertical y-axis in degrees */
 	Cube* selectedCube = Q_NULLPTR; /*! Reference to the cube currently in the selected state */
 	unsigned int lastCubeID = 0; /*! Cube identifier of most recently inserted cube */
 	QList<Cube*> cubes; /*! List of cubes that have been inserted into the cube world */

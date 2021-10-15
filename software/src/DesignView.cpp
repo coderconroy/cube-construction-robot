@@ -4,7 +4,8 @@
 DesignView::DesignView(QWidget* parent): QWidget(parent) 
 {
 	// Initialize cube world model
-	cubeWorldModel = new CubeWorldModel(this);
+	cubeWorldModel = new CubeWorldModel(64, 10, this);
+	connect(cubeWorldModel, &CubeWorldModel::log, this, &DesignView::log); // Propagate log signal
 
 	// Initialize 3D shape design controls
 	insertCube = new QPushButton("Insert Cube");
@@ -33,9 +34,8 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	shapeView->setCubes(cubeWorldModel->getCubes());
 
 	connect(shapeView, &OpenGLView::cubePositionUpdateRequested, cubeWorldModel, &CubeWorldModel::updateSelectedCubePosition);
-
-	// Propagate log signal
-	connect(shapeView, &OpenGLView::log, this, &DesignView::log);
+	connect(shapeView, &OpenGLView::cubeOrientationUpdateRequested, cubeWorldModel, &CubeWorldModel::updateSelectedCubeOrientation);
+	connect(shapeView, &OpenGLView::log, this, &DesignView::log); // Propagate log signal
 
 	// Initialize controls layout
 	controlsLayout = new QVBoxLayout();
@@ -71,7 +71,7 @@ void DesignView::updateShapeView()
 void DesignView::insertCubeClicked()
 {
 	// Create new cube in cubeWorldModel
-	const Cube* cube = cubeWorldModel->insertCube(glm::vec3(0, 0.5, 0));
+	const Cube* cube = cubeWorldModel->insertCube();
 
 	// Add cube to cube list widget
 	QString cubeDescription = "Cube " + QString::number(cube->getCubeID());

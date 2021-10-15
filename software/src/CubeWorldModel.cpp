@@ -1,6 +1,15 @@
 #include "CubeWorldModel.h"
 
-CubeWorldModel::CubeWorldModel(QObject* parent) : QObject(parent) {};
+CubeWorldModel::CubeWorldModel(unsigned int cubeSideLength, unsigned int cubeMargin, QObject* parent) : QObject(parent) 
+{
+	// Initialize member variables
+	this->cubeSideLength = cubeSideLength;
+	this->cubeMargin = cubeMargin;
+
+	// Check input is valid
+	if (cubeSideLength % 2 != 0)
+		emit log(Message(MessageType::ERROR_LOG, "Cube World Model", "Cube side length must be a multiple of 2"));
+};
 
 CubeWorldModel::~CubeWorldModel()
 {
@@ -8,6 +17,7 @@ CubeWorldModel::~CubeWorldModel()
 	for (int i = 0; i < cubes.size(); i++)
 		delete cubes[i];
 
+	// Reset pointers to deallocated cubes
 	cubes.clear();
 	selectedCube = Q_NULLPTR;
 }
@@ -17,12 +27,11 @@ const QList<Cube*>* CubeWorldModel::getCubes() const
 	return &cubes;
 }
 
-const Cube* CubeWorldModel::insertCube(glm::vec3& position)
+const Cube* CubeWorldModel::insertCube()
 {
 	// Create new cube
-	unsigned int cubeSize = 64;
-	Cube* newCube = new Cube(++lastCubeID, cubeSize, this);
-	newCube->setPosition(position);
+	Cube* newCube = new Cube(++lastCubeID, cubeSideLength, this);
+	newCube->setPosition(glm::vec3(0, cubeSideLength / 2, 0));
 
 	// Update selected cube
 	if (selectedCube != Q_NULLPTR)
@@ -99,12 +108,53 @@ int CubeWorldModel::getCubeCount() const
 	return cubes.size();
 }
 
-void CubeWorldModel::updateSelectedCubePosition(const int deltaX, const int deltaZ, const int deltaLayer)
+int CubeWorldModel::getCubeLayer(const Cube& cube) const
 {
+	unsigned int sideLength = cube.getSideLength();
+	int bottomYPos = (cube.getPosition().y - sideLength / 2); // Y position of bottom cube face
+
+	// Check if cube is in a valid layer vertical position
+	if (bottomYPos % sideLength != 0)
+	{
+		emit log(Message(MessageType::ERROR_LOG, "Cube World Model", "Invalid vertical cube position in model"));
+		return -1;
+	}
+
+	// Compute cube layer
+	int layer = bottomYPos / sideLength;
+	return layer;
+}
+
+void CubeWorldModel::updateSelectedCubePosition(int deltaX, int deltaZ, int deltaLayer)
+{
+	// Check if there is currently a cube selected
 	if (selectedCube == Q_NULLPTR)
 		return;
 
+	// Check cube does not exceed construction vertical boundaries
+	if (deltaLayer != 0)
+	{
+		int selectedCubeLayer = getCubeLayer(*selectedCube);
+		if (selectedCubeLayer <= 0 && deltaLayer < 0)
+			deltaLayer = 0;
+		else if (selectedCubeLayer >= (numLayers - 1) && deltaLayer > 0)
+			deltaLayer = 0;
+	}
+
+	// Update the position of the selected cube
 	glm::vec3 position = selectedCube->getPosition();
-	position = glm::vec3(position.x + deltaX, position.y, position.z + deltaZ);
+	position = glm::vec3(position.x + deltaX, position.y + deltaLayer * (int) cubeSideLength, position.z + deltaZ);
 	selectedCube->setPosition(position);
+}
+
+void CubeWorldModel::updateSelectedCubeOrientation(int angleSteps)
+{
+	// Check if there is currently a cube selected
+	if (selectedCube == Q_NULLPTR)
+		return;
+
+	// Update the orientation of the selected cube
+	glm::vec3 orientation = selectedCube->getOrientation();
+	orientation.y += glm::radians(angleSteps * rotationAngleResolution);
+	selectedCube->setOrientation(orientation);
 }

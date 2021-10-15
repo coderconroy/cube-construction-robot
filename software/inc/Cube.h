@@ -29,7 +29,7 @@ public:
 	* \param [in] sideLength Length of the cube edges in terms of steps.
 	* \param [in] parent Parent \class QObject.
 	*/
-	Cube(unsigned int& cubeID, unsigned int& sideLength, QObject* parent);
+	Cube(const unsigned int cubeID, const unsigned int sideLength, QObject* parent);
 
 	/*!
 	* Cube state setter.
@@ -59,7 +59,7 @@ public:
 	* Cube side length getter.
 	* \return Length of the cube edges in terms of steps.
 	*/
-	unsigned int getSideLength();
+	unsigned int getSideLength() const;
 
 	/*!
 	* Cube state getter.

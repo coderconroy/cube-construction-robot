@@ -39,7 +39,7 @@ signals:
     /*!
     * Signal generated when an input to update the orientation of the selected cube is received.
     */
-    void cubeOrientationUpdateRequested(const int& angle);
+    void cubeOrientationUpdateRequested(const int angleSteps);
 
 protected:
     /*!

@@ -148,7 +148,7 @@ void OpenGLView::resizeGL(int width, int height)
     screen_height = height;
 }
 
-int rho = 10;
+int rho = 800;
 float theta = 0;
 float phi = 30;
 float xFocal = 0;
@@ -178,10 +178,7 @@ void OpenGLView::paintGL()
         glm::vec3(xFocal, yFocal, zFocal),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
-    //view = glm::translate(view, glm::vec3(xPos, yPos, zPos -3.0f));
-    //view = glm::rotate(view, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
-    //view = glm::rotate(view, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-    projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 10000.0f);
 
     // Update the shader program's view and projection matrices
     shaderProgram->setUniformMat4("view", view);
@@ -206,9 +203,11 @@ void OpenGLView::paintGL()
                 glBindTexture(GL_TEXTURE_2D, cubeTextureSelected);
 
             // Compute model matrix
-            glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
+            glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local frame to the world frame
             model = glm::translate(model, cube->getPosition());
-            model = glm::rotate(model, cube->getYaw(), glm::vec3(1.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, cube->getPitch(), glm::vec3(0.0f, 1.0f, 0.0f));
+            // Scale the cube from one step in size to its side length in steps
+            model = glm::scale(model, glm::vec3(cube->getSideLength(), cube->getSideLength(), cube->getSideLength()));
 
             // Update the shader program's model matrix
             shaderProgram->setUniformMat4("model", model);
@@ -267,39 +266,55 @@ void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
 
 }
 
+bool shiftKeyPressed = false;
+
 void OpenGLView::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Up)
     {
-        emit cubePositionUpdateRequested(0, -1, 0);
+        if(shiftKeyPressed)
+            emit cubePositionUpdateRequested(0, 0, 1); // Increment cube layer
+        else
+            emit cubePositionUpdateRequested(0, -1, 0); // Move cube back
     }
-    if (event->key() == Qt::Key_Down)
+    else if (event->key() == Qt::Key_Down)
     {
-        emit cubePositionUpdateRequested(0, 1, 0);
+        if (shiftKeyPressed)
+            emit cubePositionUpdateRequested(0, 0, -1); // Decrement cube layer
+        else
+            emit cubePositionUpdateRequested(0, 1, 0); // Move cube forward
     }
-    if (event->key() == Qt::Key_Left)
+    else if (event->key() == Qt::Key_Left)
     {
-        emit cubePositionUpdateRequested(-1, 0, 0);
+        if (shiftKeyPressed)
+            emit cubeOrientationUpdateRequested(1); // Rotate cube
+        else
+            emit cubePositionUpdateRequested(-1, 0, 0); // Move cube left
     }
-    if (event->key() == Qt::Key_Right)
+    else if (event->key() == Qt::Key_Right)
     {
-        emit cubePositionUpdateRequested(1, 0, 0);
+        if (shiftKeyPressed)
+            emit cubeOrientationUpdateRequested(-1); // Rotate cube
+        else
+            emit cubePositionUpdateRequested(1, 0, 0); // Move cube right
     }
-    
+    else if (event->key() == Qt::Key_Shift)
+        shiftKeyPressed = true;
 }
 
 void OpenGLView::keyReleaseEvent(QKeyEvent* event)
 {
-
+    if (event->key() == Qt::Key_Shift)
+        shiftKeyPressed = false;
 }
 
 void OpenGLView::wheelEvent(QWheelEvent* event)
 {
     if (event->angleDelta().y() > 0) // up Wheel
-        rho -= 5;
+        rho -= 100;
     else if (event->angleDelta().y() < 0) //down Wheel
-        rho += 5;
+        rho += 100;
 
     if (rho <= 0)
-        rho = 5;
+        rho = 100;
 }
