@@ -83,7 +83,7 @@ private:
 	/*!
 	* update the message display based on the current logger state.
 	*/
-	void updateDisplay();
+	void refreshDisplay();
 
 	/*!
 	* Slot for hide log button click event.

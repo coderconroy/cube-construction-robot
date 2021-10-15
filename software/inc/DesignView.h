@@ -11,6 +11,13 @@ class DesignView: public QWidget
     Q_OBJECT
 public:
     DesignView(QWidget* parent = Q_NULLPTR);
+
+signals:
+    /*!
+    * Generated when a message is logged by an \class OpenGLView instance.
+    */
+    void log(Message message);
+
 private:
     QVBoxLayout* baseLayout;
     OpenGLView* shapeView;

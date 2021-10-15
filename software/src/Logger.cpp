@@ -23,9 +23,9 @@ Logger::Logger(QWidget* parent): QWidget(parent)
 	// Connect control signals
 	connect(hideLog, &QPushButton::clicked, this, &Logger::hideLogClicked);
 	connect(clear, &QPushButton::clicked, this, &Logger::clearLog);
-	connect(showInfo, &QCheckBox::clicked, this, &Logger::updateDisplay);
-	connect(showWarnings, &QCheckBox::clicked, this, &Logger::updateDisplay);
-	connect(showErrors, &QCheckBox::clicked, this, &Logger::updateDisplay);
+	connect(showInfo, &QCheckBox::clicked, this, &Logger::refreshDisplay);
+	connect(showWarnings, &QCheckBox::clicked, this, &Logger::refreshDisplay);
+	connect(showErrors, &QCheckBox::clicked, this, &Logger::refreshDisplay);
 
 	// Initialize control layout
 	controlLayout = new QVBoxLayout();
@@ -47,7 +47,40 @@ Logger::Logger(QWidget* parent): QWidget(parent)
 void Logger::log(const Message& message)
 {
 	messageLog.append(message);
-	updateDisplay();
+
+	// Display message type
+	switch (message.type)
+	{
+	case MessageType::INFO_LOG:
+		// Do not display message if info messages are disabled
+		if (!showInfo->isChecked())
+			return;
+
+		// Display message as info message
+		display->insertHtml("<span style=\"font-family:Consolas;font-size:13px\"><pre><b>INFO</b>   \t</pre></span>");
+		break;
+
+	case MessageType::WARNING_LOG:
+		// Do not display message if warning messages are disabled
+		if (!showWarnings->isChecked())
+			return;
+
+		// Display message as warning message
+		display->insertHtml("<span style=\"font-family:Consolas;font-size:13px\"><pre><b>WARNING</b>\t</pre></span>");
+		break;
+
+	case MessageType::ERROR_LOG:
+		// Do not display message if error messages are disabled
+		if (!showErrors->isChecked())
+			return;
+
+		// Display message as error message
+		display->insertHtml("<span style=\"font-family:Consolas;font-size:13px\"><pre><b>ERROR</b>  \t</pre></span>");
+		break;
+	}
+
+	// Display message source and content
+	display->insertHtml("<em>" + message.source + "</em> - " + message.content + "<br>");
 }
 
 void Logger::clearLog()
@@ -61,7 +94,7 @@ void Logger::hideLogClicked()
 	emit hideRequested();
 }
 
-void Logger::updateDisplay()
+void Logger::refreshDisplay()
 {
 	// Clear message display
 	display->clear();

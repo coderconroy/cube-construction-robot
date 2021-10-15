@@ -64,6 +64,9 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	shapeView->setFormat(format);
 	shapeView->setCubes(cubeWorldModel->getCubes());
 
+	// Propagate log signal
+	connect(shapeView, &OpenGLView::log, this, &DesignView::log);
+
 	// Initialize design view layout
 	baseLayout = new QVBoxLayout();
 	baseLayout->addWidget(shapeView);

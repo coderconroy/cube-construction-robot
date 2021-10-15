@@ -38,12 +38,7 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	messageLog = new Logger();
 	connect(messageLog, &Logger::hideRequested, this, &SystemController::hideMessageLog);
 
-	messageLog->log(Message(MessageType::INFO_LOG, "Source A", "Info test 1."));
-	messageLog->log(Message(MessageType::WARNING_LOG, "Source A", "Warning test 1."));
-	messageLog->log(Message(MessageType::ERROR_LOG, "Source A", "Error test 1."));
-	messageLog->log(Message(MessageType::INFO_LOG, "Source B", "Info test 2."));
-	messageLog->log(Message(MessageType::WARNING_LOG, "Source B", "Warning test 2."));
-	messageLog->log(Message(MessageType::ERROR_LOG, "Source B", "Error test 2."));
+	connect(designView, &DesignView::log, messageLog, &Logger::log);
 
 	// Initialize primary view container
 	viewLayout = new QStackedLayout();

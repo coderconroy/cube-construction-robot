@@ -125,10 +125,13 @@ void OpenGLView::resizeGL(int width, int height)
     screen_height = height;
 }
 
-float angle = 0;
-float xPos = 0;
-float yPos = 0;
-float zPos = 0;
+double rho = 10;
+float theta = 0;
+float phi = 30;
+float xFocal = 0;
+float yFocal = -2.5;
+float zFocal = -6.8;
+
 void OpenGLView::paintGL()
 {
     // Reset the background color and depth buffer
@@ -144,12 +147,21 @@ void OpenGLView::paintGL()
 
     // Comput the view and projection matrices
     float frustumAngle = 45; // Perspective angle of frustum
-    glm::mat4 view = glm::mat4(1.0f); // The view matrix transforms the world frame to the cameras frame
     glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
-    view = glm::translate(view, glm::vec3(xPos, yPos, zPos -3.0f));
-    view = glm::rotate(view, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
-    view = glm::rotate(view, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    float xPos = rho * sin(glm::radians(theta)) * cos(glm::radians(phi)) + xFocal;
+    float yPos = rho * sin(glm::radians(phi)) + yFocal;
+    float zPos = rho * cos(glm::radians(theta)) * cos(glm::radians(phi)) + zFocal;
+
+    // The view matrix transforms the world frame to the cameras frame
+    glm::mat4 view = glm::lookAt(glm::vec3(xPos, yPos, zPos),
+        glm::vec3(xFocal, yFocal, zFocal),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+
+    //view = glm::translate(view, glm::vec3(xPos, yPos, zPos -3.0f));
+    //view = glm::rotate(view, glm::radians(angle), glm::vec3(1.0f, 0.0f, 0.0f));
+    //view = glm::rotate(view, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 100.0f);
 
     // Update the shader program's view and projection matrices
@@ -179,17 +191,48 @@ void OpenGLView::paintGL()
     }
 }
 
+
+int mouseX = 0;
+int mouseY = 0;
+int thetaSensitivity = 30;
+int phiSensitivity = 30;
+int xFocalSensitivity = 5;
+int zFocalSensitivity = 5;
+
 void OpenGLView::mousePressEvent(QMouseEvent* event)
 {
-    if (event->buttons() == Qt::RightButton)
-        angle += 2;
-    else if (event->buttons() == Qt::LeftButton)
-        angle -= 2;
+    mouseX = event->x();
+    mouseY = event->y();
 }
 
 void OpenGLView::mouseMoveEvent(QMouseEvent* event)
 {
 
+    if (event->buttons() == Qt::RightButton)
+    {
+        int deltaX = event->x() - mouseX;
+        int deltaY = event->y() - mouseY;
+
+        theta -= deltaX * (thetaSensitivity / 100.0);
+        phi += deltaY * (phiSensitivity / 100.0);
+
+        if (phi > 89.9)
+            phi = 89.9;
+        else if (phi < 0)
+            phi = 0;
+    }
+    if (event->buttons() == Qt::MiddleButton)
+    {
+        double deltaX = event->x() - mouseX;
+        double deltaY = event->y() - mouseY;
+
+        xFocal -= (deltaX * cos(glm::radians(theta)) + deltaY * sin(glm::radians(theta))) * ((xFocalSensitivity + 0.5 * rho) / 1000.0);
+        zFocal -= (deltaY * cos(glm::radians(theta)) - deltaX * sin(glm::radians(theta))) * ((zFocalSensitivity + 0.5 * rho)  / 1000.0);
+
+    }
+
+    mouseX = event->x();
+    mouseY = event->y();
 }
 
 void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
@@ -199,17 +242,22 @@ void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
 
 void OpenGLView::keyPressEvent(QKeyEvent* event)
 {
-    if (event->key() == Qt::Key_Left)
-        xPos += 0.2;
-    else if (event->key() == Qt::Key_Right)
-        xPos -= 0.2;
-    else if (event->key() == Qt::Key_Up)
-        yPos -= 0.2;
-    else if (event->key() == Qt::Key_Down)
-        yPos += 0.2;
+
+    
 }
 
 void OpenGLView::keyReleaseEvent(QKeyEvent* event)
 {
 
+}
+
+void OpenGLView::wheelEvent(QWheelEvent* event)
+{
+    if (event->angleDelta().y() > 0) // up Wheel
+        rho -= 5;
+    else if (event->angleDelta().y() < 0) //down Wheel
+        rho += 5;
+
+    if (rho <= 0)
+        rho = 5;
 }

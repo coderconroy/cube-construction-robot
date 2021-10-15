@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <vector>
+#include "Logger.h"
 
 class OpenGLView: public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -22,6 +23,12 @@ public:
     * \param cubes Cubes to be rendered.
     */
     void setCubes(const std::vector<Cube*>* cubes);
+
+signals:
+    /*!
+    * Generated when a message is logged by an \class OpenGLView instance.
+    */
+    void log(Message message);
 
 protected:
     /*!
@@ -70,6 +77,12 @@ protected:
      * \param [in] Key event description.
      */
     void keyReleaseEvent(QKeyEvent* event) override;
+
+    /*!
+     * Event handler for when the scroll wheel is rotated;
+     * \param [in] Scroll wheel event description.
+     */
+    void wheelEvent(QWheelEvent* event);
 
 private:
     ShaderProgram* shaderProgram; /*! Shader program from vertex and fragment shaders */
