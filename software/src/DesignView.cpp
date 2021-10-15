@@ -1,5 +1,9 @@
 #include "DesignView.h"
 #include <glm/glm.hpp>;
+#include <QJsonDocument>
+#include <QFile>
+#include <QTextStream>
+#include <QList>
 
 DesignView::DesignView(QWidget* parent): QWidget(parent) 
 {
@@ -102,12 +106,67 @@ void DesignView::removeCubeClicked()
 
 void DesignView::saveModelClicked()
 {
+	// Convert cube world model to JSON object
+	QJsonObject jsonCubeWorldModel;
+	cubeWorldModel->write(jsonCubeWorldModel);
+
+	// Write JSON cube world model to file
+	QJsonDocument document;
+	document.setObject(jsonCubeWorldModel);
+	QByteArray jsonBytes = document.toJson(QJsonDocument::Indented);
+	QFile jsonFile("models/testFile.cubeworld");
+	if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+	{
+		QTextStream textStream(&jsonFile);
+		textStream.setEncoding(QStringConverter::Utf8);
+		textStream << jsonBytes;
+		jsonFile.close();
+		emit log(Message(MessageType::INFO_LOG, "Design View", "Cube world model successfully saved to file"));
+	}
+	else
+	{
+		emit log(Message(MessageType::ERROR_LOG, "Design View", "Failed to open file to write cube world JSON model to"));
+	}
+
 	// Update view state
 	updateControlState();
 }
 
 void DesignView::loadModelClicked()
 {
+	// Read JSON cube world model from file
+	QFile jsonFile("models/testFile.cubeworld");
+	if (jsonFile.open(QIODevice::ReadOnly))
+	{
+		// Read file into byte array
+		QByteArray jsonBytes = jsonFile.readAll();
+		jsonFile.close();
+
+		// Parse JSON document from byte array
+		QJsonParseError jsonError;
+		QJsonDocument document = QJsonDocument::fromJson(jsonBytes, &jsonError);
+		if (jsonError.error != QJsonParseError::NoError)
+		{
+			QString errorMessage = QString("Failed to read from JSON cube world model file: ") + jsonError.errorString();
+			emit log(Message(MessageType::ERROR_LOG, "Design View", errorMessage));
+			return;
+		}
+
+		// Initialize cube world model with JSON object
+		cubeWorldModel->read(document.object());
+		emit log(Message(MessageType::INFO_LOG, "Design View", "Cube world model successfully loaded from file"));
+	}
+
+	// Populate cube list widget with loaded cubes
+	const QList<Cube*>* cubes = cubeWorldModel->getCubes();
+	for (int i = 0; i < cubes->size(); ++i)
+	{
+		// Add cube to cube list widget
+		QString cubeDescription = "Cube " + QString::number(cubes->value(i)->getCubeID());
+		cubeMap.insert(cubeDescription, cubes->value(i));
+		cubeList->addItem(cubeDescription);
+	}
+
 	// Update view state
 	updateControlState();
 }

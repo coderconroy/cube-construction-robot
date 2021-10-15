@@ -168,14 +168,6 @@ void CubeWorldModel::updateSelectedCubeOrientation(int angleSteps)
 
 void CubeWorldModel::read(const QJsonObject& json)
 {
-	// Read and initialize cube side length
-	if (json.contains("cubeSideLength") && json["cubeSideLength"].isDouble())
-		cubeSideLength = json["cubeSideLength"].toInt();
-
-	// Read and initialize cube margin
-	if (json.contains("cubeMargin") && json["cubeMargin"].isDouble())
-		cubeMargin = json["cubeMargin"].toInt();
-
 	// Read and cube list
 	if (json.contains("cubes") && json["cubes"].isArray()) {
 		QJsonArray jsonCubes = json["cubes"].toArray();
@@ -187,6 +179,18 @@ void CubeWorldModel::read(const QJsonObject& json)
 			cubes.append(cube);
 		}
 	}
+
+	// Read and initialize cube side length
+	if (json.contains("cubeSideLength") && json["cubeSideLength"].isDouble())
+		cubeSideLength = json["cubeSideLength"].toInt();
+
+	// Read and initialize cube margin
+	if (json.contains("cubeMargin") && json["cubeMargin"].isDouble())
+		cubeMargin = json["cubeMargin"].toInt();
+
+	// Read and initialize last cube identifier
+	if (json.contains("lastCubeID") && json["lastCubeID"].isDouble())
+		lastCubeID = json["lastCubeID"].toInt();
 }
 
 void CubeWorldModel::write(QJsonObject& json) const
@@ -194,6 +198,7 @@ void CubeWorldModel::write(QJsonObject& json) const
 	// Write integer members to JSON object
 	json["cubeSideLength"] = (int) cubeSideLength;
 	json["cubeMargin"] = (int) cubeMargin;
+	json["lastCubeID"] = (int) lastCubeID;
 
 	// Initialize cube list JSON array
 	QJsonArray jsonCubes;

@@ -1,6 +1,10 @@
 #include "Cube.h"
 
-Cube::Cube(QObject* parent) : QObject(parent) {}
+Cube::Cube(QObject* parent) : QObject(parent) 
+{
+	// Initialize member variables
+	state = CubeState::VALID;
+}
 
 Cube::Cube(const unsigned int cubeID, const unsigned int sideLength, QObject* parent) : QObject(parent)
 {

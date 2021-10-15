@@ -17,7 +17,7 @@ signals:
     /*!
     * Generated when a message is logged by an \class OpenGLView instance.
     */
-    void log(Message message);
+    void log(Message message) const;
 
 private:
     QHBoxLayout* baseLayout; /*! Layout to store the fundamental design view widgets */
