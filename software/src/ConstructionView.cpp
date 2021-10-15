@@ -81,6 +81,11 @@ void ConstructionView::setRobot(Robot* robot)
     this->robot = robot;
 }
 
+void ConstructionView::setCamera(cv::VideoCapture* camera)
+{
+    this->camera = camera;
+}
+
 void ConstructionView::sleepRobotClicked()
 {
     robot->sleep();

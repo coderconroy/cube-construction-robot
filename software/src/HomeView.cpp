@@ -66,20 +66,10 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     // Add base layout to view
     setLayout(baseLayout);
 
-    // Initialize camera
-    camera = new cv::VideoCapture(0);
-    if (!camera->isOpened()) 
-        std::cerr << "ERROR: No camera found" << std::endl;
-
     // Initialize camera feed timer
     cameraFeedTimer = new QTimer(this);
     connect(cameraFeedTimer, &QTimer::timeout, this, &HomeView::updateCameraFeed);
     cameraFeedTimer->start(20); // Update feed every 20ms
-}
-
-HomeView::~HomeView()
-{
-    delete camera;
 }
 
 void HomeView::refreshAvailablePorts()
@@ -117,6 +107,11 @@ void HomeView::updateCameraFeed()
 void HomeView::setRobot(Robot* robot)
 {
     this->robot = robot;
+}
+
+void HomeView::setCamera(cv::VideoCapture* camera)
+{
+    this->camera = camera;
 }
 
 void HomeView::connectToRobot()
@@ -159,4 +154,3 @@ void HomeView::portListSelectionChange()
 {
     connectButton->setEnabled(portList->currentItem() != Q_NULLPTR);
 }
-

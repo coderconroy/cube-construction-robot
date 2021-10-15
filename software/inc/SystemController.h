@@ -18,6 +18,11 @@ public:
     */
     SystemController(QWidget *parent = Q_NULLPTR);
 
+    /*!
+    * Class destructor.
+    */
+    ~SystemController();
+
 private:
     QHBoxLayout* navigationLayout; /*! Layout for software navigation components */
     QVBoxLayout* baseLayout; /* Base layout for the program views and navigation components */
@@ -33,6 +38,7 @@ private:
 
     Logger* messageLog; /*! Display for all messages logged by various software components */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
+    cv::VideoCapture* camera = Q_NULLPTR; /*! Source of live camera images */
 
     /*!
     * Set the current primary view based on which link button was clicked.

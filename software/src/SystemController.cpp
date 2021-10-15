@@ -5,13 +5,20 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	// Initialize robot interface
 	robot = new Robot(this);
 
+	// Initialize camera
+	camera = new cv::VideoCapture(0);
+	if (!camera->isOpened())
+		messageLog->log(Message(MessageType::ERROR_LOG, "System Controller", "No camera found"));
+
 	// Initialize views
 	homeView = new HomeView();
 	designView = new DesignView();
 	constructionView = new ConstructionView();
 
 	homeView->setRobot(robot);
+	homeView->setCamera(camera);
 	constructionView->setRobot(robot);
+	constructionView->setCamera(camera);
 
 	connect(homeView, &HomeView::robotConnected, this, &SystemController::robotConnected);
 
@@ -70,6 +77,11 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 
 	// Add base layout to window
 	setLayout(baseLayout);
+}
+
+SystemController::~SystemController()
+{
+	delete camera;
 }
 
 void SystemController::setView()

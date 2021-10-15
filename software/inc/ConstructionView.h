@@ -2,6 +2,7 @@
 
 #include "Robot.h"
 #include "Logger.h"
+#include "opencv2/opencv.hpp"
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -23,6 +24,11 @@ public:
     * Set the construction view's reference to the system robot instance.
     */
     void setRobot(Robot* robot);
+
+    /*!
+    * Set the construction view's reference to the system camera instance.
+    */
+    void setCamera(cv::VideoCapture* camera);
 
 signals:
     /*!
@@ -50,6 +56,7 @@ private:
     QSpinBox* yPosition;
     QSpinBox* zPosition;
     QSpinBox* rPosition;
+    cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
     void sleepRobotClicked();

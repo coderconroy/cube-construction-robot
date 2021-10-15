@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Robot.h"
+#include "Logger.h"
+#include "opencv2/opencv.hpp"
 #include <QWidget>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -11,8 +13,7 @@
 #include <QSerialPortInfo>
 #include <QSpinBox>
 #include <QMap>
-#include "Logger.h"
-#include "opencv2/opencv.hpp"
+
 
 /*!
 * The \class HomeView class defines the layout and operation of the home screen. 
@@ -35,14 +36,14 @@ public:
     HomeView(QWidget* parent = Q_NULLPTR);
 
     /*!
-    * Class destructor.
-    */
-    ~HomeView();
-
-    /*!
     * Set the home view's reference to the system robot instance.
     */
     void setRobot(Robot* robot);
+
+    /*!
+    * Set the home view's reference to the system camera instance.
+    */
+    void setCamera(cv::VideoCapture* camera);
 
 signals:
     /*!
@@ -71,7 +72,7 @@ private:
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
     QMap<QString, QSerialPortInfo>* portInfoMap; /*! Map of items in serial port list to serial ports*/
     QSerialPort* port; /*! Serial port for UART communication with robot */
-    cv::VideoCapture* camera = Q_NULLPTR; /*! Source of live camera images */
+    cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
     /*!
