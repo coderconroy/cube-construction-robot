@@ -1,5 +1,7 @@
 #include "Cube.h"
 
+Cube::Cube(QObject* parent) : QObject(parent) {}
+
 Cube::Cube(const unsigned int cubeID, const unsigned int sideLength, QObject* parent) : QObject(parent)
 {
 	// Initialize member variables
@@ -92,7 +94,7 @@ void Cube::write(QJsonObject& json) const
 {
 	// Write integer members to JSON object
 	json["cubeID"] = (int) cubeID;
-	json["sideLength"] = (int)sideLength;
+	json["sideLength"] = (int) sideLength;
 
 	// Initialize JSON arrays
 	QJsonArray jsonPosition = {position.x, position.y, position.z};

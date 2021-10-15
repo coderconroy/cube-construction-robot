@@ -71,7 +71,14 @@ void CubeWorldModel::removeCube(const Cube* cube)
 
 void CubeWorldModel::clearCubes()
 {
+	// Free dynamically allocated memory of cube objects
+	for (int i = 0; i < cubes.size(); i++)
+		delete cubes[i];
+
+	// Reset pointers to deallocated cubes
 	cubes.clear();
+	selectedCube = Q_NULLPTR;
+
 	lastCubeID = 0;
 }
 
@@ -161,12 +168,42 @@ void CubeWorldModel::updateSelectedCubeOrientation(int angleSteps)
 
 void CubeWorldModel::read(const QJsonObject& json)
 {
+	// Read and initialize cube side length
+	if (json.contains("cubeSideLength") && json["cubeSideLength"].isDouble())
+		cubeSideLength = json["cubeSideLength"].toInt();
 
+	// Read and initialize cube margin
+	if (json.contains("cubeMargin") && json["cubeMargin"].isDouble())
+		cubeMargin = json["cubeMargin"].toInt();
+
+	// Read and cube list
+	if (json.contains("cubes") && json["cubes"].isArray()) {
+		QJsonArray jsonCubes = json["cubes"].toArray();
+		clearCubes();
+		for (int i = 0; i < jsonCubes.size(); ++i) {
+			QJsonObject jsonCube = jsonCubes[i].toObject();
+			Cube* cube = new Cube(this);
+			cube->read(jsonCube);
+			cubes.append(cube);
+		}
+	}
 }
-
 
 void CubeWorldModel::write(QJsonObject& json) const
 {
+	// Write integer members to JSON object
 	json["cubeSideLength"] = (int) cubeSideLength;
 	json["cubeMargin"] = (int) cubeMargin;
+
+	// Initialize cube list JSON array
+	QJsonArray jsonCubes;
+	for (int i = 0; i < cubes.size(); ++i)
+	{
+		QJsonObject jsonCube;
+		cubes[i]->write(jsonCube);
+		jsonCubes.append(jsonCube);
+	}
+
+	// Write cube list JSON array to JSON object
+	json["cubes"] = jsonCubes;
 }

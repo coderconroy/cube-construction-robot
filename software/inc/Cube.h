@@ -27,6 +27,12 @@ class Cube: public QObject
 public:
 	/*!
 	* Class constructor.
+	* \param [in] parent Parent \class QObject.
+	*/
+	Cube(QObject* parent);
+
+	/*!
+	* Class constructor.
 	* \param [in] cubeID Unique cube identifier.
 	* \param [in] sideLength Length of the cube edges in terms of steps.
 	* \param [in] parent Parent \class QObject.
