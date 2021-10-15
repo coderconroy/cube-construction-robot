@@ -11,6 +11,7 @@
 #include <QSerialPortInfo>
 #include <QSpinBox>
 #include <QMap>
+#include "Logger.h"
 #include "opencv2/opencv.hpp"
 
 /*!
@@ -37,6 +38,23 @@ public:
     * Class destructor.
     */
     ~HomeView();
+
+    /*!
+    * Set the home view's reference to the system robot instance.
+    */
+    void setRobot(Robot* robot);
+
+signals:
+    /*!
+    * Generated when a message is logged by an \class HomeView instance.
+    */
+    void log(Message message) const;
+
+    /*!
+    * Generated when a connection is established with the robot.
+    */
+    void robotConnected() const;
+
 private:
     QVBoxLayout* baseLayout; /*! Base layout for the home screen */
     QVBoxLayout* cameraLayout; /* Layout for camera connection widgets */
@@ -54,26 +72,7 @@ private:
     QMap<QString, QSerialPortInfo>* portInfoMap; /*! Map of items in serial port list to serial ports*/
     QSerialPort* port; /*! Serial port for UART communication with robot */
     cv::VideoCapture* camera = Q_NULLPTR; /*! Source of live camera images */
-    Robot* robot = Q_NULLPTR; /*! Interface with the robotic subsystem */
-
-    QHBoxLayout* robotPositionLayout;
-    QHBoxLayout* robotControlLayout;
-    QPushButton* sleepRobot;
-    QPushButton* wakeRobot;
-    QPushButton* calibrateRobot;
-    QPushButton* setRobotPosition;
-    QPushButton* idleRobotActuator;
-    QPushButton* actuateRobotActuator;
-    QPushButton* releaseRobotActuator;
-    QPushButton* demo;
-    QLabel* xPositionLabel;
-    QLabel* yPositionLabel;
-    QLabel* zPositionLabel;
-    QLabel* rPositionLabel;
-    QSpinBox* xPosition;
-    QSpinBox* yPosition;
-    QSpinBox* zPosition;
-    QSpinBox* rPosition;
+    Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
     /*!
     * Update list of serial ports available.
@@ -95,12 +94,4 @@ private:
     */
     void portListSelectionChange();
 
-    void sleepRobotClicked();
-    void wakeRobotClicked();
-    void calibrateRobotClicked();
-    void setRobotPositionClicked();
-    void idleRobotActuatorClicked();
-    void actuateRobotActuatorClicked();
-    void releaseRobotActuatorClicked();
-    void performDemo();
 };

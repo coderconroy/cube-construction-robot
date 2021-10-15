@@ -1,8 +1,8 @@
 #include "Robot.h"
 
-Robot::Robot(QSerialPort* port)
+Robot::Robot(QObject* parent) : QObject(parent)
 {
-	this->port = port;
+
 }
 
 void Robot::calibrate()
@@ -35,6 +35,11 @@ void Robot::wake()
 
     // Transmit packet
     transmitPacket(packet);
+}
+
+void Robot::setPort(QSerialPort* port)
+{
+    this->port = port;
 }
 
 void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)

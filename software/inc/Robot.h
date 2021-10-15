@@ -8,12 +8,13 @@
 */
 class Robot: public QObject
 {
+	Q_OBJECT
 public:
 	/*!
 	* Class constructor.
-	* \param [in] port Serial port over which a connection with the robot has already been established.
+	* \param [in] parent Parent \class QObject.
 	*/
-	Robot(QSerialPort* port);
+	Robot(QObject* parent);
 
 	/*!
 	* Calibrate the reference positions for the X, Y and Z axes. The robot will perform a calibration sequence to find these positions using the
@@ -30,6 +31,12 @@ public:
 	* Places all of the robotic subsystem motors in active mode.
 	*/
 	void wake();
+
+	/*!
+	* Set the serial port over which a connection with the robot has already been established.
+	* \param[in] port Serial port 
+	*/
+	void setPort(QSerialPort* port);
 
 	/*!
 	* Instructs the robot to move the end effector to specified position and orientation.
@@ -63,7 +70,7 @@ public:
 	void delay();
 
 private:
-	QSerialPort* port; /*! Serial port for communication with robot */
+	QSerialPort* port = Q_NULLPTR; /*! Serial port for communication with robot */
 
 	/*!
 	* Transmit the packet over the serial port instance.

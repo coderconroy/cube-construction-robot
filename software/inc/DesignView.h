@@ -15,7 +15,7 @@ public:
 
 signals:
     /*!
-    * Generated when a message is logged by an \class OpenGLView instance.
+    * Generated when a message is logged by an \class DesignView instance.
     */
     void log(Message message) const;
 

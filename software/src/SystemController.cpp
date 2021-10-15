@@ -2,16 +2,27 @@
 
 SystemController::SystemController(QWidget *parent): QWidget(parent)
 {
+	// Initialize robot interface
+	robot = new Robot(this);
+
 	// Initialize views
 	homeView = new HomeView();
 	designView = new DesignView();
 	constructionView = new ConstructionView();
+
+	homeView->setRobot(robot);
+	constructionView->setRobot(robot);
+
+	connect(homeView, &HomeView::robotConnected, this, &SystemController::robotConnected);
 
 	// Initialize navigation widgets
 	homeViewLink = new QPushButton("Home");
 	designViewLink = new QPushButton("3D Shape Design");
 	constructionViewLink = new QPushButton("Construction");
 	showMessageLog = new QPushButton();
+
+	constructionViewLink->setEnabled(false);
+
 	showMessageLog->setIcon(QIcon("res/log-icon.png"));
 	showMessageLog->setIconSize(QSize(32, 32));
 
@@ -38,7 +49,9 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	messageLog = new Logger();
 	connect(messageLog, &Logger::hideRequested, this, &SystemController::hideMessageLog);
 
+	connect(homeView, &HomeView::log, messageLog, &Logger::log);
 	connect(designView, &DesignView::log, messageLog, &Logger::log);
+	connect(constructionView, &ConstructionView::log, messageLog, &Logger::log);
 
 	// Initialize primary view container
 	viewLayout = new QStackedLayout();
@@ -89,4 +102,9 @@ void SystemController::showMessageLogClick()
 {
 	messageLog->show();
 	showMessageLog->hide();
+}
+
+void SystemController::robotConnected()
+{
+	constructionViewLink->setEnabled(true);
 }

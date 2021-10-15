@@ -32,6 +32,7 @@ private:
     QPushButton* showMessageLog; /*! Show message log button */
 
     Logger* messageLog; /*! Display for all messages logged by various software components */
+    Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
     /*!
     * Set the current primary view based on which link button was clicked.
@@ -47,4 +48,9 @@ private:
     * Show the message log widget.
     */
     void showMessageLogClick();
+
+    /*!
+    * Update system state when robot connection is established
+    */
+    void robotConnected();
 };
