@@ -32,6 +32,8 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	shapeView->setFormat(format);
 	shapeView->setCubes(cubeWorldModel->getCubes());
 
+	connect(shapeView, &OpenGLView::cubePositionUpdateRequested, cubeWorldModel, &CubeWorldModel::updateSelectedCubePosition);
+
 	// Propagate log signal
 	connect(shapeView, &OpenGLView::log, this, &DesignView::log);
 
@@ -121,11 +123,13 @@ void DesignView::clearModelClicked()
 
 void DesignView::cubeListSelectionChange()
 {
+	// Enable remove button only if a cube is selected
 	removeCube->setEnabled(cubeList->currentItem() != Q_NULLPTR);
 }
 
 void DesignView::updateControlState()
 {
+	// Set enable state of control buttons
 	if (cubeWorldModel->getCubeCount() > 0)
 	{
 		saveModel->setEnabled(true);

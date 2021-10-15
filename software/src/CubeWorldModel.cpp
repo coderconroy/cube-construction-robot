@@ -9,6 +9,7 @@ CubeWorldModel::~CubeWorldModel()
 		delete cubes[i];
 
 	cubes.clear();
+	selectedCube = Q_NULLPTR;
 }
 
 const QList<Cube*>* CubeWorldModel::getCubes() const
@@ -22,6 +23,13 @@ const Cube* CubeWorldModel::insertCube(glm::vec3& position)
 	unsigned int cubeSize = 64;
 	Cube* newCube = new Cube(++lastCubeID, cubeSize, this);
 	newCube->setPosition(position);
+
+
+	// Update selected cube
+	if (selectedCube != Q_NULLPTR)
+		selectedCube->setState(CubeState::VALID);
+	selectedCube = newCube;
+	newCube->setState(CubeState::SELECTED);
 
 	// Add cube to cube world list
 	cubes.append(newCube);
@@ -37,6 +45,11 @@ void CubeWorldModel::removeCube(const Cube* cube)
 		// Remove cube
 		if (cubes[i]->getCubeID() == cube->getCubeID())
 		{
+			// If cube to be removed is the selected cube reset the selected cube reference
+			if (selectedCube != Q_NULLPTR && cube->getCubeID() == selectedCube->getCubeID())
+				selectedCube = Q_NULLPTR;
+
+			// Remove cube from cube world
 			cubes.removeAt(i);
 			break;
 		}
@@ -53,4 +66,14 @@ void CubeWorldModel::clearCubes()
 int CubeWorldModel::getCubeCount() const
 {
 	return cubes.size();
+}
+
+void CubeWorldModel::updateSelectedCubePosition(const int deltaX, const int deltaZ, const int deltaLayer)
+{
+	if (selectedCube == Q_NULLPTR)
+		return;
+
+	glm::vec3 position = selectedCube->getPosition();
+	position = glm::vec3(position.x + deltaX, position.y, position.z + deltaZ);
+	selectedCube->setPosition(position);
 }

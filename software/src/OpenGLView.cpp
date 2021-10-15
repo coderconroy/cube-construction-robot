@@ -97,10 +97,32 @@ void OpenGLView::initializeGL()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Texture filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Load texture source image
+    // Load cube texture source image
     int imgWidth, imgHeight, imgChannels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(CUBE_TEXTURE_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    // Initialize selected cube texture
+    glGenTextures(1, &cubeTextureSelected);
+    glBindTexture(GL_TEXTURE_2D, cubeTextureSelected); // Bind texture to current context
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Texture mapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Texture filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load selected cube texture source image
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load(CUBE_TEXTURE_SELECTED_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -139,10 +161,6 @@ void OpenGLView::paintGL()
     glClearColor(0.67f, 0.95f, 0.95f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Bind cube texture to texture unit
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, cubeTexture);
-
     // Set the active shader program for the current context
     shaderProgram->useProgram();
 
@@ -177,6 +195,15 @@ void OpenGLView::paintGL()
         {
             // Get cube to render
             Cube* cube = cubes->at(i);
+
+            // Bind cube texture to texture unit based on cube state
+            glActiveTexture(GL_TEXTURE0);
+            if (cube->getState() == CubeState::VALID)
+                glBindTexture(GL_TEXTURE_2D, cubeTexture);
+            else if (cube->getState() == CubeState::SELECTED)
+                glBindTexture(GL_TEXTURE_2D, cubeTextureSelected);
+            else if (cube->getState() == CubeState::COLLISION)
+                glBindTexture(GL_TEXTURE_2D, cubeTextureSelected);
 
             // Compute model matrix
             glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local from to the world frame
@@ -242,7 +269,22 @@ void OpenGLView::mouseReleaseEvent(QMouseEvent* event)
 
 void OpenGLView::keyPressEvent(QKeyEvent* event)
 {
-
+    if (event->key() == Qt::Key_Up)
+    {
+        emit cubePositionUpdateRequested(0, -1, 0);
+    }
+    if (event->key() == Qt::Key_Down)
+    {
+        emit cubePositionUpdateRequested(0, 1, 0);
+    }
+    if (event->key() == Qt::Key_Left)
+    {
+        emit cubePositionUpdateRequested(-1, 0, 0);
+    }
+    if (event->key() == Qt::Key_Right)
+    {
+        emit cubePositionUpdateRequested(1, 0, 0);
+    }
     
 }
 

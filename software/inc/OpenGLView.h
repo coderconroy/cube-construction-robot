@@ -27,9 +27,19 @@ public:
 
 signals:
     /*!
-    * Generated when a message is logged by an \class OpenGLView instance.
+    * Signal generated when a message is logged by an \class OpenGLView instance.
     */
     void log(Message message);
+
+    /*!
+    * Signal generated when an input to update the position of the selected cube is received.
+    */
+    void cubePositionUpdateRequested(const int deltaX, const int deltaZ, const int deltaLayer);
+
+    /*!
+    * Signal generated when an input to update the orientation of the selected cube is received.
+    */
+    void cubeOrientationUpdateRequested(const int& angle);
 
 protected:
     /*!
@@ -88,7 +98,9 @@ protected:
 private:
     ShaderProgram* shaderProgram; /*! Shader program from vertex and fragment shaders */
     unsigned int vertArrayObj; /*! Vertex array buffer object ID */
-    unsigned int cubeTexture; /*! Texture applied to each cube face */
+    unsigned int cubeTexture; /*! Texture applied to each valid cube face */
+    unsigned int cubeTextureSelected; /*! Texture applied to each selected cube face */
+    unsigned int cubeTextureCollision; /*! Texture applied to each collided cube face */
     const QList<Cube*>* cubes = Q_NULLPTR; /*! Cubes in the world reference frame to be rendered */
 
     // Viewport parameters
@@ -101,4 +113,5 @@ private:
 
     // Texture resource paths
     const char* CUBE_TEXTURE_PATH = "res/cube-texture.jpg";
+    const char* CUBE_TEXTURE_SELECTED_PATH = "res/cube-texture-selected.jpg";
 };

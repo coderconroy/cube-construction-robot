@@ -50,7 +50,16 @@ public:
 	*/
 	int getCubeCount() const;
 
+	/*!
+	* Updates the position of the selected cube.
+	* \param [in] deltaX Position change along x-axis from current x-axis position.
+	* \param [in] deltaZ Position change along z-axis from current z-axis position.
+	* \param [in] deltaLayer Position change in layers from current layer position.
+	*/
+	void updateSelectedCubePosition(const int deltaX, const int deltaZ, const int deltaLayer);
+
 private:
+	Cube* selectedCube = Q_NULLPTR; /*! Reference to the cube currently in the selected state */
 	unsigned int lastCubeID = 0; /*! Cube identifier of most recently inserted cube */
 	QList<Cube*> cubes; /*! List of cubes that have been inserted into the cube world */
 };
