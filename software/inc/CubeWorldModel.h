@@ -45,6 +45,12 @@ public:
 	void clearCubes();
 
 	/*!
+	* Update currently selected cube.
+	* \param [in] cube Cube to select.
+	*/
+	void selectCube(const Cube* cube);
+
+	/*!
 	* Getter for the size of the cube world.
 	* \return Number of cubes in cube world.
 	*/

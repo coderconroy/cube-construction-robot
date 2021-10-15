@@ -24,7 +24,6 @@ const Cube* CubeWorldModel::insertCube(glm::vec3& position)
 	Cube* newCube = new Cube(++lastCubeID, cubeSize, this);
 	newCube->setPosition(position);
 
-
 	// Update selected cube
 	if (selectedCube != Q_NULLPTR)
 		selectedCube->setState(CubeState::VALID);
@@ -55,12 +54,44 @@ void CubeWorldModel::removeCube(const Cube* cube)
 		}
 	}
 
+	if (cubes.size() == 0)
+		lastCubeID = 0;
+
 	return;
 }
 
 void CubeWorldModel::clearCubes()
 {
 	cubes.clear();
+	lastCubeID = 0;
+}
+
+void CubeWorldModel::selectCube(const Cube* cube)
+{
+	// Unselect currently selected cube
+	if (selectedCube != Q_NULLPTR)
+	{
+		selectedCube->setState(CubeState::VALID);
+		selectedCube = Q_NULLPTR;
+	}
+
+	// Check if a cube was specified
+	if (cube == Q_NULLPTR)
+		return;
+
+	// Find cube to select in cube list
+	for (int i = 0; i < cubes.size(); ++i)
+	{
+		// Select cube
+		if (cubes[i]->getCubeID() == cube->getCubeID())
+		{
+			selectedCube = cubes[i];
+			cubes[i]->setState(CubeState::SELECTED);
+			break;
+		}
+	}
+
+	return;
 }
 
 int CubeWorldModel::getCubeCount() const

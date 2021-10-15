@@ -78,6 +78,9 @@ void DesignView::insertCubeClicked()
 	cubeMap.insert(cubeDescription, cube);
 	cubeList->addItem(cubeDescription);
 
+	// Select newly added cube in the cube list widget
+	cubeList->setCurrentRow(cubeList->count() - 1);
+
 	// Update view state
 	updateControlState();
 }
@@ -92,7 +95,6 @@ void DesignView::removeCubeClicked()
 	cubeMap.remove(cubeDescription);
 	cubeWorldModel->removeCube(cube);
 	cubeList->takeItem(cubeList->currentIndex().row());
-	cubeList->selectionModel()->clear();
 
 	// Update view state
 	updateControlState();
@@ -125,6 +127,15 @@ void DesignView::cubeListSelectionChange()
 {
 	// Enable remove button only if a cube is selected
 	removeCube->setEnabled(cubeList->currentItem() != Q_NULLPTR);
+
+	// Select cube in cube world model
+	if (cubeList->currentItem() != Q_NULLPTR)
+	{
+		// Get selected cube from cube list
+		QString cubeDescription = cubeList->currentItem()->text();
+		const Cube* cube = cubeMap.value(cubeDescription);
+		cubeWorldModel->selectCube(cube);
+	}
 }
 
 void DesignView::updateControlState()
