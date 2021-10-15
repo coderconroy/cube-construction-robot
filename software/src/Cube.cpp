@@ -64,3 +64,41 @@ float Cube::getYaw() const
 {
 	return orientation[2];
 }
+
+void Cube::read(const QJsonObject& json)
+{
+	// Read and initialize cube identifier
+	if (json.contains("cubeID") && json["cubeID"].isDouble())
+		cubeID = json["cubeID"].toInt();
+
+	// Read and initialize cube side length
+	if (json.contains("sideLength") && json["sideLength"].isDouble())
+		sideLength = json["sideLength"].toInt();
+
+	// Read and initialize cube position
+	if (json.contains("position") && json["position"].isArray()) {
+		QJsonArray jsonPosition = json["position"].toArray();
+		position = glm::vec3(jsonPosition[0].toDouble(), jsonPosition[1].toDouble(), jsonPosition[2].toDouble());
+	}
+
+	// Read and initialize cube orientation
+	if (json.contains("orientation") && json["orientation"].isArray()) {
+		QJsonArray jsonOrientation = json["orientation"].toArray();
+		orientation = glm::vec3(jsonOrientation[0].toDouble(), jsonOrientation[1].toDouble(), jsonOrientation[2].toDouble());
+	}
+}
+
+void Cube::write(QJsonObject& json) const
+{
+	// Write integer members to JSON object
+	json["cubeID"] = (int) cubeID;
+	json["sideLength"] = (int)sideLength;
+
+	// Initialize JSON arrays
+	QJsonArray jsonPosition = {position.x, position.y, position.z};
+	QJsonArray jsonOrientation = {orientation.x, orientation.y, orientation.z};
+
+	// Write JSON arrays to JSON object
+	json["position"] = jsonPosition;
+	json["orientation"] = jsonOrientation;
+}

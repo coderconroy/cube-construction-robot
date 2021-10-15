@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <glm/glm.hpp>
 
 /*!
@@ -96,6 +98,18 @@ public:
 	* \return psi
 	*/
 	float getYaw() const;
+
+	/*!
+	* Load cube from a JSON object.
+	* \param [in] json JSON object to load the cube from.
+	*/
+	void read(const QJsonObject& json);
+
+	/*!
+	* Write the cube to a JSON object.
+	* \param [out] json JSON object to write the cube to.
+	*/
+	void write(QJsonObject& json) const;
 
 private:
 	CubeState state; /*! State of the cube in an external context */

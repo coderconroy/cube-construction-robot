@@ -158,3 +158,15 @@ void CubeWorldModel::updateSelectedCubeOrientation(int angleSteps)
 	orientation.y += glm::radians(angleSteps * rotationAngleResolution);
 	selectedCube->setOrientation(orientation);
 }
+
+void CubeWorldModel::read(const QJsonObject& json)
+{
+
+}
+
+
+void CubeWorldModel::write(QJsonObject& json) const
+{
+	json["cubeSideLength"] = (int) cubeSideLength;
+	json["cubeMargin"] = (int) cubeMargin;
+}

@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include <QObject>
 #include <QList>
+#include <QJsonObject>
 #include <glm/glm.hpp>
 
 class CubeWorldModel : public QObject
@@ -78,6 +79,18 @@ public:
 	* \param [in] angleSteps Cube rotation change about the vertical y-axis in steps of the rotation angle resolution.
 	*/
 	void updateSelectedCubeOrientation(int angleSteps);
+
+	/*!
+	* Load cube world model from a JSON object.
+	* \param [in] json JSON object to load the cube world model from.
+	*/
+	void read(const QJsonObject& json);
+
+	/*!
+	* Write the cube world model to a JSON object.
+	* \param [out] json JSON object to write the cube world model to.
+	*/
+	void write(QJsonObject& json) const;
 
 signals:
 	/*!
