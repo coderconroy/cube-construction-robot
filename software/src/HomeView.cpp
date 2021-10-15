@@ -210,7 +210,7 @@ void HomeView::connectToRobot()
 
 void HomeView::portListSelectionChange()
 {
-    connectButton->setEnabled(portList->currentItem() != NULL);
+    connectButton->setEnabled(portList->currentItem() != Q_NULLPTR);
 }
 
 void HomeView::sleepRobotClicked()
@@ -256,6 +256,7 @@ const int moveOffset = 200;
 const int cubePadding = 8;
 const int numCubes = 17;
 int centreSpacing = cubeWidth + 2 * cubePadding;
+
 void HomeView::performDemo()
 {
     int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873 };

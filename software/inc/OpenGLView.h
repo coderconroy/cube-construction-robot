@@ -6,6 +6,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <QList>
 #include <vector>
 #include "Logger.h"
 
@@ -22,7 +23,7 @@ public:
     * Setter for list of cubes in the world reference frame that need to be rendered.
     * \param cubes Cubes to be rendered.
     */
-    void setCubes(const std::vector<Cube*>* cubes);
+    void setCubes(const QList<Cube*>* cubes);
 
 signals:
     /*!
@@ -88,7 +89,7 @@ private:
     ShaderProgram* shaderProgram; /*! Shader program from vertex and fragment shaders */
     unsigned int vertArrayObj; /*! Vertex array buffer object ID */
     unsigned int cubeTexture; /*! Texture applied to each cube face */
-    const std::vector<Cube*>* cubes = nullptr; /*! Cubes in the world reference frame to be rendered */
+    const QList<Cube*>* cubes = Q_NULLPTR; /*! Cubes in the world reference frame to be rendered */
 
     // Viewport parameters
     unsigned int screen_width; /*! OpenGL viewport width */
@@ -101,4 +102,3 @@ private:
     // Texture resource paths
     const char* CUBE_TEXTURE_PATH = "res/cube-texture.jpg";
 };
-

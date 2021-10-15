@@ -11,14 +11,31 @@ CubeWorldModel::~CubeWorldModel()
 	cubes.clear();
 }
 
-const std::vector<Cube*>* CubeWorldModel::getCubes() const
+const QList<Cube*>* CubeWorldModel::getCubes() const
 {
 	return &cubes;
 }
 
-void CubeWorldModel::insertCube(glm::vec3& position)
+const Cube* CubeWorldModel::insertCube(glm::vec3& position)
 {
 	Cube* newCube = new Cube(64, this);
 	newCube->setPosition(position);
-	cubes.push_back(newCube);
+	cubes.append(newCube);
+	return newCube;
+}
+
+void CubeWorldModel::removeCube(const Cube* cube)
+{
+	// Find cube to remove in cube list
+	for (int i = 0; i < cubes.size(); ++i)
+	{
+		// Remove cube
+		if (cubes[i] == cube)
+		{
+			cubes.removeAt(i);
+		}
+		break;
+	}
+
+	return;
 }

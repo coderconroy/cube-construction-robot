@@ -5,13 +5,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb-image/stb_image.h>
 
+
 OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) 
 {
     // Set focus policy to ensure the widget receives keyboard events
     setFocusPolicy(Qt::ClickFocus);
 }
 
-void OpenGLView::setCubes(const std::vector<Cube*>* cubes)
+void OpenGLView::setCubes(const QList<Cube*>* cubes)
 {
     this->cubes = cubes;
 }
@@ -125,12 +126,12 @@ void OpenGLView::resizeGL(int width, int height)
     screen_height = height;
 }
 
-double rho = 10;
+int rho = 10;
 float theta = 0;
 float phi = 30;
 float xFocal = 0;
-float yFocal = -2.5;
-float zFocal = -6.8;
+float yFocal = 0;
+float zFocal = 0;
 
 void OpenGLView::paintGL()
 {
@@ -191,7 +192,6 @@ void OpenGLView::paintGL()
     }
 }
 
-
 int mouseX = 0;
 int mouseY = 0;
 int thetaSensitivity = 30;
@@ -223,11 +223,11 @@ void OpenGLView::mouseMoveEvent(QMouseEvent* event)
     }
     if (event->buttons() == Qt::MiddleButton)
     {
-        double deltaX = event->x() - mouseX;
-        double deltaY = event->y() - mouseY;
+        int deltaX = event->x() - mouseX;
+        int deltaY = event->y() - mouseY;
 
-        xFocal -= (deltaX * cos(glm::radians(theta)) + deltaY * sin(glm::radians(theta))) * ((xFocalSensitivity + 0.5 * rho) / 1000.0);
-        zFocal -= (deltaY * cos(glm::radians(theta)) - deltaX * sin(glm::radians(theta))) * ((zFocalSensitivity + 0.5 * rho)  / 1000.0);
+        xFocal -= ((double) deltaX * cos(glm::radians(theta)) + (double) deltaY * sin(glm::radians(theta))) * ((xFocalSensitivity + 0.5 * (double) rho) / 1000.0);
+        zFocal -= ((double) deltaX * -sin(glm::radians(theta)) + (double) deltaY * cos(glm::radians(theta))) * ((zFocalSensitivity + 0.5 * (double) rho)  / 1000.0);
 
     }
 
