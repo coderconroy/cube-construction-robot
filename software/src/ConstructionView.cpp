@@ -1,11 +1,31 @@
 #include "ConstructionView.h"
+#include <QJsonDocument>
+#include <QFile>
+#include <QTextStream>
+#include <QList>
 
 ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 {
+    // Initialize cube world model
+    cubeWorldModel = new CubeWorldModel(64, 10, this);
+    connect(cubeWorldModel, &CubeWorldModel::log, this, &ConstructionView::log); // Propagate log signal
+
+    // Initialize OpenGL view for the 3D shapes
+    shapeView = new OpenGLView(parent);
+    QSurfaceFormat format;
+    format.setVersion(3, 3);
+    format.setProfile(QSurfaceFormat::CoreProfile);
+    shapeView->setFormat(format);
+    shapeView->setCubes(cubeWorldModel->getCubes());
+
+    connect(shapeView, &OpenGLView::log, this, &ConstructionView::log); // Propagate log signal
+
     // Initialize camera feed and controls
     cameraFeed = new QLabel();
 
     // Initialize general robot controls
+    loadModel = new QPushButton("Load Model");
+    execute = new QPushButton("Start Construction");
     sleepRobot = new QPushButton("Sleep");
     wakeRobot = new QPushButton("Wake");
     calibrateRobot = new QPushButton("Calibrate");
@@ -14,6 +34,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     releaseRobotActuator = new QPushButton("Actuator->Release");
     demo = new QPushButton("Perform Demo");
 
+    connect(loadModel, &QPushButton::clicked, this, &ConstructionView::loadModelClicked);
     connect(sleepRobot, &QPushButton::clicked, this, &ConstructionView::sleepRobotClicked);
     connect(wakeRobot, &QPushButton::clicked, this, &ConstructionView::wakeRobotClicked);
     connect(calibrateRobot, &QPushButton::clicked, this, &ConstructionView::calibrateRobotClicked);
@@ -24,6 +45,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     robotControlLayout = new QHBoxLayout();
     robotControlLayout->addStretch();
+    robotControlLayout->addWidget(loadModel);
+    robotControlLayout->addWidget(execute);
     robotControlLayout->addWidget(sleepRobot);
     robotControlLayout->addWidget(wakeRobot);
     robotControlLayout->addWidget(calibrateRobot);
@@ -74,6 +97,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     // Intialize shape layout
     shapeLayout = new QVBoxLayout();
+    shapeLayout->addWidget(shapeView);
 
     // Initialize visual layout
     visualLayout = new QHBoxLayout();
@@ -95,16 +119,58 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     // Initialize camera feed timer
     cameraFeedTimer = new QTimer(this);
     connect(cameraFeedTimer, &QTimer::timeout, this, &ConstructionView::updateCameraFeed);
+
+    // Initialize OpenGL shape view timer
+    openGLTimer = new QTimer(this);
+    connect(openGLTimer, &QTimer::timeout, this, &ConstructionView::updateShapeView);
 }
 
 void ConstructionView::showView()
 {
     cameraFeedTimer->start(20); // Update camera feed every 20ms
+    openGLTimer->start(20); // Refresh OpenGL render every 20ms
 }
 
 void ConstructionView::hideView()
 {
     cameraFeedTimer->stop(); // Do not refresh camera feed when the construction view is hidden
+    openGLTimer->stop(); // Do not refresh OpenGL render when the design view is hidden
+}
+
+void ConstructionView::updateShapeView()
+{
+    shapeView->update();
+}
+
+void ConstructionView::loadModelClicked()
+{
+    // Read JSON cube world model from file
+    QFile jsonFile("models/testFile.cubeworld");
+    if (jsonFile.open(QIODevice::ReadOnly))
+    {
+        // Read file into byte array
+        QByteArray jsonBytes = jsonFile.readAll();
+        jsonFile.close();
+
+        // Parse JSON document from byte array
+        QJsonParseError jsonError;
+        QJsonDocument document = QJsonDocument::fromJson(jsonBytes, &jsonError);
+        if (jsonError.error != QJsonParseError::NoError)
+        {
+            QString errorMessage = QString("Failed to read from JSON cube world model file: ") + jsonError.errorString();
+            emit log(Message(MessageType::ERROR_LOG, "Design View", errorMessage));
+            return;
+        }
+
+        // Initialize cube world model with JSON object
+        cubeWorldModel->read(document.object());
+        emit log(Message(MessageType::INFO_LOG, "Construction View", "Cube world model successfully loaded from file"));
+    }
+}
+
+void ConstructionView::executeConstruction()
+{
+
 }
 
 void ConstructionView::setRobot(Robot* robot)

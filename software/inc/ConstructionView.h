@@ -2,6 +2,8 @@
 
 #include "Robot.h"
 #include "Logger.h"
+#include "OpenGLView.h"
+#include "CubeWorldModel.h"
 #include "opencv2/opencv.hpp"
 #include <QWidget>
 #include <QHBoxLayout>
@@ -54,7 +56,13 @@ private:
     QVBoxLayout* shapeLayout; /* Layout for 3D shape view and supplementary widgets */
     QLabel* cameraFeed; /*! Display live images captured by camera */
 
+    QPushButton* loadModel; /* Load model to be constructed into the cube world model from JSON file */
+    QPushButton* execute; /* Initiate construction of cube world model */
+
+    OpenGLView* shapeView; /*! OpenGL render of 3D shape to be constructed */
+    CubeWorldModel* cubeWorldModel; /*! Model of cubes in world frame */
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
+    QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
     cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
@@ -81,6 +89,21 @@ private:
     * Captures new image from camera and updates the camera feed.
     */
     void updateCameraFeed();
+
+    /*!
+    * Request OpenGL redraw the shape view.
+    */
+    void updateShapeView();
+
+    /*!
+    * Load cube world model from file.
+    */
+    void loadModelClicked();
+
+    /*!
+    * Control robot to construct cube world model.
+    */
+    void executeConstruction();
 
     void sleepRobotClicked();
     void wakeRobotClicked();
