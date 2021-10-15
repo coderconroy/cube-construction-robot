@@ -36,6 +36,16 @@ public:
     HomeView(QWidget* parent = Q_NULLPTR);
 
     /*!
+    * Update the home view state when it is displayed on screen.
+    */
+    void showView();
+
+    /*!
+    * Update the home view state when it is hidden off screen to stop performing unnessary computations.
+    */
+    void hideView();
+
+    /*!
     * Set the home view's reference to the system robot instance.
     */
     void setRobot(Robot* robot);

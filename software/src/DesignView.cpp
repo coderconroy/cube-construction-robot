@@ -64,7 +64,16 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	// TODO: Review if this timer is necessary when other events trigger a shape view update
 	openGLTimer = new QTimer(this);
 	connect(openGLTimer, &QTimer::timeout, this, &DesignView::updateShapeView);
-	openGLTimer->start(20); // Update feed every 20ms
+}
+
+void DesignView::showView()
+{
+	openGLTimer->start(20); // Update camera feed every 20ms
+}
+
+void DesignView::hideView()
+{
+	openGLTimer->stop(); // Do not refresh openGL render when the design view is hidden
 }
 
 void DesignView::updateShapeView()

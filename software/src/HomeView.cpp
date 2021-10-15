@@ -69,7 +69,16 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     // Initialize camera feed timer
     cameraFeedTimer = new QTimer(this);
     connect(cameraFeedTimer, &QTimer::timeout, this, &HomeView::updateCameraFeed);
-    cameraFeedTimer->start(20); // Update feed every 20ms
+}
+
+void HomeView::showView()
+{
+    cameraFeedTimer->start(20); // Update camera feed every 20ms
+}
+
+void HomeView::hideView()
+{
+    cameraFeedTimer->stop(); // Do not refresh camera feed when the home view is hidden
 }
 
 void HomeView::refreshAvailablePorts()

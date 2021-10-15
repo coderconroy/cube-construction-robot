@@ -11,7 +11,21 @@ class DesignView: public QWidget
 {
     Q_OBJECT
 public:
+    /*!
+    * Class constructor. Initializes the home screen.
+    * @param [in] parent Parent widget
+    */
     DesignView(QWidget* parent = Q_NULLPTR);
+
+    /*!
+    * Update the design view state when it is displayed on screen.
+    */
+    void showView();
+
+    /*!
+    * Update the design view state when it is hidden off screen to stop performing unnessary computations.
+    */
+    void hideView();
 
 signals:
     /*!

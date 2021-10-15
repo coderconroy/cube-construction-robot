@@ -66,6 +66,7 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	viewLayout->addWidget(designView);
 	viewLayout->addWidget(constructionView);
 	viewLayout->setCurrentWidget(homeView);
+	homeView->showView();
 
 	// Initialize the base layout
 	baseLayout = new QVBoxLayout();
@@ -89,17 +90,25 @@ void SystemController::setView()
 	// Get signal source
 	QObject* source = sender();
 
+	// Set all views to hide state
+	homeView->hideView();
+	designView->hideView();
+	constructionView->hideView();
+
 	// Set view based on source button
 	if (source == homeViewLink)
 	{
+		homeView->showView();
 		viewLayout->setCurrentWidget(homeView);
 	}
 	else if (source == designViewLink)
 	{
+		designView->showView();
 		viewLayout->setCurrentWidget(designView);
 	}
 	else if (source == constructionViewLink)
 	{
+		constructionView->showView();
 		viewLayout->setCurrentWidget(constructionView);
 	}
 }

@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
+#include <QTimer>
 
 class ConstructionView : public QWidget
 {
@@ -19,6 +20,16 @@ public:
     * @param [in] parent Parent widget
     */
     ConstructionView(QWidget* parent = Q_NULLPTR);
+
+    /*!
+    * Update the construction view state when it is displayed on screen.
+    */
+    void showView();
+
+    /*!
+    * Update the construction view state when it is hidden off screen to stop performing unnessary computations.
+    */
+    void hideView();
 
     /*!
     * Set the construction view's reference to the system robot instance.
@@ -38,6 +49,15 @@ signals:
 
 private:
     QVBoxLayout* baseLayout; /* Layout for all the main construction view components and layouts */
+    QHBoxLayout* visualLayout; /* Layout for camera and shape view layouts */
+    QVBoxLayout* cameraLayout; /* Layout for camera feed and supplementary widgets */
+    QVBoxLayout* shapeLayout; /* Layout for 3D shape view and supplementary widgets */
+    QLabel* cameraFeed; /*! Display live images captured by camera */
+
+    QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
+    cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
+    Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
+
     QHBoxLayout* robotPositionLayout;
     QHBoxLayout* robotControlLayout;
     QPushButton* sleepRobot;
@@ -56,8 +76,11 @@ private:
     QSpinBox* yPosition;
     QSpinBox* zPosition;
     QSpinBox* rPosition;
-    cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
-    Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
+
+    /*!
+    * Captures new image from camera and updates the camera feed.
+    */
+    void updateCameraFeed();
 
     void sleepRobotClicked();
     void wakeRobotClicked();

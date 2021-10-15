@@ -2,6 +2,9 @@
 
 ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 {
+    // Initialize camera feed and controls
+    cameraFeed = new QLabel();
+
     // Initialize general robot controls
     sleepRobot = new QPushButton("Sleep");
     wakeRobot = new QPushButton("Wake");
@@ -65,15 +68,43 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotPositionLayout->addWidget(setRobotPosition);
     robotPositionLayout->addStretch();
 
+    // Initialize camera layout
+    cameraLayout = new QVBoxLayout();
+    cameraLayout->addWidget(cameraFeed);
+
+    // Intialize shape layout
+    shapeLayout = new QVBoxLayout();
+
+    // Initialize visual layout
+    visualLayout = new QHBoxLayout();
+    visualLayout->addLayout(cameraLayout);
+    visualLayout->addLayout(shapeLayout);
+
     // Initialize base layout
     baseLayout = new QVBoxLayout();
     baseLayout->addStretch();
+    baseLayout->addLayout(visualLayout);
+    baseLayout->addSpacing(20);
     baseLayout->addLayout(robotControlLayout);
     baseLayout->addSpacing(20);
     baseLayout->addLayout(robotPositionLayout);
     baseLayout->addStretch();
 
     setLayout(baseLayout);
+
+    // Initialize camera feed timer
+    cameraFeedTimer = new QTimer(this);
+    connect(cameraFeedTimer, &QTimer::timeout, this, &ConstructionView::updateCameraFeed);
+}
+
+void ConstructionView::showView()
+{
+    cameraFeedTimer->start(20); // Update camera feed every 20ms
+}
+
+void ConstructionView::hideView()
+{
+    cameraFeedTimer->stop(); // Do not refresh camera feed when the construction view is hidden
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -84,6 +115,18 @@ void ConstructionView::setRobot(Robot* robot)
 void ConstructionView::setCamera(cv::VideoCapture* camera)
 {
     this->camera = camera;
+}
+
+void ConstructionView::updateCameraFeed()
+{
+    // Capture frame from camera
+    cv::Mat frame;
+    *camera >> frame;
+
+    // Display image in camera feed
+    cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
+    QImage cameraFeedImage = QImage((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+    cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
 }
 
 void ConstructionView::sleepRobotClicked()
