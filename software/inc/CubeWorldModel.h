@@ -39,7 +39,19 @@ public:
 	*/
 	void removeCube(const Cube* cube);
 
+	/*!
+	* Remove all cubes from the cube world.
+	*/
+	void clearCubes();
+
+	/*!
+	* Getter for the size of the cube world.
+	* \return Number of cubes in cube world.
+	*/
+	int getCubeCount() const;
+
 private:
+	unsigned int lastCubeID = 0; /*! Cube identifier of most recently inserted cube */
 	QList<Cube*> cubes; /*! List of cubes that have been inserted into the cube world */
 };
 

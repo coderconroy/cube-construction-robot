@@ -14,8 +14,7 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	clearModel = new QPushButton("Clear Model");
 	cubeList = new QListWidget();
 
-	cubeList->setMaximumWidth(300);
-	removeCube->setEnabled(false);
+	cubeList->setMaximumWidth(200);
 
 	// Initialize control signal connections
 	connect(insertCube, &QPushButton::clicked, this, &DesignView::insertCubeClicked);
@@ -38,12 +37,15 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 
 	// Initialize controls layout
 	controlsLayout = new QVBoxLayout();
+
+	controlsLayout->addWidget(loadModel);
+	controlsLayout->addWidget(saveModel);
+	controlsLayout->addWidget(clearModel);
 	controlsLayout->addWidget(insertCube);
 	controlsLayout->addWidget(removeCube);
-	controlsLayout->addWidget(saveModel);
-	controlsLayout->addWidget(loadModel);
-	controlsLayout->addWidget(clearModel);
 	controlsLayout->addWidget(cubeList);
+
+	updateControlState();
 
 	// Initialize design view layout
 	baseLayout = new QHBoxLayout();
@@ -70,9 +72,12 @@ void DesignView::insertCubeClicked()
 	const Cube* cube = cubeWorldModel->insertCube(glm::vec3(0, 0.5, 0));
 
 	// Add cube to cube list widget
-	QString cubeDescription = "Cube " + QString::number(++lastCubeReference);
+	QString cubeDescription = "Cube " + QString::number(cube->getCubeID());
 	cubeMap.insert(cubeDescription, cube);
 	cubeList->addItem(cubeDescription);
+
+	// Update view state
+	updateControlState();
 }
 
 void DesignView::removeCubeClicked()
@@ -83,27 +88,35 @@ void DesignView::removeCubeClicked()
 
 	// Remove selected cube from cube world model, cube list and cube map
 	cubeMap.remove(cubeDescription);
+	cubeWorldModel->removeCube(cube);
 	cubeList->takeItem(cubeList->currentIndex().row());
 	cubeList->selectionModel()->clear();
-	cubeWorldModel->removeCube(cube);
 
 	// Update view state
-	removeCube->setEnabled(false);
+	updateControlState();
 }
 
 void DesignView::saveModelClicked()
 {
-
+	// Update view state
+	updateControlState();
 }
 
 void DesignView::loadModelClicked()
 {
-
+	// Update view state
+	updateControlState();
 }
 
 void DesignView::clearModelClicked()
 {
+	// Remove all cubes from cube world model, cube list and cube map
+	cubeMap.clear();
+	cubeList->clear();
+	cubeWorldModel->clearCubes();
 
+	// Update view state
+	updateControlState();
 }
 
 void DesignView::cubeListSelectionChange()
@@ -111,52 +124,21 @@ void DesignView::cubeListSelectionChange()
 	removeCube->setEnabled(cubeList->currentItem() != Q_NULLPTR);
 }
 
-//// Layer 1 Row 1
-//cubeWorldModel->insertCube(glm::vec3(1.8, -2, -5));
-//cubeWorldModel->insertCube(glm::vec3(0.6, -2, -5));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, -2, -5));
-//cubeWorldModel->insertCube(glm::vec3(-1.8, -2, -5));
+void DesignView::updateControlState()
+{
+	if (cubeWorldModel->getCubeCount() > 0)
+	{
+		saveModel->setEnabled(true);
+		loadModel->setEnabled(false);
+		clearModel->setEnabled(true);
+	}
+	else
+	{
+		saveModel->setEnabled(false);
+		loadModel->setEnabled(true);
+		clearModel->setEnabled(false);
+	}
 
-//// Layer 1 Row 2
-//cubeWorldModel->insertCube(glm::vec3(1.8, -2, -6.2));
-//cubeWorldModel->insertCube(glm::vec3(0.6, -2, -6.2));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, -2, -6.2));
-//cubeWorldModel->insertCube(glm::vec3(-1.8, -2, -6.2));
-
-//// Layer 1 Row 3
-//cubeWorldModel->insertCube(glm::vec3(1.8, -2, -7.4));
-//cubeWorldModel->insertCube(glm::vec3(0.6, -2, -7.4));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, -2, -7.4));
-//cubeWorldModel->insertCube(glm::vec3(-1.8, -2, -7.4));
-
-//// Layer 1 Row 4
-//cubeWorldModel->insertCube(glm::vec3(1.8, -2, -8.6));
-//cubeWorldModel->insertCube(glm::vec3(0.6, -2, -8.6));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, -2, -8.6));
-//cubeWorldModel->insertCube(glm::vec3(-1.8, -2, -8.6));
-
-//// Layer 2 Row 1
-//cubeWorldModel->insertCube(glm::vec3(1.2, -1, -5.6));
-//cubeWorldModel->insertCube(glm::vec3(0.0, -1, -5.6));
-//cubeWorldModel->insertCube(glm::vec3(-1.2, -1, -5.6));
-
-//// Layer 2 Row 2
-//cubeWorldModel->insertCube(glm::vec3(1.2, -1, -6.8));
-//cubeWorldModel->insertCube(glm::vec3(0.0, -1, -6.8));
-//cubeWorldModel->insertCube(glm::vec3(-1.2, -1, -6.8));
-
-//// Layer 2 Row 3
-//cubeWorldModel->insertCube(glm::vec3(1.2, -1, -8.0));
-//cubeWorldModel->insertCube(glm::vec3(0.0, -1, -8.0));
-//cubeWorldModel->insertCube(glm::vec3(-1.2, -1, -8.0));
-
-//// Layer 3 Row 1
-//cubeWorldModel->insertCube(glm::vec3(0.6, 0, -6.2));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, 0, -6.2));
-
-//// Layer 3 Row 2
-//cubeWorldModel->insertCube(glm::vec3(0.6, 0, -7.4));
-//cubeWorldModel->insertCube(glm::vec3(-0.6, 0, -7.4));
-
-//// Layer 4 Row 1
-//cubeWorldModel->insertCube(glm::vec3(0, 1, -6.8));
+	// Enable remove button only if a cube is selected
+	removeCube->setEnabled(cubeList->currentItem() != Q_NULLPTR);
+}

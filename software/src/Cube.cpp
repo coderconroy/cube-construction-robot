@@ -1,11 +1,18 @@
 #include "Cube.h"
 
-Cube::Cube(unsigned int sideLength, QObject* parent) : QObject(parent)
+Cube::Cube(unsigned int& cubeID, unsigned int& sideLength, QObject* parent) : QObject(parent)
 {
 	// Initialize member variables
+	state = CubeState::VALID;
+	this->cubeID = cubeID;
 	this->sideLength = sideLength;
 	position = glm::vec3(0, 0, 0);
 	orientation = glm::vec3(0, 0, 0);
+}
+
+void Cube::setState(const CubeState& state)
+{
+	this->state = state;
 }
 
 void Cube::setPosition(const glm::vec3& position)
@@ -18,9 +25,19 @@ void Cube::setOrientation(const glm::vec3& orientation)
 	this->orientation = orientation;
 }
 
+unsigned int Cube::getCubeID() const
+{
+	return cubeID;
+}
+
 unsigned int Cube::getSideLength()
 {
 	return sideLength;
+}
+
+CubeState Cube::getState() const
+{
+	return state;
 }
 
 glm::vec3 Cube::getPosition() const

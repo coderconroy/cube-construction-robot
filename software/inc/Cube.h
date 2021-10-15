@@ -4,6 +4,16 @@
 #include <glm/glm.hpp>
 
 /*!
+* Enumeration for representing the state of the cube in an external context.
+*/
+enum class CubeState
+{
+	VALID,	  // Cube is not selected and does not intersect any other cube's margin space.
+	SELECTED, // Cube is selected ready for position and orientation updates.
+	COLLISION // Cube is not selected but intersectes at least one other cubes's margin space.
+};
+
+/*!
 * Represents a construction cube in terms of its size, 3D centroid position and orientation.
 * The position of the cube is represented using Cartesian coordinates with respect to the world frame.
 * The local cube frame assumes a right-hand coordinate system. The orientation of the cube is parameterized
@@ -15,10 +25,17 @@ class Cube: public QObject
 public:
 	/*!
 	* Class constructor.
+	* \param [in] cubeID Unique cube identifier.
 	* \param [in] sideLength Length of the cube edges in terms of steps.
 	* \param [in] parent Parent \class QObject.
 	*/
-	Cube(unsigned int sideLength, QObject* parent);
+	Cube(unsigned int& cubeID, unsigned int& sideLength, QObject* parent);
+
+	/*!
+	* Cube state setter.
+	* \param [in] state Cube state.
+	*/
+	void setState(const CubeState& state);
 
 	/*!
 	* Cube position setter.
@@ -33,10 +50,22 @@ public:
 	void setOrientation(const glm::vec3& orientation);
 
 	/*!
+	* Cube ID getter.
+	* \return Cube ID
+	*/
+	unsigned int getCubeID() const;
+
+	/*!
 	* Cube side length getter.
 	* \return Length of the cube edges in terms of steps.
 	*/
 	unsigned int getSideLength();
+
+	/*!
+	* Cube state getter.
+	* \return Cube state.
+	*/
+	CubeState getState() const;
 
 	/*!
 	* Cube position getter.
@@ -69,6 +98,8 @@ public:
 	float getYaw() const;
 
 private:
+	CubeState state; /*! State of the cube in an external context */
+	unsigned int cubeID; /*! Unique cube identifier */
 	unsigned int sideLength; /*! Length of the cube edges in terms of steps */
 	glm::vec3 position; /*! Cartesian position of the cube centre (x, y, z) in steps */
 	glm::vec3 orientation; /*! Orientation of cube parameterized using Euler angles (phi, theta, psi) in radians */

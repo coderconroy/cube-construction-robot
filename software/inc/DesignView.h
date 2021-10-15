@@ -33,8 +33,6 @@ private:
     QMap<QString, const Cube*> cubeMap; /*! Map of items in cube list to cube instances */
     QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
 
-    unsigned int lastCubeReference = 0; /*! Reference number of most recently inserted cube */
-
     /*!
     * Request OpenGL redraw the shape view.
     */
@@ -70,4 +68,8 @@ private:
     */
     void cubeListSelectionChange();
 
+    /*!
+    * Update state of the 3D shape design controls to coincide with the cube world model state.
+    */
+    void updateControlState();
 };

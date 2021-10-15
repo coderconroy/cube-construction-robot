@@ -18,9 +18,14 @@ const QList<Cube*>* CubeWorldModel::getCubes() const
 
 const Cube* CubeWorldModel::insertCube(glm::vec3& position)
 {
-	Cube* newCube = new Cube(64, this);
+	// Create new cube
+	unsigned int cubeSize = 64;
+	Cube* newCube = new Cube(++lastCubeID, cubeSize, this);
 	newCube->setPosition(position);
+
+	// Add cube to cube world list
 	cubes.append(newCube);
+
 	return newCube;
 }
 
@@ -30,12 +35,22 @@ void CubeWorldModel::removeCube(const Cube* cube)
 	for (int i = 0; i < cubes.size(); ++i)
 	{
 		// Remove cube
-		if (cubes[i] == cube)
+		if (cubes[i]->getCubeID() == cube->getCubeID())
 		{
 			cubes.removeAt(i);
+			break;
 		}
-		break;
 	}
 
 	return;
+}
+
+void CubeWorldModel::clearCubes()
+{
+	cubes.clear();
+}
+
+int CubeWorldModel::getCubeCount() const
+{
+	return cubes.size();
 }
