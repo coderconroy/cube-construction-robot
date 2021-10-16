@@ -47,6 +47,11 @@ public:
 	*/
 	void performNextStep(Robot* robot);
 
+	/*!
+	* Reset the cube step counter to the first step.
+	*/
+	void resetSteps();
+
 private:
 	unsigned int cubeHeight = 318; /*! Length of the cube edge in vertical steps */
 	int moveOffset = 200; /*! Number of vertical steps in clearance along z-axis during cube translation */

@@ -71,3 +71,9 @@ void CubeTask::performNextStep(Robot* robot)
 
 	step++;
 }
+
+void CubeTask::resetSteps()
+{
+	step = 0;
+	taskComplete = false;
+}
