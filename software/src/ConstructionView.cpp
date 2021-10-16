@@ -258,19 +258,26 @@ void ConstructionView::performDemo()
 
     for (int i = 0; i < numCubes; i++)
     {
-        // Pick up cube at source 
-        robot->setPosition(xSrc[i], ySrc[i], zSrc[i] + moveOffset, 0);
-        robot->setPosition(xSrc[i], ySrc[i], zSrc[i] - bufferAction, 0);
-        robot->actuateGripper();
-        robot->delay();
-        robot->setPosition(xSrc[i], ySrc[i], zDest[i] + moveOffset + cubeHeight, 0);
+        CubeTask task;
+        task.setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
+        task.setDestinationPose(xDest[i], yDest[i], zDest[i], rDest[i]);
+        
+        while (!task.isComplete())
+            task.performNextStep(robot);
 
-        // Place cube at destination
-        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, rDest[i]);
-        robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, rDest[i]);
-        robot->releaseGripper();
-        robot->delay();
-        robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, rDest[i]);
-        robot->resetGripper();
+        //// Pick up cube at source 
+        //robot->setPosition(xSrc[i], ySrc[i], zSrc[i] + moveOffset, 0);
+        //robot->setPosition(xSrc[i], ySrc[i], zSrc[i] - bufferAction, 0);
+        //robot->actuateGripper();
+        //robot->delay();
+        //robot->setPosition(xSrc[i], ySrc[i], zDest[i] + moveOffset + cubeHeight, 0);
+
+        //// Place cube at destination
+        //robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, rDest[i]);
+        //robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, rDest[i]);
+        //robot->releaseGripper();
+        //robot->delay();
+        //robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, rDest[i]);
+        //robot->resetGripper();
     }
 }

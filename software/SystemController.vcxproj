@@ -125,6 +125,7 @@
     <QtMoc Include="inc\CubeWorldModel.h" />
     <QtMoc Include="inc\ConstructionView.h" />
     <QtMoc Include="inc\Logger.h" />
+    <QtMoc Include="inc\CubeTask.h" />
     <ClInclude Include="inc\Packet.h" />
     <QtMoc Include="inc\Robot.h" />
     <QtMoc Include="inc\ShaderProgram.h" />
@@ -133,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="src\ConstructionView.cpp" />
     <ClCompile Include="src\Cube.cpp" />
+    <ClCompile Include="src\CubeTask.cpp" />
     <ClCompile Include="src\CubeWorldModel.cpp" />
     <ClCompile Include="src\DesignView.cpp" />
     <ClCompile Include="src\HomeView.cpp" />

@@ -4,6 +4,7 @@
 #include "Logger.h"
 #include "OpenGLView.h"
 #include "CubeWorldModel.h"
+#include "CubeTask.h"
 #include "opencv2/opencv.hpp"
 #include <QWidget>
 #include <QHBoxLayout>

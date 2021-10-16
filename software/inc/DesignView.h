@@ -12,7 +12,7 @@ class DesignView: public QWidget
     Q_OBJECT
 public:
     /*!
-    * Class constructor. Initializes the home screen.
+    * Class constructor. Initializes the design screen.
     * @param [in] parent Parent widget
     */
     DesignView(QWidget* parent = Q_NULLPTR);
