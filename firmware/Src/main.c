@@ -23,6 +23,9 @@ int main(void)
 	initialize_motor();
 
 	packet_t rx_packet;
+	packet_t tx_packet_complete;
+	tx_packet_complete.control = 0x1;
+
 	while(1)
 	{
 		delay(1000);
@@ -51,6 +54,7 @@ int main(void)
 				motor_run(); // Initiate motor run
 
 				while(motor_system_state() != READY); // Wait for run to complete
+				usart_transmit_packet(&tx_packet_complete);
 				break;
 			case 0x4:
 				if (rx_packet.data[0] == 0x0)
@@ -59,9 +63,11 @@ int main(void)
 					vacuum_actuate(SERVO_PERIOD_ACTUATE);
 				else if (rx_packet.data[0] == 0x2)
 					vacuum_actuate(SERVO_PERIOD_RELEASE);
+				usart_transmit_packet(&tx_packet_complete);
 				break;
 			case 0x5:
 				delay(2000000);
+				usart_transmit_packet(&tx_packet_complete);
 				break;
 			}
 		}
@@ -277,7 +283,7 @@ void ADC_COMP_IRQHandler()
 	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
 	{
 		value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
-		usart_transmit((uint8_t*) &value, 2);
+//		usart_transmit((uint8_t*) &value, 2);
 	}
 }
 

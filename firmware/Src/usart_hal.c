@@ -42,6 +42,13 @@ void usart_transmit(const uint8_t* data, const uint8_t size)
 	if (size <= 0)
 		return;
 
+	// Reset transmission buffer read and write indices
+	if (usart_bytes_waiting() == 0)
+	{
+		tx_write_index = 0;
+		tx_read_index = 0;
+	}
+
 	// Copy data to TX buffer
 	for (uint8_t i = 0; i < size; i++)
 	{
