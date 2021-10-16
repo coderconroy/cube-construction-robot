@@ -176,6 +176,7 @@ void ConstructionView::executeConstruction()
 void ConstructionView::setRobot(Robot* robot)
 {
     this->robot = robot;
+    connect(robot, &Robot::commandCompleted, this, &ConstructionView::handleRobotCommand);
 }
 
 void ConstructionView::setCamera(cv::VideoCapture* camera)
@@ -193,6 +194,11 @@ void ConstructionView::updateCameraFeed()
     cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
     QImage cameraFeedImage = QImage((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
     cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
+}
+
+void ConstructionView::handleRobotCommand()
+{
+    emit log(Message(MessageType::INFO_LOG, "Construction view", "Command Complete"));
 }
 
 void ConstructionView::sleepRobotClicked()

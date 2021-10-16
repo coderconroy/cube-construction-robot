@@ -40,6 +40,7 @@ void Robot::wake()
 void Robot::setPort(QSerialPort* port)
 {
     this->port = port;
+    connect(port, &QSerialPort::readyRead, this, &Robot::serialDataReceived);
 }
 
 void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)
@@ -106,4 +107,25 @@ void Robot::delay()
 
     // Transmit packet
     transmitPacket(packet);
+}
+
+void Robot::serialDataReceived()
+{
+    while (port->bytesAvailable() >= 9)
+    {
+        QByteArray data = port->read(9);
+        Packet packet;
+        packet.setControl(data[0]);
+        packet.setDataWord(0, data[1] | (data[2] << 8));
+        packet.setDataWord(1, data[3] | (data[4] << 8));
+        packet.setDataWord(2, data[5] | (data[6] << 8));
+        packet.setDataWord(3, data[7] | (data[8] << 8));
+
+        switch (packet.getControl())
+        {
+        case 0x1:
+            emit commandCompleted();
+            break;
+        }
+    }
 }

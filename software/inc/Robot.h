@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Packet.h"
+#include "Logger.h"
 #include <QSerialPort>
 
 /*!
@@ -69,6 +70,17 @@ public:
 	*/
 	void delay();
 
+signals:
+	/*!
+	* Signal generated when robot indicates the most recent command has been completed.
+	*/
+	void commandCompleted() const;
+
+	/*!
+	* Generated when a message is logged by an \class Robot instance.
+	*/
+	void log(Message message) const;
+
 private:
 	QSerialPort* port = Q_NULLPTR; /*! Serial port for communication with robot */
 
@@ -77,5 +89,10 @@ private:
 	* \param [in] packet Packet to transmit.
 	*/
 	void transmitPacket(const Packet &packet);
+
+	/*!
+	* Check if a packet has been received.
+	*/
+	void serialDataReceived();
 };
 

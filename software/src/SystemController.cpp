@@ -59,6 +59,7 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	connect(homeView, &HomeView::log, messageLog, &Logger::log);
 	connect(designView, &DesignView::log, messageLog, &Logger::log);
 	connect(constructionView, &ConstructionView::log, messageLog, &Logger::log);
+	connect(robot, &Robot::log, messageLog, &Logger::log);
 
 	// Initialize primary view container
 	viewLayout = new QStackedLayout();

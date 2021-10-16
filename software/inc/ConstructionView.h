@@ -106,6 +106,11 @@ private:
     */
     void executeConstruction();
 
+    /*!
+    * Send next command to robot when previous command is complete.
+    */
+    void handleRobotCommand();
+
     void sleepRobotClicked();
     void wakeRobotClicked();
     void calibrateRobotClicked();
