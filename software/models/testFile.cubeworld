@@ -10,7 +10,7 @@
                 0
             ],
             "position": [
-                -93,
+                0,
                 32,
                 0
             ],
@@ -20,11 +20,11 @@
             "cubeID": 2,
             "orientation": [
                 0,
-                0,
+                -0.4398230314254761,
                 0
             ],
             "position": [
-                89,
+                -169,
                 32,
                 0
             ],
@@ -34,86 +34,16 @@
             "cubeID": 3,
             "orientation": [
                 0,
-                -0.848230242729187,
+                0.4084070920944214,
                 0
             ],
             "position": [
-                1,
+                164,
                 32,
-                0
-            ],
-            "sideLength": 64
-        },
-        {
-            "cubeID": 4,
-            "orientation": [
-                0,
-                0,
-                0
-            ],
-            "position": [
-                -50,
-                96,
-                -13
-            ],
-            "sideLength": 64
-        },
-        {
-            "cubeID": 5,
-            "orientation": [
-                0,
-                0,
-                0
-            ],
-            "position": [
-                39,
-                96,
-                10
-            ],
-            "sideLength": 64
-        },
-        {
-            "cubeID": 6,
-            "orientation": [
-                0,
-                0,
-                0
-            ],
-            "position": [
-                0,
-                160,
-                0
-            ],
-            "sideLength": 64
-        },
-        {
-            "cubeID": 7,
-            "orientation": [
-                0,
-                0.9424780607223511,
-                0
-            ],
-            "position": [
-                0,
-                224,
-                2
-            ],
-            "sideLength": 64
-        },
-        {
-            "cubeID": 8,
-            "orientation": [
-                0,
-                0,
-                0
-            ],
-            "position": [
-                0,
-                288,
                 0
             ],
             "sideLength": 64
         }
     ],
-    "lastCubeID": 9
+    "lastCubeID": 3
 }

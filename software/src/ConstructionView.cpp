@@ -35,6 +35,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     demo = new QPushButton("Perform Demo");
 
     connect(loadModel, &QPushButton::clicked, this, &ConstructionView::loadModelClicked);
+    connect(execute, &QPushButton::clicked, this, &ConstructionView::executeConstruction);
     connect(sleepRobot, &QPushButton::clicked, this, &ConstructionView::sleepRobotClicked);
     connect(wakeRobot, &QPushButton::clicked, this, &ConstructionView::wakeRobotClicked);
     connect(calibrateRobot, &QPushButton::clicked, this, &ConstructionView::calibrateRobotClicked);
@@ -168,9 +169,32 @@ void ConstructionView::loadModelClicked()
     }
 }
 
+const int numCubes = 17;
+int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873 };
+int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045, 983, 983, 983 };
+int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
+int xOffset = 500;
+int yOffset = 500;
+
 void ConstructionView::executeConstruction()
 {
+    for (int i = 0; i < cubeTasks.size(); ++i)
+        delete cubeTasks[i];
+    cubeTasks.clear();
 
+    // TODO: Sort cubes
+    for (int i = 0; i < cubeWorldModel->getCubeCount(); ++i) {
+        Cube* cube = cubeWorldModel->getCubes()->at(i);
+        glm::vec3 destPos = cube->getPosition();
+        int zRotation = glm::degrees(cube->getPitch()) / 1.8;
+
+        CubeTask* task = new CubeTask();
+        task->setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
+        task->setDestinationPose(destPos.x + xOffset, destPos.z + yOffset, destPos.y, zRotation);
+        cubeTasks.append(task);
+    }
+
+    cubeTasks.first()->performNextStep(robot);
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -231,79 +255,55 @@ void ConstructionView::releaseRobotActuatorClicked()
     robot->releaseGripper();
 }
 
-const int cubeHeight = 318;
-const int cubeWidth = 64;
-const int baseLayer = 180;
-const int bufferAction = 50;
-const int moveOffset = 200;
-const int cubePadding = 8;
-const int numCubes = 17;
-int centreSpacing = cubeWidth + 2 * cubePadding;
-
-int i = 0;
-
-int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873 };
-int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045, 983, 983, 983 };
-int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
-
-int xDest[numCubes] = { 500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500, 500 + centreSpacing, 500 + 2 * centreSpacing,
-    500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2, 500 + centreSpacing / 2,
-    500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
-int yDest[numCubes] = { 500, 500, 500, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + 2 * centreSpacing,
-    500 + 2 * centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2,
-    500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
-int zDest[numCubes] = { baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer,
-baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + 2 * cubeHeight,
-baseLayer + 3 * cubeHeight, baseLayer + 4 * cubeHeight, baseLayer + 5 * cubeHeight };
-int rDest[numCubes] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 40, 60 };
-
-CubeTask task;
+//const int cubeHeight = 318;
+//const int cubeWidth = 64;
+//const int baseLayer = 180;
+//const int bufferAction = 50;
+//const int moveOffset = 200;
+//const int cubePadding = 8;
+//
+//int centreSpacing = cubeWidth + 2 * cubePadding;
+//
+//int i = 0;
+//
+//
+//int xDest[numCubes] = { 500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500, 500 + centreSpacing, 500 + 2 * centreSpacing,
+//    500, 500 + centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2, 500 + centreSpacing / 2,
+//    500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
+//int yDest[numCubes] = { 500, 500, 500, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + 2 * centreSpacing,
+//    500 + 2 * centreSpacing, 500 + 2 * centreSpacing, 500 + centreSpacing / 2, 500 + centreSpacing / 2, 500 + 3 * centreSpacing / 2,
+//    500 + 3 * centreSpacing / 2, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing, 500 + centreSpacing };
+//int zDest[numCubes] = { baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer, baseLayer,
+//baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + cubeHeight, baseLayer + 2 * cubeHeight,
+//baseLayer + 3 * cubeHeight, baseLayer + 4 * cubeHeight, baseLayer + 5 * cubeHeight };
+//int rDest[numCubes] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 40, 60 };
+//
+//CubeTask task;
 
 void ConstructionView::performDemo()
 {
-    task.setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
-    task.setDestinationPose(xDest[i], yDest[i], zDest[i], rDest[i]);
-    task.performNextStep(robot);
-
-    //for (int i = 0; i < numCubes; i++)
-    //{
-    //    CubeTask task;
-    //    task.setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
-    //    task.setDestinationPose(xDest[i], yDest[i], zDest[i], rDest[i]);
-        
-        //while (!task.isComplete())
-        //    task.performNextStep(robot);
-
-        //// Pick up cube at source 
-        //robot->setPosition(xSrc[i], ySrc[i], zSrc[i] + moveOffset, 0);
-        //robot->setPosition(xSrc[i], ySrc[i], zSrc[i] - bufferAction, 0);
-        //robot->actuateGripper();
-        //robot->delay();
-        //robot->setPosition(xSrc[i], ySrc[i], zDest[i] + moveOffset + cubeHeight, 0);
-
-        //// Place cube at destination
-        //robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset + cubeHeight, rDest[i]);
-        //robot->setPosition(xDest[i], yDest[i], zDest[i] - bufferAction, rDest[i]);
-        //robot->releaseGripper();
-        //robot->delay();
-        //robot->setPosition(xDest[i], yDest[i], zDest[i] + moveOffset, rDest[i]);
-        //robot->resetGripper();
-    //}
+    //task.setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
+    //task.setDestinationPose(xDest[i], yDest[i], zDest[i], rDest[i]);
+    //task.performNextStep(robot);
 }
 
 void ConstructionView::handleRobotCommand()
 {
     emit log(Message(MessageType::INFO_LOG, "Construction view", "Command Complete"));
 
-    if (!task.isComplete())
+    CubeTask* task = cubeTasks.first();
+
+    if (!task->isComplete())
     {
-        task.performNextStep(robot);
+        task->performNextStep(robot);
     }
-    else if (++i < numCubes)
+    else
     {
-        task.resetSteps();
-        task.setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
-        task.setDestinationPose(xDest[i], yDest[i], zDest[i], rDest[i]);
-        task.performNextStep(robot);
+        delete cubeTasks.first();
+        cubeTasks.removeFirst();
+        task = Q_NULLPTR;
+
+        if (cubeTasks.size() > 0)
+            cubeTasks.first()->performNextStep(robot);
     }
 }

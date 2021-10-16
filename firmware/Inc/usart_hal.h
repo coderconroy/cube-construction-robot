@@ -6,7 +6,7 @@
 #include "packet.h"
 
 // Defines
-#define TX_BUFFER_SIZE 20 // Size of buffer to store bytes waiting to be transmitted
+#define TX_BUFFER_SIZE 255 // Size of buffer to store bytes waiting to be transmitted
 #define RX_BUFFER_SIZE 4000 // Size of buffer to store received bytes before they are read
 
 // Function prototypes

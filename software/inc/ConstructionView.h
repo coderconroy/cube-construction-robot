@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QTimer>
+#include <QList>
 
 class ConstructionView : public QWidget
 {
@@ -59,6 +60,7 @@ private:
 
     QPushButton* loadModel; /* Load model to be constructed into the cube world model from JSON file */
     QPushButton* execute; /* Initiate construction of cube world model */
+    QList<CubeTask*> cubeTasks; /*! List of cube tasks to be completed for the current construction task */
 
     OpenGLView* shapeView; /*! OpenGL render of 3D shape to be constructed */
     CubeWorldModel* cubeWorldModel; /*! Model of cubes in world frame */
