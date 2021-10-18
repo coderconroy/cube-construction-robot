@@ -67,7 +67,43 @@ Lastly, the viewport transform is performed to convert the 3D coordinates to 2D 
 
 \subsection{OpenGL Camera}
 
+The next OpenGL component that needed to be implemented after the basic 3D rendering is the camera control. The view matrix is used to map the world space to the camera space. A convenient approach to constructing the view matrix is by using a so-called LookAt matrix $\boldsymbol{V}$. The look at matrix is defined as
 
+\begin{align}
+	\boldsymbol{V}=
+	\begin{bmatrix}
+		R_x & R_y & R_z & 0 \\
+		U_x & U_y & U_z & 0 \\
+		D_x & D_y & D_z & 0 \\
+		0 & 0 & 0 & 1 \\
+	\end{bmatrix}
+	\begin{bmatrix}
+		1 & 0 & 0 & -P_x \\
+		0 & 1 & 0 & -P_y \\
+		0 & 0 & 1 & -P_z \\
+		0 & 0 & 0 & 1 \\
+	\end{bmatrix}
+\end{align}
 
+where $\boldsymbol{R}$ is the right vector, $\boldsymbol{U}$ is the up vector, $\boldsymbol{D}$ is the direction vector and $\boldsymbol{P}$ is the position vector for the camera in the world space. These vectors defining the $\boldsymbol{V}$ matrix can be obtained from 3 vectors which are much more intuitive to use for camera control. Specifically a position, target (i.e. the point in the world space the camera is pointed towards) and up vector are sufficient to derive a look up matrix. This was used as the basis to form the camera system for this project's implementation. The desired camera behaviour was defined as follows:
+
+\begin{compactitem}
+	\item The camera frame x-axis should remain parallel to the world xz plane.
+	\item The camera movement about a point should always be on the surface of a dome about that point when not translating or zooming.
+	\item As the camera rotates the camera should continue to look at the same focal point.
+\end{compactitem}
+
+This behaviour was successfully implemented for the camera.
+
+\subsection{Shape Definition}
+
+The following features were completed regarding the OpenGL 3D shape definition component:
+
+\begin{compactitem}
+	\item Camera control by means of computer peripherals was implemented. The right mouse button can be used to control the rotation of the camera about a given focal point. The middle mouse button can be used to translate the camera horizontally in the world scene.
+	\item The OpenGL shape render view was integrated with the main software \ac{GUI} component.
+	\item The ability for the user to insert and remove shapes from the model as well as the ability for the user to specify the position and rotation of the cube within the 3D model space.
+	\item The option to load and save model files.
+\end{compactitem}
 
 \pendsign
