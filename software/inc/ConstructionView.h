@@ -78,7 +78,6 @@ private:
     QPushButton* idleRobotActuator;
     QPushButton* actuateRobotActuator;
     QPushButton* releaseRobotActuator;
-    QPushButton* demo;
     QLabel* xPositionLabel;
     QLabel* yPositionLabel;
     QLabel* zPositionLabel;

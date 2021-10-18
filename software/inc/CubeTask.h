@@ -21,8 +21,8 @@ public:
 	* Set the initial pose of the cube. The position refers to the centre of the cube.
 	* \param [in] xPos Initial cube position along x-axis in horizontal steps.
 	* \param [in] yPos Initial cube position along y-axis in horizontal steps.
-	* \param [in] zPos Initial cube position along z-axis in horizontal steps.
-	* \param [in] zRotation Initial cube rotation about z-axis in vertical steps.
+	* \param [in] zPos Initial cube position along z-axis in vertical steps.
+	* \param [in] zRotation Initial cube rotation about z-axis in rotation steps.
 	*/
 	void setSourcePose(int xPos, int yPos, int zPos, int zRotation);
 
@@ -30,8 +30,8 @@ public:
 	* Set the final pose of the cube. The position refers to the centre of the cube.
 	* \param [in] xPos Final cube position along x-axis in horizontal steps.
 	* \param [in] yPos Final cube position along y-axis in horizontal steps.
-	* \param [in] zPos Final cube position along z-axis in horizontal steps.
-	* \param [in] zRotation Final cube rotation about z-axis in vertical steps.
+	* \param [in] zPos Final cube position along z-axis in vertical steps.
+	* \param [in] zRotation Final cube rotation about z-axis in rotation steps.
 	*/
 	void setDestinationPose(int xPos, int yPos, int zPos, int zRotation);
 
