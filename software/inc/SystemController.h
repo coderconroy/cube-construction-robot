@@ -40,6 +40,11 @@ private:
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
     cv::VideoCapture* camera = Q_NULLPTR; /*! Source of live camera images */
 
+    const double CAMERA_WIDTH = 1280; /*! Robot vision camera input image width in pixels */
+    const double CAMERA_HEIGHT = 720; /*! Robot vision camera input image height in pixels */
+    const double CAMERA_EXPOSURE = -7; /*! Robot vision camera exposure level */
+    const double CAMERA_FOCUS = 5; /*! Robot vision camera focus distance (must be a multiple of 5) */
+
     /*!
     * Set the current primary view based on which link button was clicked.
     */

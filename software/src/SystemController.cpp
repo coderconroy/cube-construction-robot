@@ -7,6 +7,11 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 
 	// Initialize camera
 	camera = new cv::VideoCapture(0);
+	camera->set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+	camera->set(cv::CAP_PROP_FRAME_HEIGHT,1080);
+	camera->set(cv::CAP_PROP_EXPOSURE, CAMERA_EXPOSURE);
+	camera->set(cv::CAP_PROP_FOCUS, CAMERA_FOCUS);
+
 	if (!camera->isOpened())
 		messageLog->log(Message(MessageType::ERROR_LOG, "System Controller", "No camera found"));
 
@@ -66,8 +71,8 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	viewLayout->addWidget(homeView);
 	viewLayout->addWidget(designView);
 	viewLayout->addWidget(constructionView);
-	viewLayout->setCurrentWidget(homeView);
-	homeView->showView();
+	viewLayout->setCurrentWidget(constructionView);
+	constructionView->showView();
 
 	// Initialize the base layout
 	baseLayout = new QVBoxLayout();

@@ -207,15 +207,91 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
     this->camera = camera;
 }
 
+// Threshold parameters
+int thresh = 80;
+int maxThresh = 255;
+int blurSize = 0;
+int maxBlurSize = 20;
+
+// Bounding box parameters
+int length = 605;
+int left = 601;
+int right = left + length;
+int top = 230;
+int bottom = top + length;
+bool showCoords = false;
+
 void ConstructionView::updateCameraFeed()
 {
     // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+
     cv::Mat frame;
-    *camera >> frame;
+    input.copyTo(frame);
+
+    // Process image
+    cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
+    cv::blur(frame, frame, cv::Size(blurSize + 1, blurSize + 1));
+    cv::threshold(frame, frame, thresh, maxThresh, cv::THRESH_BINARY);
+
+    // Apply contour detection
+    std::vector<std::vector<cv::Point> > contours;
+    cv::findContours(frame, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // Get the moment of each contour
+    std::vector<cv::Moments> contourMoments(contours.size());
+    for (int i = 0; i < contours.size(); i++)
+        contourMoments[i] = moments(contours[i], false);
+
+    // Get the centroid of each contour moment
+    std::vector<cv::Point2f> momentCentroids(contours.size());
+    for (int i = 0; i < contours.size(); i++)
+        momentCentroids[i] = cv::Point2f(contourMoments[i].m10 / contourMoments[i].m00, contourMoments[i].m01 / contourMoments[i].m00);
+
+    // Draw and label each moment centroid
+    for (int i = 0; i < contours.size(); i++)
+    {
+        cv::Point2d centroid = momentCentroids[i];
+        if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom)
+        {
+            circle(input, momentCentroids[i], 4, cv::Scalar(255, 0, 0), -1, cv::LINE_AA);
+            std::vector<std::vector<cv::Point>> contour;
+            contour.push_back(contours[i]);
+            cv::drawContours(input, contour, -1, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
+
+            if (showCoords)
+            {
+                cv::putText(input,
+                    "(" + std::to_string((int)momentCentroids[i].x) + ", " + std::to_string((int)momentCentroids[i].y) + ")",
+                    cv::Point2f(momentCentroids[i].x - 90, momentCentroids[i].y + 50), // Coordinates
+                    cv::FONT_HERSHEY_PLAIN, // Font
+                    2, // Scale. 2.0 = 2x bigger
+                    cv::Scalar(255, 255, 255), // BGR Color
+                    2, // Line Thickness (Optional)
+                    cv::LINE_AA); // Anti-alias (Optional, see version note)
+            }
+        }
+    }
+
+    // Draw image box
+    cv::Scalar color(255, 255, 0);
+    cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
+    int thickness = 2;
+
+    // Line drawn using 8 connected
+    // Bresenham algorithm
+    line(input, tl, tr, color, thickness, cv::LINE_8);
+    line(input, tr, br, color, thickness, cv::LINE_8);
+    line(input, br, bl, color, thickness, cv::LINE_8);
+    line(input, bl, tl, color, thickness, cv::LINE_8);
+
+    cv::Mat output;
+    cv::resize(input, output, cv::Size(), 0.75, 0.75);
 
     // Display image in camera feed
-    cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
-    QImage cameraFeedImage = QImage((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+    cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
+    QImage cameraFeedImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
     cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
 }
 

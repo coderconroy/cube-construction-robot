@@ -108,6 +108,7 @@ void HomeView::updateCameraFeed()
     *camera >> frame;
 
     // Display image in camera feed
+    cv::resize(frame, frame, cv::Size(), 0.5, 0.5);
     cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
     QImage cameraFeedImage = QImage((uchar*) frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
     cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
