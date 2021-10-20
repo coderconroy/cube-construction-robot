@@ -44,15 +44,6 @@
     <Filter Include="Source Files\Computer Vision">
       <UniqueIdentifier>{89363d25-6260-482c-a8c9-bfbcf12ac59d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Unit Tests">
-      <UniqueIdentifier>{095529ab-bbb7-4b7a-8a78-5e507c322de8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Unit Tests\Header Files">
-      <UniqueIdentifier>{0c9b5ab0-3fc9-4b97-b61e-d1b76405fc54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Unit Tests\Source Files">
-      <UniqueIdentifier>{a2222922-e69c-44c4-a129-9865f34b069a}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="SystemController.qrc">
@@ -102,6 +93,9 @@
     <QtMoc Include="inc\CubeTask.h">
       <Filter>Header Files\Robot</Filter>
     </QtMoc>
+    <QtMoc Include="inc\Vision.h">
+      <Filter>Header Files\Computer Vision</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\Packet.h">
@@ -150,6 +144,9 @@
     </ClCompile>
     <ClCompile Include="src\CubeTask.cpp">
       <Filter>Source Files\Robot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vision.cpp">
+      <Filter>Source Files\Computer Vision</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

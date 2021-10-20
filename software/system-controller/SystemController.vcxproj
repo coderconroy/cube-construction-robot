@@ -120,6 +120,7 @@
     <QtMoc Include="inc\HomeView.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="inc\Vision.h" />
     <QtMoc Include="inc\OpenGLView.h" />
     <QtMoc Include="inc\Cube.h" />
     <QtMoc Include="inc\CubeWorldModel.h" />
@@ -146,6 +147,7 @@
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\stb_image.cpp" />
     <ClCompile Include="src\SystemController.cpp" />
+    <ClCompile Include="src\Vision.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
