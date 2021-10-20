@@ -41,16 +41,29 @@ Vision::Vision(QObject* parent) : QObject(parent)
 
 cv::Point3d Vision::projectImagePoint(const cv::Point2d& imagePoint, double z) const
 {
+	// Form homogenous image point
+	cv::Point3d imagePointH(imagePoint.x, imagePoint.y, 1);
 
-	return cv::Point3d();
+	// Compute left and right components of equation
+	cv::Mat leftMatrix = rotationMatrix.inv() * cameraMatrix.inv() * cv::Mat(imagePointH, false);
+	cv::Mat rightMatrix = rotationMatrix.inv() * translationVector;
+
+	// Compute world point
+	double s = (z + rightMatrix.at<double>(2)) / leftMatrix.at<double>(2);
+	cv::Mat worldPointMat = leftMatrix * s - rightMatrix;
+	cv::Point3d worldPoint(worldPointMat.at<double>(0), worldPointMat.at<double>(1), worldPointMat.at<double>(2));
+
+	return worldPoint;
 }
 
 cv::Point2d Vision::projectWorldPoint(cv::Point3d worldPoint) const
 {
 	// Compute homogenous image point
-	cv::Mat imagePoint = cameraMatrix * (rotationMatrix * cv::Mat(worldPoint, false) + translationVector);
+	cv::Mat imagePointMat = cameraMatrix * (rotationMatrix * cv::Mat(worldPoint, false) + translationVector);
 
-	// Normalize and return uv frame image point
-	double s = imagePoint.at<double>(2);
-	return cv::Point2d(imagePoint.at<double>(0) / s, imagePoint.at<double>(1) / s);
+	// Normalize image point
+	double s = imagePointMat.at<double>(2);
+	cv::Point2d imagePoint = cv::Point2d(imagePointMat.at<double>(0) / s, imagePointMat.at<double>(1) / s);
+
+	return imagePoint;
 }
