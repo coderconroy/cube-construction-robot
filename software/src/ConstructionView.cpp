@@ -125,8 +125,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
 void ConstructionView::showView()
 {
-    cameraFeedTimer->start(20); // Update camera feed every 20ms
-    openGLTimer->start(20); // Refresh OpenGL render every 20ms
+    cameraFeedTimer->start(1000); // Update camera feed every 20ms
+    openGLTimer->start(2); // Refresh OpenGL render every 20ms
 }
 
 void ConstructionView::hideView()
@@ -210,16 +210,22 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
 // Threshold parameters
 int thresh = 80;
 int maxThresh = 255;
-int blurSize = 0;
+int blurSize = 1;
 int maxBlurSize = 20;
 
 // Bounding box parameters
-int length = 605;
-int left = 601;
-int right = left + length;
-int top = 230;
-int bottom = top + length;
-bool showCoords = false;
+int left = 480;
+int right = 1360;
+int top = 150;
+int bottom = 950;
+bool showCoords = true;
+double cameraMat[3][3] = 
+    {{696.2920653066839 * 2, 0, 469.7644569362635 * 2},
+    {0, 696.1538823160478 * 2, 281.0969237061734 * 2},
+    {0, 0, 1}};
+cv::Point2d principlePoint(469.7644569362635 * 2, 281.0969237061734 * 2);
+double areaThreshold = 1300;
+
 
 void ConstructionView::updateCameraFeed()
 {
@@ -227,6 +233,8 @@ void ConstructionView::updateCameraFeed()
     cv::Mat input;
     *camera >> input;
 
+    cv::imwrite("output1.jpg", input);
+    
     cv::Mat frame;
     input.copyTo(frame);
 
@@ -253,12 +261,33 @@ void ConstructionView::updateCameraFeed()
     for (int i = 0; i < contours.size(); i++)
     {
         cv::Point2d centroid = momentCentroids[i];
-        if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom)
+        double area = cv::contourArea(contours[i]);
+        if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom && area > areaThreshold)
         {
             circle(input, momentCentroids[i], 4, cv::Scalar(255, 0, 0), -1, cv::LINE_AA);
             std::vector<std::vector<cv::Point>> contour;
             contour.push_back(contours[i]);
+
             cv::drawContours(input, contour, -1, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
+
+            double cx = momentCentroids[i].x;
+            double cy = momentCentroids[i].y;
+            double maxDist = 0;
+            double maxIndex = 0;
+            for (int j = 0; j < contours[i].size(); j++)
+            {
+                double px = contours[i][j].x;
+                double py = contours[i][j].y;
+                double dist = sqrt(pow(px - cx, 2) + pow(py - cy, 2));
+
+                if (dist > maxDist)
+                {
+                    maxDist = dist;
+                    maxIndex = j;
+                }
+            }
+
+            circle(input, contours[i][maxIndex], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
 
             if (showCoords)
             {
@@ -270,9 +299,14 @@ void ConstructionView::updateCameraFeed()
                     cv::Scalar(255, 255, 255), // BGR Color
                     2, // Line Thickness (Optional)
                     cv::LINE_AA); // Anti-alias (Optional, see version note)
+
+
             }
         }
     }
+
+    // Show principle point
+    circle(input, principlePoint, 4, cv::Scalar(255, 0, 255), -1, cv::LINE_AA);
 
     // Draw image box
     cv::Scalar color(255, 255, 0);
@@ -288,6 +322,7 @@ void ConstructionView::updateCameraFeed()
 
     cv::Mat output;
     cv::resize(input, output, cv::Size(), 0.75, 0.75);
+    //cv::imwrite("output1.jpg", input);
 
     // Display image in camera feed
     cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
