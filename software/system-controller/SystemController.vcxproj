@@ -32,7 +32,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>6.2.0_msvc2019_64</QtInstall>
-    <QtModules>core;gui;opengl;serialport;widgets;openglwidgets</QtModules>
+    <QtModules>core;opengl;gui;widgets;serialport;openglwidgets</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
@@ -55,7 +55,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\inc;C:\opencv\build\include;C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\lib;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\system-controller\lib;C:\opencv\build\include;C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\system-controller\inc;C:\Users\user\OneDrive - GE\Documents\University of Pretoria\Modules\Year 4 Semester 2\EPR 402\2021_conroy_ch\software\system-controller\src;$(IncludePath)</IncludePath>
     <LibraryPath>C:\opencv\build\x64\vc15\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">

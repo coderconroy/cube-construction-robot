@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Views">
+      <UniqueIdentifier>{ddf067fc-34d0-48d7-ba2e-2869c6500a6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Views">
+      <UniqueIdentifier>{d4c22d4c-894d-4bbe-87e3-d198717eba34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Robot">
+      <UniqueIdentifier>{d1ae02d5-5a7d-43a9-a02f-c9f7466d9c1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Robot">
+      <UniqueIdentifier>{fa2e2e87-206a-4418-9412-9d5139d312cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shape Design">
+      <UniqueIdentifier>{7735c249-7575-41bf-99fc-004e57421ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shape Design">
+      <UniqueIdentifier>{8586c25c-ea8a-41db-9d9f-4cf0606501e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shape Design\Shaders">
+      <UniqueIdentifier>{31f6d309-f7a3-4a05-ade1-5dd351f1cbfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Computer Vision">
+      <UniqueIdentifier>{c54c6a56-6ed6-418a-bc39-88ad55242996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Computer Vision">
+      <UniqueIdentifier>{89363d25-6260-482c-a8c9-bfbcf12ac59d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit Tests">
+      <UniqueIdentifier>{095529ab-bbb7-4b7a-8a78-5e507c322de8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit Tests\Header Files">
+      <UniqueIdentifier>{0c9b5ab0-3fc9-4b97-b61e-d1b76405fc54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit Tests\Source Files">
+      <UniqueIdentifier>{a2222922-e69c-44c4-a129-9865f34b069a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="SystemController.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+    <None Include="src\shaders\shader.frag">
+      <Filter>Source Files\Shape Design\Shaders</Filter>
+    </None>
+    <None Include="src\shaders\shader.vert">
+      <Filter>Source Files\Shape Design\Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="inc\SystemController.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\DesignView.h">
+      <Filter>Header Files\Views</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\HomeView.h">
+      <Filter>Header Files\Views</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\OpenGLView.h">
+      <Filter>Header Files\Shape Design</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\ShaderProgram.h">
+      <Filter>Header Files\Shape Design</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\CubeWorldModel.h">
+      <Filter>Header Files\Shape Design</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\Cube.h">
+      <Filter>Header Files\Shape Design</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\ConstructionView.h">
+      <Filter>Header Files\Views</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\Logger.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\Robot.h">
+      <Filter>Header Files\Robot</Filter>
+    </QtMoc>
+    <QtMoc Include="inc\CubeTask.h">
+      <Filter>Header Files\Robot</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\Packet.h">
+      <Filter>Header Files\Robot</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DesignView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HomeView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Robot.cpp">
+      <Filter>Source Files\Robot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Cube.cpp">
+      <Filter>Source Files\Shape Design</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CubeWorldModel.cpp">
+      <Filter>Source Files\Shape Design</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGLView.cpp">
+      <Filter>Source Files\Shape Design</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Packet.cpp">
+      <Filter>Source Files\Robot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderProgram.cpp">
+      <Filter>Source Files\Shape Design</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stb_image.cpp">
+      <Filter>Source Files\Shape Design</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ConstructionView.cpp">
+      <Filter>Source Files\Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CubeTask.cpp">
+      <Filter>Source Files\Robot</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

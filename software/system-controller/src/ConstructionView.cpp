@@ -232,8 +232,6 @@ void ConstructionView::updateCameraFeed()
     // Capture frame from camera
     cv::Mat input;
     *camera >> input;
-
-    cv::imwrite("output1.jpg", input);
     
     cv::Mat frame;
     input.copyTo(frame);
