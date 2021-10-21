@@ -13,6 +13,8 @@ public:
 	*/
 	Vision(QObject* parent = Q_NULLPTR);
 
+	void calibrate(cv::Mat& image);
+
 	/*!
 	* Compute the corresponding world point given an image point and the Z coordinate of the world point.
 	* \param [in] imagePoint Coordinates of the source point in the uv image frame.
@@ -26,7 +28,30 @@ public:
 	* \param [in] worldPoint Coordinates of the source point in the XYZ world frame.
 	* \return Image point corresponding to given world point.
 	*/
-	cv::Point2d projectWorldPoint(cv::Point3d worldPoint) const;
+	cv::Point2d projectWorldPoint(cv::Point3d& worldPoint) const;
+
+	/*!
+	* Get the contour centroid.
+	* \param [in] contour Contour to find centroid from.
+	* \return Centroid point of contour.
+	*/
+	cv::Point getCentroid(std::vector<cv::Point>& contour) const;
+
+	/*!
+	* Assumes the input contour is a square and estimates the square corners.
+	* \param [in] contour Contour to estimate corners from.
+	* \return Estimated coordinates for 4 corners running clockwise around the square.
+	*/
+	std::vector<cv::Point> findSquareCorners(std::vector<cv::Point>& contour) const;
+
+	/*!
+	* Map angle to the range (-PI, PI] randians.
+	* \param [in] Angle to map in radians.
+	* \return Mapped angle in radians.
+	*/
+	float mapAngle(float angle) const;
+
+	void temp();
 
 private:
 	double fx = 696.2920653066839 * 2; /*! Camera x-axis focal length */
