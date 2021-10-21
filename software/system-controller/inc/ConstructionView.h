@@ -6,6 +6,7 @@
 #include "CubeWorldModel.h"
 #include "CubeTask.h"
 #include "opencv2/opencv.hpp"
+#include "Vision.h"
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QPushButton>

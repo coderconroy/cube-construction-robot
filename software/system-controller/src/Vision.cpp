@@ -7,6 +7,14 @@ int maxThresh = 255;
 int blurSize = 1;
 int maxBlurSize = 20;
 
+// Fiducials
+float fiducialThresh = 0.7f;
+int fiducialWidth = 128;
+int fiducialHeight = 128;
+
+// Fiducial sample points
+std::vector<cv::Point> fiducialSamplePoints;
+
 // Bounding box parameters
 int left = 480;
 int right = 1360;
@@ -17,61 +25,46 @@ double areaThreshold = 1300;
 
 Vision::Vision(QObject* parent) : QObject(parent)
 {
-	// Initialize world points
-	std::vector<cv::Point3d> worldPoints;
-	worldPoints.push_back(cv::Point3d(0, 0, -64));
-	worldPoints.push_back(cv::Point3d(507, 0, -64));
-	worldPoints.push_back(cv::Point3d(1015, 0, -64));
-	worldPoints.push_back(cv::Point3d(0, 562, -64));
-	worldPoints.push_back(cv::Point3d(507, 562, -64));
-	worldPoints.push_back(cv::Point3d(1015, 562, -64));
-	worldPoints.push_back(cv::Point3d(0, 1125, -64));
-	worldPoints.push_back(cv::Point3d(507, 1125, -64));
-	worldPoints.push_back(cv::Point3d(1015, 1125, -64));
+    // Initialize world point of each fiducial
+    fiducialWorldPoints.insert(11, cv::Point3i(0, 0, 0));
+    fiducialWorldPoints.insert(37, cv::Point3i(0, 562, 0));
+    fiducialWorldPoints.insert(10, cv::Point3i(0, 1125, 0));
+    fiducialWorldPoints.insert(3, cv::Point3i(1015, 0, 0));
+    fiducialWorldPoints.insert(6, cv::Point3i(1015, 562, 0));
+    fiducialWorldPoints.insert(41, cv::Point3i(1015, 1125, 0));
 
-	// Initialize image points
-	std::vector<cv::Point2d> imagePoints;
-	imagePoints.push_back(cv::Point2d(545, 830));
-	imagePoints.push_back(cv::Point2d(543, 519));
-	imagePoints.push_back(cv::Point2d(540, 206));
-	imagePoints.push_back(cv::Point2d(889, 827));
-	imagePoints.push_back(cv::Point2d(888, 518));
-	imagePoints.push_back(cv::Point2d(886, 207));
-	imagePoints.push_back(cv::Point2d(1233, 826));
-	imagePoints.push_back(cv::Point2d(1232, 515));
-	imagePoints.push_back(cv::Point2d(1232, 204));
+    // Initialize fiducial sample points
+    fiducialSamplePoints.push_back(cv::Point(31, 31));
+    fiducialSamplePoints.push_back(cv::Point(63, 31));
+    fiducialSamplePoints.push_back(cv::Point(95, 31));
+    fiducialSamplePoints.push_back(cv::Point(31, 63));
+    fiducialSamplePoints.push_back(cv::Point(63, 63));
+    fiducialSamplePoints.push_back(cv::Point(95, 63));
+    fiducialSamplePoints.push_back(cv::Point(31, 95));
+    fiducialSamplePoints.push_back(cv::Point(63, 95));
+    fiducialSamplePoints.push_back(cv::Point(95, 95));
 
-	// Initialize camera matrix and distortion coefficients
-	cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
-	distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
-
-	// Compute pose of world frame with respect to the fixed camera frame
-	cv::Mat rotationVector;
-	cv::solvePnP(worldPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
-
-	// Convert rotation vector to rotation matrix
-	cv::Rodrigues(rotationVector, rotationMatrix);
+    // Initialize camera matrix and distortion coefficients
+    cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
+    distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 }
 
-void Vision::calibrate(cv::Mat& input)
+void Vision::calibrate(const cv::Mat& calibrationImage)
 {
-    // Initialize intermediate image matrices
-    cv::Mat processImage;
-    cv::Mat output;
-    input.copyTo(output);
+    // Reset vision system to uncalibrated state
+    fiducialContours.clear();
+    cubeContours.clear();
+    calibrated = false;
 
     // Process image
-    cv::cvtColor(input, processImage, cv::COLOR_BGR2GRAY);
+    cv::Mat processImage;
+    cv::cvtColor(calibrationImage, processImage, cv::COLOR_BGR2GRAY);
     cv::blur(processImage, processImage, cv::Size(blurSize + 1, blurSize + 1));
     cv::threshold(processImage, processImage, thresh, maxThresh, cv::THRESH_BINARY);
 
     // Apply contour detection
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(processImage, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    // Initialize cube and fiducial lists
-    std::vector<std::vector<cv::Point>> cubes;
-    std::vector<std::vector<cv::Point>> fiducials;
 
     // Process contours for cubes and fiducials
     for (int i = 0; i < contours.size(); i++)
@@ -84,50 +77,98 @@ void Vision::calibrate(cv::Mat& input)
         double area = cv::contourArea(contours[i]);
 
         // Process contours of significant size in bounding box 
-        if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom && area > areaThreshold)
+        if (area > areaThreshold)
         {
             // Find corners
             std::vector<cv::Point> corners = findSquareCorners(contour);
 
+            // Isolate rectangle
+            cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
+            cv::Mat homographyMatrix;
+            isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
+            cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
 
-            // Plot corners
-            circle(output, corners[0], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
-            circle(output, corners[1], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
-            circle(output, corners[2], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
-            circle(output, corners[3], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
-            circle(output, centroid, 4, cv::Scalar(255, 0, 0), -1, cv::LINE_AA);
+            // Process fiducial
+            int fiducialId = processFiducial(isolatedImage, isolatedImage);
 
-            //if (showCoords)
-            //{
-            //    cv::putText(input,
-            //        "(" + std::to_string((int)momentCentroids[i].x) + ", " + std::to_string((int)momentCentroids[i].y) + ")",
-            //        cv::Point2f(momentCentroids[i].x - 90, momentCentroids[i].y + 50), // Coordinates
-            //        cv::FONT_HERSHEY_PLAIN, // Font
-            //        2, // Scale. 2.0 = 2x bigger
-            //        cv::Scalar(255, 255, 255), // BGR Color
-            //        2, // Line Thickness (Optional)
-            //        cv::LINE_AA); // Anti-alias (Optional, see version note)
-
-
-            //}
+            // Add to fiducial list if fiducial
+            if (fiducialId >= 0) 
+            {
+                FiducialContour fiducial;
+                fiducial.id = fiducialId;
+                fiducial.centroid = centroid;
+                fiducial.contour = contour;
+                fiducial.corners = corners;
+                fiducial.homographyMatrix = homographyMatrix;
+                fiducialContours.push_back(fiducial);
+            }
         }
     }
 
-    // Display result
-    cv::resize(output, output, cv::Size(), 0.75, 0.75);
-    cv::namedWindow("Display window", cv::WINDOW_AUTOSIZE);// Create a window for display.
-    cv::imshow("Display window", output);
-    cv::waitKey(0);
+    // Get world points and corresponding image points from fiducial set
+    std::vector<cv::Point3d> worldPoints;
+    std::vector<cv::Point2d> imagePoints;
+    for (int i = 0; i < fiducialContours.size(); ++i)
+    {
+        FiducialContour f = fiducialContours[i];
+        
+        // Check if world point is defined for fiducial
+        if (fiducialWorldPoints.contains(f.id))
+        {
+            worldPoints.push_back(fiducialWorldPoints.value(f.id)); // Get known world point of fiducial
+            imagePoints.push_back(f.centroid); // Use centroid of fiducial contour as image point
+        }
+    }
+
+    // Compute pose of world frame with respect to the fixed camera frame
+    if (worldPoints.size() > 4)
+    {
+        // Solve for pose
+        cv::Mat rotationVector;
+        cv::solvePnP(worldPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
+
+        // Convert rotation vector to rotation matrix
+        cv::Rodrigues(rotationVector, rotationMatrix);
+
+        // Transition system to calibrated state
+        calibrated = true;
+    }
 }
 
-cv::Point Vision::getCentroid(std::vector<cv::Point>& contour) const
+void Vision::plotFiducialInfo(cv::Mat& image)
+{
+    // Plot fiducial information
+    for (int i = 0; i < fiducialContours.size(); ++i)
+    {
+        // Get fiducial
+        FiducialContour f = fiducialContours[i];
+
+        // Plot contour
+        std::vector<std::vector<cv::Point>> contours = { f.contour };
+        //cv::drawContours(image, contours, 0, cv::Scalar(0, 255, 0), 4);
+
+        // Plot identifier
+        cv::Point textPoint(f.centroid.x - 20, f.centroid.y + 10);
+        cv::putText(image, std::to_string(f.id), textPoint, cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(0, 0, 255), 2);
+
+        // Plot corners
+        for (int j = 0; j < f.corners.size(); ++j)
+            circle(image, f.corners[j], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
+    }
+
+    cv::Point3i worldPoint = cv::Point3i(500, 0, -384);
+    cv::Point imagePoint = projectWorldPoint(worldPoint);
+    circle(image, imagePoint, 4, cv::Scalar(0, 0, 255), -1, cv::LINE_AA);
+}
+
+cv::Point Vision::getCentroid(const std::vector<cv::Point>& contour) const
 {
     cv::Moments contourMoments = moments(contour, false);
     cv::Point centroid = cv::Point2f(contourMoments.m10 / contourMoments.m00, contourMoments.m01 / contourMoments.m00);
     return centroid;
 }
 
-std::vector<cv::Point> Vision::findSquareCorners(std::vector<cv::Point>& contour) const
+std::vector<cv::Point> Vision::findSquareCorners(const std::vector<cv::Point>& contour) const
 {
     // Find the contour point furthest from the centroid and take as first corner
     cv::Point centroid = getCentroid(contour);
@@ -176,6 +217,80 @@ std::vector<cv::Point> Vision::findSquareCorners(std::vector<cv::Point>& contour
     return corners;
 }
 
+void Vision::isolateRectangle(const std::vector<cv::Point>& corners, const cv::Mat& sourceImage, cv::Mat& isolatedImage, cv::Mat& homographyMatrix) const
+{
+    // Define destination points in isolation image
+    std::vector<cv::Point> isolatedImagePoints;
+    isolatedImagePoints.push_back(cv::Point(0, 0));
+    isolatedImagePoints.push_back(cv::Point(isolatedImage.cols - 1, 0));
+    isolatedImagePoints.push_back(cv::Point(isolatedImage.cols - 1, isolatedImage.rows - 1));
+    isolatedImagePoints.push_back(cv::Point(0, isolatedImage.rows - 1));
+
+    // Compute homography matrix and isolate and warp rectangle to isolation image
+    homographyMatrix = cv::findHomography(corners, isolatedImagePoints);
+    warpPerspective(sourceImage, isolatedImage, homographyMatrix, isolatedImage.size());
+}
+
+int Vision::processFiducial(const cv::Mat& inputImage, cv::Mat& outputImage) const
+{
+    // Check if image conforms to isolated fiducial specification
+    if (inputImage.rows != fiducialWidth || inputImage.cols != fiducialHeight)
+    {
+        emit log(Message(MessageType::ERROR_LOG, "Vision System", "Image does not conform to isolated fiducial specification"));
+        return -1;
+    }
+
+    // Check if image A is a binary image
+    if (inputImage.type() != CV_8UC1)
+    {
+        emit log(Message(MessageType::ERROR_LOG, "Vision System", "Input image is not a binary image"));
+        return -1;
+    }
+
+    // Initialize output image
+    inputImage.copyTo(outputImage);
+
+    // Rotate image until correct orientation is found by alignment with 3 orientation reference blocks
+    int rotationCount = 0;
+    int refBlock1 = outputImage.at<uchar>(fiducialSamplePoints[0]);
+    int refBlock2 = outputImage.at<uchar>(fiducialSamplePoints[6]);
+    int refBlock3 = outputImage.at<uchar>(fiducialSamplePoints[8]);
+    while (refBlock1 != 0 || refBlock2 != 0 || refBlock3 != 255)
+    {
+        // Check if all orientations have been tested
+        rotationCount++;
+        if (rotationCount == 4)
+            return -1;
+
+        // Rotate to new orientation
+        cv::rotate(outputImage, outputImage, cv::ROTATE_90_CLOCKWISE);
+
+        // Sample orientation reference blocks
+        refBlock1 = outputImage.at<uchar>(fiducialSamplePoints[0]);
+        refBlock2 = outputImage.at<uchar>(fiducialSamplePoints[6]);
+        refBlock3 = outputImage.at<uchar>(fiducialSamplePoints[8]);
+    }
+
+    // Get fiducial identifier by mapping fiducial blocks to binary bits
+    int bits[6];
+    bits[0] = outputImage.at<uchar>(fiducialSamplePoints[1]) ? 1 : 0;
+    bits[1] = outputImage.at<uchar>(fiducialSamplePoints[2]) ? 1 : 0;
+    bits[2] = outputImage.at<uchar>(fiducialSamplePoints[3]) ? 1 : 0;
+    bits[3] = outputImage.at<uchar>(fiducialSamplePoints[4]) ? 1 : 0;
+    bits[4] = outputImage.at<uchar>(fiducialSamplePoints[5]) ? 1 : 0;
+    bits[5] = outputImage.at<uchar>(fiducialSamplePoints[7]) ? 1 : 0;
+
+    int identifier = 0;
+    for (int i = 0; i < 6; ++i)
+        identifier |= bits[i] << i;
+
+
+    //cv::imshow("Display Name", outputImage);
+    //cv::waitKey(0);
+
+    return identifier;
+}
+
 float Vision::mapAngle(float angle) const
 {
     if (angle > M_PI)
@@ -186,8 +301,12 @@ float Vision::mapAngle(float angle) const
     return angle;
 }
 
-cv::Point3d Vision::projectImagePoint(const cv::Point2d& imagePoint, double z) const
+cv::Point3i Vision::projectImagePoint(const cv::Point2d& imagePoint, double z) const
 {
+    // Check that vision system is calibrated
+    if (!calibrated)
+        return cv::Point3i(0, 0, 0);
+
 	// Form homogenous image point
 	cv::Point3d imagePointH(imagePoint.x, imagePoint.y, 1);
 
@@ -203,8 +322,12 @@ cv::Point3d Vision::projectImagePoint(const cv::Point2d& imagePoint, double z) c
 	return worldPoint;
 }
 
-cv::Point2d Vision::projectWorldPoint(cv::Point3d& worldPoint) const
+cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 {
+    // Check that vision system is calibrated
+    if (!calibrated)
+        return cv::Point(0, 0);
+
 	// Compute homogenous image point
 	cv::Mat imagePointMat = cameraMatrix * (rotationMatrix * cv::Mat(worldPoint, false) + translationVector);
 
@@ -215,91 +338,37 @@ cv::Point2d Vision::projectWorldPoint(cv::Point3d& worldPoint) const
 	return imagePoint;
 }
 
-void Vision::temp()
-{
-    cv::Mat input;
-    cv::Mat frame;
-    input.copyTo(frame);
+//// Draw image box
+//cv::Scalar color(255, 255, 0);
+//int left = 15, top = 15, right = 112, bottom = 112;
+//cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
+//int thickness = 1;
 
-    // Process image
-    cv::cvtColor(frame, frame, cv::COLOR_BGR2GRAY);
-    cv::blur(frame, frame, cv::Size(blurSize + 1, blurSize + 1));
-    cv::threshold(frame, frame, thresh, maxThresh, cv::THRESH_BINARY);
+//// Line drawn using 8 connected
+//// Bresenham algorithm
+//line(temp, tl, tr, color, thickness, cv::LINE_8);
+//line(temp, tr, br, color, thickness, cv::LINE_8);
+//line(temp, br, bl, color, thickness, cv::LINE_8);
+//line(temp, bl, tl, color, thickness, cv::LINE_8);
+//line(temp, cv::Point2d(left, top + 32), cv::Point2d(right, top + 32), color, thickness, cv::LINE_8);
+//line(temp, cv::Point2d(left, top + 64), cv::Point2d(right, top + 64), color, thickness, cv::LINE_8);
+//line(temp, cv::Point2d(left + 32, bottom), cv::Point2d(left + 32, top), color, thickness, cv::LINE_8);
+//line(temp, cv::Point2d(left + 64, bottom), cv::Point2d(left + 64, top), color, thickness, cv::LINE_8);
 
-    // Apply contour detection
-    std::vector<std::vector<cv::Point> > contours;
-    cv::findContours(frame, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+//for (int j = 0; j < 9; ++j)
+//    circle(temp, fiducialSamplePoints[j], 2, cv::Scalar(255, 255, 255), -1, cv::LINE_AA);
 
-    // Get the moment of each contour
-    std::vector<cv::Moments> contourMoments(contours.size());
-    for (int i = 0; i < contours.size(); i++)
-        contourMoments[i] = moments(contours[i], false);
+//// Draw image box
+//cv::Scalar color(255, 255, 0);
+//cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
+//int thickness = 2;
 
-    // Get the centroid of each contour moment
-    std::vector<cv::Point2f> momentCentroids(contours.size());
-    for (int i = 0; i < contours.size(); i++)
-        momentCentroids[i] = cv::Point2f(contourMoments[i].m10 / contourMoments[i].m00, contourMoments[i].m01 / contourMoments[i].m00);
+//// Line drawn using 8 connected
+//// Bresenham algorithm
+//line(image, tl, tr, color, thickness, cv::LINE_8);
+//line(image, tr, br, color, thickness, cv::LINE_8);
+//line(image, br, bl, color, thickness, cv::LINE_8);
+//line(image, bl, tl, color, thickness, cv::LINE_8);
 
-    // Draw and label each moment centroid
-    for (int i = 0; i < contours.size(); i++)
-    {
-        cv::Point2d centroid = momentCentroids[i];
-        double area = cv::contourArea(contours[i]);
-        if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom && area > areaThreshold)
-        {
-            circle(input, momentCentroids[i], 4, cv::Scalar(255, 0, 0), -1, cv::LINE_AA);
-            std::vector<std::vector<cv::Point>> contour;
-            contour.push_back(contours[i]);
-
-            cv::drawContours(input, contour, -1, cv::Scalar(0, 0, 255), 2, cv::LINE_AA);
-
-            double cx = momentCentroids[i].x;
-            double cy = momentCentroids[i].y;
-            double maxDist = 0;
-            double maxIndex = 0;
-            for (int j = 0; j < contours[i].size(); j++)
-            {
-                double px = contours[i][j].x;
-                double py = contours[i][j].y;
-                double dist = sqrt(pow(px - cx, 2) + pow(py - cy, 2));
-
-                if (dist > maxDist)
-                {
-                    maxDist = dist;
-                    maxIndex = j;
-                }
-            }
-
-            circle(input, contours[i][maxIndex], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
-
-            if (showCoords)
-            {
-                cv::putText(input,
-                    "(" + std::to_string((int)momentCentroids[i].x) + ", " + std::to_string((int)momentCentroids[i].y) + ")",
-                    cv::Point2f(momentCentroids[i].x - 90, momentCentroids[i].y + 50), // Coordinates
-                    cv::FONT_HERSHEY_PLAIN, // Font
-                    2, // Scale. 2.0 = 2x bigger
-                    cv::Scalar(255, 255, 255), // BGR Color
-                    2, // Line Thickness (Optional)
-                    cv::LINE_AA); // Anti-alias (Optional, see version note)
-
-
-            }
-        }
-    }
-
-    // Show principle point
-    circle(input, cv::Point2d(cx, cy), 4, cv::Scalar(255, 0, 255), -1, cv::LINE_AA);
-
-    // Draw image box
-    cv::Scalar color(255, 255, 0);
-    cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
-    int thickness = 2;
-
-    // Line drawn using 8 connected
-    // Bresenham algorithm
-    line(input, tl, tr, color, thickness, cv::LINE_8);
-    line(input, tr, br, color, thickness, cv::LINE_8);
-    line(input, br, bl, color, thickness, cv::LINE_8);
-    line(input, bl, tl, color, thickness, cv::LINE_8);
-}
+// Process contours of significant size in bounding box 
+//if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom && area > areaThreshold)

@@ -125,7 +125,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
 void ConstructionView::showView()
 {
-    cameraFeedTimer->start(1000); // Update camera feed every 20ms
+    cameraFeedTimer->start(100); // Update camera feed every 20ms
     openGLTimer->start(2); // Refresh OpenGL render every 20ms
 }
 
@@ -214,8 +214,14 @@ void ConstructionView::updateCameraFeed()
     *camera >> input;
 
     cv::Mat output;
-    cv::resize(input, output, cv::Size(), 0.75, 0.75);
-    //cv::imwrite("output1.jpg", input);
+    input.copyTo(output);
+
+    Vision vision;
+    vision.calibrate(input);
+    vision.plotFiducialInfo(output);
+
+    cv::resize(output, output, cv::Size(), 0.75, 0.75);
+    //cv::imwrite("output1.jpg", output);
 
     // Display image in camera feed
     cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
