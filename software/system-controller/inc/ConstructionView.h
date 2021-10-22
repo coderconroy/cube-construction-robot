@@ -16,6 +16,7 @@
 #include <QTimer>
 #include <QList>
 #include <QRadioButton>
+#include <QButtonGroup>
 
 class ConstructionView : public QWidget
 {
@@ -58,6 +59,7 @@ private:
     QStackedLayout* baseLayout; /*! Layout containing the overview, camera and model layouts*/
 
     // Overview layout widgets
+    QWidget* overviewWidget; /*! Widget for overview layout */
     QVBoxLayout* overviewLayout; /*! Layout for all the main construction view components and layouts */
     QHBoxLayout* visualLayout; /*! Layout for camera and shape view layouts */
     QVBoxLayout* overviewCameraLayout; /*! Layout for camera feed and supplementary widgets on the overview page */
@@ -94,6 +96,7 @@ private:
     QSpinBox* rPosition;
 
     // Vision layout widgets
+    QWidget* visionWidget; /*! Widget for vision layout */
     QHBoxLayout* visionLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* visionControls; /*! Layout for the control widgets used to configure the computer vision display */
     QStackedLayout* visionVisual; /*! Layout for the computer vision visual display component */
@@ -112,11 +115,13 @@ private:
     QPushButton* projectWorldPoint; /*! Project specified world point to the image frame */
 
     // Model layout widgets
+    QWidget* modelWidget; /*! Widget for model layout */
     QHBoxLayout* modelLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* modelControls; /*! Layout for the control widgets used to configure the computer vision display */
     QButtonGroup* modelInputGroup; /*! Radio button group for 3D model display input selection */
     QRadioButton* showBuildModel; /*! Select the model to be built as input the the 3D display */
     QRadioButton* showWorldModel; /*! Select the model of cubes in world during construction as input the the 3D display */
+    OpenGLView* modelView; /*! OpenGL render of 3D shape or construction process */
 
     /*!
     * Captures new image from camera and updates the camera feed.

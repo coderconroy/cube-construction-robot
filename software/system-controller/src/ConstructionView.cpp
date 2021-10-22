@@ -11,11 +11,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(cubeWorldModel, &CubeWorldModel::log, this, &ConstructionView::log); // Propagate log signal
 
     // Initialize OpenGL view for the 3D shapes
-    shapeView = new OpenGLView(parent);
-    QSurfaceFormat format;
-    format.setVersion(3, 3);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    shapeView->setFormat(format);
+    shapeView = new OpenGLView();
     shapeView->setCubes(cubeWorldModel->getCubes());
 
     connect(shapeView, &OpenGLView::log, this, &ConstructionView::log); // Propagate log signal
@@ -102,7 +98,6 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visualLayout->addLayout(overviewCameraLayout);
     visualLayout->addLayout(overviewModelLayout);
 
-
     // Initialize overview layout
     overviewLayout = new QVBoxLayout();
     overviewLayout->addStretch();
@@ -113,37 +108,91 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     overviewLayout->addLayout(robotPositionLayout);
     overviewLayout->addStretch();
 
-    // Vision layout widgets
-    QHBoxLayout* visionLayout;
-    QVBoxLayout* visionControls;
-    QButtonGroup* visionStageGroup;
-    QRadioButton* visionInput;
-    QRadioButton* visionBlurred;
-    QRadioButton* visionThreshold;
-    QRadioButton* visionContours;
-    QRadioButton* visionFiducials;
-    QCheckBox* boundingBox;
-    QCheckBox* fiducialInfo;
-    QCheckBox* cubeInfo;
-    QSpinBox* worldPointXPos;
-    QSpinBox* worldPointYPos;
-    QSpinBox* worldPointZPos;
-    QPushButton* projectWorldPoint;
+    overviewWidget = new QWidget();
+    overviewWidget->setLayout(overviewLayout);
 
-    // Model layout widgets
-    QHBoxLayout* modelLayout;
-    QVBoxLayout* modelControls;
-    QButtonGroup* modelInputGroup;
-    QRadioButton* showBuildModel;
-    QRadioButton* showWorldModel;
+    // Initialize computer vision controls
+    visionStageGroup = new QButtonGroup(this);
+    visionInput = new QRadioButton("Camera Feed");
+    visionBlurred = new QRadioButton("Grayscale and Blurring");
+    visionThreshold = new QRadioButton("Thresholding");
+    visionContours = new QRadioButton("Contour Detection");
+    visionFiducials = new QRadioButton("Fiducial Processing");
+    boundingBox = new QCheckBox("Bounding Box");
+    fiducialInfo = new QCheckBox("Fiducial Info");
+    cubeInfo = new QCheckBox("Cube Info");
+    worldPointXPos = new QSpinBox();
+    worldPointYPos = new QSpinBox();
+    worldPointZPos = new QSpinBox();
+    projectWorldPoint = new QPushButton("Project point");
+
+    visionStageGroup->addButton(visionInput);
+    visionStageGroup->addButton(visionBlurred);
+    visionStageGroup->addButton(visionThreshold);
+    visionStageGroup->addButton(visionContours);
+    visionStageGroup->addButton(visionFiducials);
+
+    // Initialize comptuer vision controls layout
+    visionControls = new QVBoxLayout();
+    visionControls->addWidget(visionInput);
+    visionControls->addWidget(visionBlurred);
+    visionControls->addWidget(visionThreshold);
+    visionControls->addWidget(visionContours);
+    visionControls->addWidget(visionFiducials);
+    visionControls->addWidget(boundingBox);
+    visionControls->addWidget(fiducialInfo);
+    visionControls->addWidget(cubeInfo);
+    visionControls->addWidget(worldPointXPos);
+    visionControls->addWidget(worldPointYPos);
+    visionControls->addWidget(worldPointZPos);
+    visionControls->addWidget(projectWorldPoint);
+
+    // Initialize computer vision visual
+    visionVisual = new QStackedLayout();
+
+    // Initialize computer vision layout
+    visionLayout = new QHBoxLayout();
+    visionLayout->addLayout(visionControls);
+    visionLayout->addLayout(visionVisual);
+
+    visionWidget = new QWidget();
+    visionWidget->setLayout(visionLayout);
+
+    // Initialize model controls and view
+    modelInputGroup = new QButtonGroup();
+    showBuildModel = new QRadioButton("Shape Model");
+    showWorldModel = new QRadioButton("Construction Visualizaton");
+    modelView = new OpenGLView();
+
+    modelInputGroup->addButton(showBuildModel);
+    modelInputGroup->addButton(showWorldModel);
+
+    // Initialize model controls layout
+    modelControls = new QVBoxLayout();
+    modelControls->addWidget(showBuildModel);
+    modelControls->addWidget(showWorldModel);
+    modelControls->addStretch();
+
+    // Initialize model layout
+    modelLayout = new QHBoxLayout();
+    modelLayout->addLayout(modelControls);
+    modelLayout->addWidget(modelView);
+
+    modelWidget = new QWidget();
+    modelWidget->setLayout(modelLayout);
 
     // Initialize base layout
     baseLayout = new QStackedLayout();
-    baseLayout->addItem(overviewLayout);
-    baseLayout->addItem(visionLayout);
-    baseLayout->addItem(modelLayout);
 
-    setLayout(overviewLayout);
+    baseLayout->addWidget(visionWidget);
+    baseLayout->addWidget(modelWidget);
+    // NOTE: The program throws a debug error on close when the overviewWidget is added to the stackWidget before the model widget
+    // The cause of the issue is likely related to the OpenGL components both widgets contain
+    baseLayout->addWidget(overviewWidget);
+
+    baseLayout->setCurrentWidget(overviewWidget);
+
+    setLayout(baseLayout);
 
     // Initialize camera feed timer
     cameraFeedTimer = new QTimer(this);
@@ -168,7 +217,38 @@ void ConstructionView::hideView()
 
 void ConstructionView::updateShapeView()
 {
-    shapeView->update();
+    if (baseLayout->currentWidget() == overviewWidget)
+        shapeView->update();
+    else if (baseLayout->currentWidget() == modelWidget)
+        modelView->update();
+}
+
+void ConstructionView::updateCameraFeed()
+{
+    if (baseLayout->currentWidget() == overviewWidget)
+    {
+        // Capture frame from camera
+        cv::Mat input;
+        *camera >> input;
+
+        cv::Mat output;
+        input.copyTo(output);
+
+        Vision vision;
+        vision.calibrate(input);
+        vision.processScene(input);
+        vision.plotBoundingBox(output);
+        vision.plotFiducialInfo(output);
+        vision.plotCubeInfo(output);
+
+        cv::resize(output, output, cv::Size(), 0.5, 0.5);
+        //cv::imwrite("output1.jpg", output);
+
+        // Display image in camera feed
+        cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
+        QImage cameraFeedImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
+        overviewCameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
+    }
 }
 
 void ConstructionView::loadModelClicked()
@@ -236,32 +316,6 @@ void ConstructionView::setRobot(Robot* robot)
 void ConstructionView::setCamera(cv::VideoCapture* camera)
 {
     this->camera = camera;
-}
-
-int calCount = 0;
-void ConstructionView::updateCameraFeed()
-{
-    // Capture frame from camera
-    cv::Mat input;
-    *camera >> input;
-
-    cv::Mat output;
-    input.copyTo(output);
-
-    Vision vision;
-    vision.calibrate(input);
-    vision.processScene(input);
-    vision.plotBoundingBox(output);
-    vision.plotFiducialInfo(output);
-    vision.plotCubeInfo(output);
-
-    cv::resize(output, output, cv::Size(), 0.5, 0.5);
-    //cv::imwrite("output1.jpg", output);
-
-    // Display image in camera feed
-    cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
-    QImage cameraFeedImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
-    overviewCameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
 }
 
 void ConstructionView::sleepRobotClicked()

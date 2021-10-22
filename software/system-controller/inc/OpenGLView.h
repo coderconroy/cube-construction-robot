@@ -17,7 +17,7 @@ public:
     /*!
     * Class constructor. The class OpenGL initialization is not performed here.
     */
-    OpenGLView(QWidget* parent);
+    OpenGLView(QWidget* parent = Q_NULLPTR);
     
     /*!
     * Setter for list of cubes in the world reference frame that need to be rendered.
@@ -29,7 +29,7 @@ signals:
     /*!
     * Signal generated when a message is logged by an \class OpenGLView instance.
     */
-    void log(Message message);
+    void log(Message message) const;
 
     /*!
     * Signal generated when an input to update the position of the selected cube is received.

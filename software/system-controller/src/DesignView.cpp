@@ -30,11 +30,7 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	connect(cubeList, &QListWidget::itemSelectionChanged, this, &DesignView::cubeListSelectionChange);
 
 	// Initialize OpenGL view for the 3D shapes
-	shapeView = new OpenGLView(parent);
-	QSurfaceFormat format;
-	format.setVersion(3, 3);
-	format.setProfile(QSurfaceFormat::CoreProfile);
-	shapeView->setFormat(format);
+	shapeView = new OpenGLView();
 	shapeView->setCubes(cubeWorldModel->getCubes());
 
 	connect(shapeView, &OpenGLView::cubePositionUpdateRequested, cubeWorldModel, &CubeWorldModel::updateSelectedCubePosition);

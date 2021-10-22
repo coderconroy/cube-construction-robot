@@ -82,6 +82,8 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	baseLayout->addLayout(viewLayout);
 	baseLayout->addWidget(messageLog);
 
+	hideMessageLog();
+
 	// Add base layout to window
 	setLayout(baseLayout);
 }
