@@ -241,14 +241,15 @@ void Vision::plotCubeInfo(cv::Mat& image)
         for (int j = 0; j < c.corners.size(); ++j)
             circle(image, c.corners[j], 4, cv::Scalar(255, 255, 0), -1, cv::LINE_AA);
 
+        // Plot orientation
+        float angle = computeCubeZRotation(c.corners, c.centroid, -64);
+
         // Plot world coordinates
         // Assumes cube is on ground plane
         cv::Point3i worldPoint = projectImagePoint(c.centroid, -64); // Project image point to world 
-        QString text = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")";
+        QString text = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")" + QString::number(angle / M_PI * 180);
         cv::Point textPoint(c.centroid.x - 60, c.centroid.y + 40);
         cv::putText(image, text.toStdString(), textPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
-
-
     }
 }
 
@@ -300,6 +301,7 @@ std::vector<cv::Point> Vision::findSquareCorners(const std::vector<cv::Point>& c
     }
 
     // Compute angle between x axis and line from centroid to furthest point and quadrant reference angles
+    // The reference angles are defined in an anti-clockwise direction (i.e. increasing angle)
     float refAngle1 = atan2(corners[0].y - centroid.y, corners[0].x - centroid.x);
     float refAngle2 = mapAngle(refAngle1 + M_PI / 2);
     float refAngle3 = mapAngle(refAngle1 + M_PI);
@@ -408,6 +410,53 @@ float Vision::mapAngle(float angle) const
         angle -= 2 * M_PI;
     else if (angle <= -M_PI)
         angle += 2 * M_PI;
+
+    return angle;
+}
+
+float Vision::mapToCubeAngle(float angle) const
+{
+    while (angle > M_PI / 4)
+        angle -= M_PI / 2;
+
+    while (angle <= - M_PI / 4)
+        angle += M_PI / 2;
+
+    return angle;
+}
+
+float Vision::computeCubeZRotation(const std::vector<cv::Point>& corners, const cv::Point centroid, const int z) const
+{
+    // Project centroid point to the world frame
+    cv::Point3i worldCentroid = projectImagePoint(centroid, z);
+
+    // Compute cube z rotation estimate using each corner point in the world frame
+    cv::Point3i worldCorners[4];
+    float angles[4];
+    for (int i = 0; i < 4; ++i)
+    {
+        // Project the corners from the image frame to the given xy plane in the world frame
+        worldCorners[i] = projectImagePoint(corners[i], z);
+
+        // Compute angle formed by the line from the top cube face centroid to each corner with the x-axis in radians
+        // Rotate 90i degrees clockwise to align with the line formed by the first corner and centroid and map to range(- PI, PI]
+        // This assumes the corners are specified in an anti-clockwise direction
+        angles[i] = atan2(worldCorners[i].y - worldCentroid.y, worldCorners[i].x - worldCentroid.x) - (M_PI * i / 2);
+
+        // Covert angle to that between the x-axis and the line from the centroid perpendicular to the side of the cube and map to (- PI, PI]
+        angles[i] = mapAngle(angles[i] + M_PI / 4);
+    }
+
+    // Compute average of angle estimates using the individual corners, map to (- PI / 4, PI / 4) and return single angle estimate
+    float ySum = 0;
+    float xSum = 0;
+    for (int i = 0; i < 4; ++i)
+    {
+        xSum += cos(angles[i]);
+        ySum += sin(angles[i]);
+    }
+
+    float angle = mapToCubeAngle(atan2(ySum / 4, xSum / 4));
 
     return angle;
 }

@@ -116,7 +116,7 @@ private:
 	/*!
 	* Assumes the input contour is a square and estimates the square corners.
 	* \param [in] contour Contour to estimate corners from.
-	* \return Estimated coordinates for 4 corners running clockwise around the square.
+	* \return Estimated coordinates for 4 corners running anti-clockwise around the square.
 	*/
 	std::vector<cv::Point> findSquareCorners(const std::vector<cv::Point>& contour) const;
 
@@ -143,4 +143,20 @@ private:
 	* \return Mapped angle in radians.
 	*/
 	float mapAngle(float angle) const;
+
+	/*!
+	* Map angle to the range (-PI / 4, PI / 4] to describe cube rotation.
+	* \param [in] Angle to map in radians.
+	* \return Mapped angle in radians.
+	*/
+	float mapToCubeAngle(float angle) const;
+
+	/*!
+	* Compute the angle of rotation about the z-axis based on the corners of the cube contour.
+	* \param [in] corners Corners of the cube contour with respect to the image frame in an anti-clockwise direction.
+	* \param [in] z Z coordinate of the xy plane to estimate the orientation of the cube in.
+	* \param [in] centroid Centroid of the top cube face contour with respect to the image frame.
+	* \return Estimated rotation of cube about z-axis in radians.
+	*/
+	float computeCubeZRotation(const std::vector<cv::Point>& corners, const cv::Point centroid, const int z) const;
 };
