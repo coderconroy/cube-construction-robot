@@ -8,12 +8,14 @@
 #include "opencv2/opencv.hpp"
 #include "Vision.h"
 #include <QWidget>
+#include <qstackedlayout.h>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QSpinBox>
 #include <QTimer>
 #include <QList>
+#include <QRadioButton>
 
 class ConstructionView : public QWidget
 {
@@ -53,11 +55,14 @@ signals:
     void log(Message message) const;
 
 private:
-    QVBoxLayout* baseLayout; /* Layout for all the main construction view components and layouts */
-    QHBoxLayout* visualLayout; /* Layout for camera and shape view layouts */
-    QVBoxLayout* cameraLayout; /* Layout for camera feed and supplementary widgets */
-    QVBoxLayout* shapeLayout; /* Layout for 3D shape view and supplementary widgets */
-    QLabel* cameraFeed; /*! Display live images captured by camera */
+    QStackedLayout* baseLayout; /*! Layout containing the overview, camera and model layouts*/
+
+    // Overview layout widgets
+    QVBoxLayout* overviewLayout; /*! Layout for all the main construction view components and layouts */
+    QHBoxLayout* visualLayout; /*! Layout for camera and shape view layouts */
+    QVBoxLayout* overviewCameraLayout; /*! Layout for camera feed and supplementary widgets on the overview page */
+    QVBoxLayout* overviewModelLayout; /*! Layout for 3D model view and supplementary widgets on the overview page */
+    QLabel* overviewCameraFeed; /*! Display live images captured by camera */
 
     QPushButton* loadModel; /* Load model to be constructed into the cube world model from JSON file */
     QPushButton* execute; /* Initiate construction of cube world model */
@@ -87,6 +92,30 @@ private:
     QSpinBox* yPosition;
     QSpinBox* zPosition;
     QSpinBox* rPosition;
+
+    // Vision layout widgets
+    QHBoxLayout* visionLayout; /*! Layout showing the computer vision system process and output */
+    QVBoxLayout* visionControls; /*! Layout for the control widgets used to configure the computer vision display */
+    QButtonGroup* visionStageGroup; /*! Radio button group for computer vision stage selection radio buttons */
+    QRadioButton* visionInput; /*! Display computer vision image raw camera input */
+    QRadioButton* visionBlurred; /*! Display computer vision image after blur and grayscale stages */
+    QRadioButton* visionThreshold; /*! Display computer vision image after threshold stage */
+    QRadioButton* visionContours; /*! Display computer vision image after contour detection stage */
+    QRadioButton* visionFiducials; /*! Display computer vision fiducial processing stage */
+    QCheckBox* boundingBox; /*! Annotate plain computer vision raw image input with bounding box */
+    QCheckBox* fiducialInfo; /*! Annotate plain computer vision raw image input with fiducial information */
+    QCheckBox* cubeInfo; /*! Annotate plain computer vision raw image input with cube information */
+    QSpinBox* worldPointXPos; /*! X coordinate of world point to project to image frame */
+    QSpinBox* worldPointYPos; /*! Y coordinate of world point to project to image frame */
+    QSpinBox* worldPointZPos; /*! Z coordinate of world point to project to image frame */
+    QPushButton* projectWorldPoint; /*! Project specified world point to the image frame */
+
+    // Model layout widgets
+    QHBoxLayout* modelLayout; /*! Layout showing the computer vision system process and output */
+    QVBoxLayout* modelControls; /*! Layout for the control widgets used to configure the computer vision display */
+    QButtonGroup* modelInputGroup; /*! Radio button group for 3D model display input selection */
+    QRadioButton* showBuildModel; /*! Select the model to be built as input the the 3D display */
+    QRadioButton* showWorldModel; /*! Select the model of cubes in world during construction as input the the 3D display */
 
     /*!
     * Captures new image from camera and updates the camera feed.
@@ -120,5 +149,4 @@ private:
     void idleRobotActuatorClicked();
     void actuateRobotActuatorClicked();
     void releaseRobotActuatorClicked();
-    void performDemo();
 };

@@ -21,7 +21,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(shapeView, &OpenGLView::log, this, &ConstructionView::log); // Propagate log signal
 
     // Initialize camera feed and controls
-    cameraFeed = new QLabel();
+    overviewCameraFeed = new QLabel();
 
     // Initialize general robot controls
     loadModel = new QPushButton("Load Model");
@@ -90,29 +90,29 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotPositionLayout->addStretch();
 
     // Initialize camera layout
-    cameraLayout = new QVBoxLayout();
-    cameraLayout->addWidget(cameraFeed);
+    overviewCameraLayout = new QVBoxLayout();
+    overviewCameraLayout->addWidget(overviewCameraFeed);
 
     // Intialize shape layout
-    shapeLayout = new QVBoxLayout();
-    shapeLayout->addWidget(shapeView);
+    overviewModelLayout = new QVBoxLayout();
+    overviewModelLayout->addWidget(shapeView);
 
     // Initialize visual layout
     visualLayout = new QHBoxLayout();
-    visualLayout->addLayout(cameraLayout);
-    visualLayout->addLayout(shapeLayout);
+    visualLayout->addLayout(overviewCameraLayout);
+    visualLayout->addLayout(overviewModelLayout);
 
     // Initialize base layout
-    baseLayout = new QVBoxLayout();
-    baseLayout->addStretch();
-    baseLayout->addLayout(visualLayout);
-    baseLayout->addSpacing(20);
-    baseLayout->addLayout(robotControlLayout);
-    baseLayout->addSpacing(20);
-    baseLayout->addLayout(robotPositionLayout);
-    baseLayout->addStretch();
+    overviewLayout = new QVBoxLayout();
+    overviewLayout->addStretch();
+    overviewLayout->addLayout(visualLayout);
+    overviewLayout->addSpacing(20);
+    overviewLayout->addLayout(robotControlLayout);
+    overviewLayout->addSpacing(20);
+    overviewLayout->addLayout(robotPositionLayout);
+    overviewLayout->addStretch();
 
-    setLayout(baseLayout);
+    setLayout(overviewLayout);
 
     // Initialize camera feed timer
     cameraFeedTimer = new QTimer(this);
@@ -125,7 +125,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
 void ConstructionView::showView()
 {
-    cameraFeedTimer->start(100); // Update camera feed every 20ms
+    cameraFeedTimer->start(500); // Update camera feed every 20ms
     openGLTimer->start(2); // Refresh OpenGL render every 20ms
 }
 
@@ -224,13 +224,13 @@ void ConstructionView::updateCameraFeed()
     vision.plotFiducialInfo(output);
     vision.plotCubeInfo(output);
 
-    cv::resize(output, output, cv::Size(), 0.75, 0.75);
+    cv::resize(output, output, cv::Size(), 0.5, 0.5);
     //cv::imwrite("output1.jpg", output);
 
     // Display image in camera feed
     cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
     QImage cameraFeedImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
-    cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
+    overviewCameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
 }
 
 void ConstructionView::sleepRobotClicked()

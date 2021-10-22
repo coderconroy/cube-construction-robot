@@ -234,22 +234,32 @@ void Vision::plotCubeInfo(cv::Mat& image)
         std::vector<std::vector<cv::Point>> contours = { c.contour };
         //cv::drawContours(image, contours, 0, cv::Scalar(0, 255, 0), 4);
 
+        // Plot world coordinate text
+        cv::Point3i worldPoint = projectImagePoint(c.centroid, -64); // Project image point to world 
+        QString coordinateText = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")";
+        cv::Point coordinateTextPoint(c.centroid.x - 60, c.centroid.y + 40);
+        cv::putText(image, coordinateText.toStdString(), coordinateTextPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
+
+        // Plot orientation text
+        float angle = computeCubeZRotation(c.corners, c.centroid, -64);
+        QString angleText = QString::number(round(angle / M_PI * 180)) + " deg";
+        cv::Point angleTextPoint(c.centroid.x - 50, c.centroid.y + 70);
+        cv::putText(image, angleText.toStdString(), angleTextPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
+
+        // Plot orientation reference line
+        int lineLength = 64;
+        cv::Point3i worldCentroid = projectImagePoint(c.centroid, -64);
+        cv::Point3i xRefPoint = worldCentroid + cv::Point3i(lineLength, 0, 0);
+        cv::Point3i angleRefPoint = worldCentroid + cv::Point3i(lineLength * cos(angle), lineLength * sin(angle), 0);
+        cv::line(image, projectWorldPoint(worldCentroid), projectWorldPoint(xRefPoint), cv::Scalar(0, 255, 0), 3, cv::LINE_8);
+        cv::line(image, projectWorldPoint(worldCentroid), projectWorldPoint(angleRefPoint), cv::Scalar(0, 255, 0), 3, cv::LINE_8);
+
         // Plot centroid
         circle(image, c.centroid, 4, cv::Scalar(255, 0, 128), -1, cv::LINE_AA);
 
         // Plot corners
         for (int j = 0; j < c.corners.size(); ++j)
             circle(image, c.corners[j], 4, cv::Scalar(255, 255, 0), -1, cv::LINE_AA);
-
-        // Plot orientation
-        float angle = computeCubeZRotation(c.corners, c.centroid, -64);
-
-        // Plot world coordinates
-        // Assumes cube is on ground plane
-        cv::Point3i worldPoint = projectImagePoint(c.centroid, -64); // Project image point to world 
-        QString text = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")" + QString::number(angle / M_PI * 180);
-        cv::Point textPoint(c.centroid.x - 60, c.centroid.y + 40);
-        cv::putText(image, text.toStdString(), textPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
     }
 }
 
