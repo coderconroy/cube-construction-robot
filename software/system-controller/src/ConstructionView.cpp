@@ -207,6 +207,7 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
     this->camera = camera;
 }
 
+int calCount = 0;
 void ConstructionView::updateCameraFeed()
 {
     // Capture frame from camera
@@ -218,8 +219,10 @@ void ConstructionView::updateCameraFeed()
 
     Vision vision;
     vision.calibrate(input);
+    vision.processScene(input);
+    vision.plotBoundingBox(output);
     vision.plotFiducialInfo(output);
-    //vision.plotBoundingBox(output);
+    vision.plotCubeInfo(output);
 
     cv::resize(output, output, cv::Size(), 0.75, 0.75);
     //cv::imwrite("output1.jpg", output);

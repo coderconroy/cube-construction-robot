@@ -17,9 +17,16 @@ public:
 	Vision(QObject* parent = Q_NULLPTR);
 
 	/*!
-	* Initialize vision system extrinsic rotation and translation matrices through the use of reference fiducials.
+	* Calibrate the vision system extrinsic rotation and translation matrices through the use of reference fiducials.
+	* \param [in] calibrationImage Image to be used for calibration.
 	*/
-	void calibrate(const cv::Mat& image);
+	void calibrate(const cv::Mat& calibrationImage);
+
+	/*!
+	* Process the scene for cube and fiducial detection.
+	* \param [in] image Image to be processed.
+	*/
+	void processScene(const cv::Mat& image);
 
 	/*!
 	* Annotate image with fiducial information.
@@ -67,7 +74,7 @@ private:
 	struct FiducialContour
 	{
 		int id; /*! Unique fiducial identifier as encoded in fiducial pattern */
-		cv::Point centroid;
+		cv::Point centroid; /*! Centroid moment of fiducial contour */
 		std::vector<cv::Point> contour; /*! Collection of points describing contour around fiducial */
 		std::vector<cv::Point> corners; /*! Set of four corners of the fiducial square in an anti-clockwise direction */
 		cv::Mat homographyMatrix; /*! Homography matrix mapping fiducials from calibration image to isolated image */
@@ -78,6 +85,7 @@ private:
 	*/
 	struct CubeContour
 	{
+		cv::Point centroid; /*! Centroid moment of cube contour */
 		std::vector<cv::Point> contour; /*! Collection of points describing contour around cube */
 		std::vector<cv::Point> corners; /*! Set of four corners of the cube top-face in an anti-clockwise direction */
 	};

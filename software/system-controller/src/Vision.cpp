@@ -137,6 +137,69 @@ void Vision::calibrate(const cv::Mat& calibrationImage)
     }
 }
 
+void Vision::processScene(const cv::Mat& image)
+{
+    // Process image
+    cv::Mat processImage;
+    cv::cvtColor(image, processImage, cv::COLOR_BGR2GRAY);
+    cv::blur(processImage, processImage, cv::Size(blurSize + 1, blurSize + 1));
+    cv::threshold(processImage, processImage, thresh, maxThresh, cv::THRESH_BINARY);
+
+    // Apply contour detection
+    std::vector<std::vector<cv::Point>> contours;
+    cv::findContours(processImage, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // Process contours for cubes and fiducials
+    for (int i = 0; i < contours.size(); i++)
+    {
+        // Get contour
+        std::vector<cv::Point> contour = contours[i];
+
+        // Get contour centroid and area
+        cv::Point2d centroid = getCentroid(contour);
+        double area = cv::contourArea(contours[i]);
+
+        // Process contours of significant size in bounding box 
+        if (area > areaThreshold)
+        {
+            // Find corners
+            std::vector<cv::Point> corners = findSquareCorners(contour);
+
+            // Isolate rectangle
+            cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
+            cv::Mat homographyMatrix;
+            isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
+            cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
+
+            // Process fiducial
+            int fiducialId = processFiducial(isolatedImage, isolatedImage);
+
+            // Add to fiducial contour list if fiducial
+            // TODO: Add further checks to confirm fiducial nature
+            if (fiducialId >= 0)
+            {
+                FiducialContour fiducial;
+                fiducial.id = fiducialId;
+                fiducial.centroid = centroid;
+                fiducial.contour = contour;
+                fiducial.corners = corners;
+                fiducial.homographyMatrix = homographyMatrix;
+                fiducialContours.push_back(fiducial);
+            }
+            // Assume contour is cube and add to cube contour list
+            // TODO: Add further checks to confirm cube nature
+            else
+            {
+                CubeContour cube;
+                cube.centroid = centroid;
+                cube.contour = contour;
+                cube.corners = corners;
+                cubeContours.push_back(cube);
+            }
+        }
+    }
+}
+
 void Vision::plotFiducialInfo(cv::Mat& image)
 {
     // Plot fiducial information
@@ -157,10 +220,36 @@ void Vision::plotFiducialInfo(cv::Mat& image)
         for (int j = 0; j < f.corners.size(); ++j)
             circle(image, f.corners[j], 4, cv::Scalar(0, 255, 255), -1, cv::LINE_AA);
     }
+}
 
-    cv::Point3i worldPoint = cv::Point3i(500, 0, -384);
-    cv::Point imagePoint = projectWorldPoint(worldPoint);
-    circle(image, imagePoint, 4, cv::Scalar(0, 0, 255), -1, cv::LINE_AA);
+void Vision::plotCubeInfo(cv::Mat& image)
+{
+    // Plot fiducial information
+    for (int i = 0; i < cubeContours.size(); ++i)
+    {
+        // Get fiducial
+        CubeContour c = cubeContours[i];
+
+        // Plot contour
+        std::vector<std::vector<cv::Point>> contours = { c.contour };
+        //cv::drawContours(image, contours, 0, cv::Scalar(0, 255, 0), 4);
+
+        // Plot centroid
+        circle(image, c.centroid, 4, cv::Scalar(255, 0, 128), -1, cv::LINE_AA);
+
+        // Plot corners
+        for (int j = 0; j < c.corners.size(); ++j)
+            circle(image, c.corners[j], 4, cv::Scalar(255, 255, 0), -1, cv::LINE_AA);
+
+        // Plot world coordinates
+        // Assumes cube is on ground plane
+        cv::Point3i worldPoint = projectImagePoint(c.centroid, -64); // Project image point to world 
+        QString text = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")";
+        cv::Point textPoint(c.centroid.x - 60, c.centroid.y + 40);
+        cv::putText(image, text.toStdString(), textPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
+
+
+    }
 }
 
 void Vision::plotBoundingBox(cv::Mat& image)
