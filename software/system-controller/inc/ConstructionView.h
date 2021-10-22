@@ -96,6 +96,7 @@ private:
     // Vision layout widgets
     QHBoxLayout* visionLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* visionControls; /*! Layout for the control widgets used to configure the computer vision display */
+    QStackedLayout* visionVisual; /*! Layout for the computer vision visual display component */
     QButtonGroup* visionStageGroup; /*! Radio button group for computer vision stage selection radio buttons */
     QRadioButton* visionInput; /*! Display computer vision image raw camera input */
     QRadioButton* visionBlurred; /*! Display computer vision image after blur and grayscale stages */

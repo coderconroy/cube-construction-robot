@@ -89,11 +89,11 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotPositionLayout->addWidget(setRobotPosition);
     robotPositionLayout->addStretch();
 
-    // Initialize camera layout
+    // Initialize camera overview layout
     overviewCameraLayout = new QVBoxLayout();
     overviewCameraLayout->addWidget(overviewCameraFeed);
 
-    // Intialize shape layout
+    // Intialize shape overview layout
     overviewModelLayout = new QVBoxLayout();
     overviewModelLayout->addWidget(shapeView);
 
@@ -102,7 +102,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visualLayout->addLayout(overviewCameraLayout);
     visualLayout->addLayout(overviewModelLayout);
 
-    // Initialize base layout
+
+    // Initialize overview layout
     overviewLayout = new QVBoxLayout();
     overviewLayout->addStretch();
     overviewLayout->addLayout(visualLayout);
@@ -111,6 +112,36 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     overviewLayout->addSpacing(20);
     overviewLayout->addLayout(robotPositionLayout);
     overviewLayout->addStretch();
+
+    // Vision layout widgets
+    QHBoxLayout* visionLayout;
+    QVBoxLayout* visionControls;
+    QButtonGroup* visionStageGroup;
+    QRadioButton* visionInput;
+    QRadioButton* visionBlurred;
+    QRadioButton* visionThreshold;
+    QRadioButton* visionContours;
+    QRadioButton* visionFiducials;
+    QCheckBox* boundingBox;
+    QCheckBox* fiducialInfo;
+    QCheckBox* cubeInfo;
+    QSpinBox* worldPointXPos;
+    QSpinBox* worldPointYPos;
+    QSpinBox* worldPointZPos;
+    QPushButton* projectWorldPoint;
+
+    // Model layout widgets
+    QHBoxLayout* modelLayout;
+    QVBoxLayout* modelControls;
+    QButtonGroup* modelInputGroup;
+    QRadioButton* showBuildModel;
+    QRadioButton* showWorldModel;
+
+    // Initialize base layout
+    baseLayout = new QStackedLayout();
+    baseLayout->addItem(overviewLayout);
+    baseLayout->addItem(visionLayout);
+    baseLayout->addItem(modelLayout);
 
     setLayout(overviewLayout);
 
