@@ -16,10 +16,6 @@ int fiducialHeight = 128;
 std::vector<cv::Point> fiducialSamplePoints;
 
 // Bounding box parameters
-int left = 480;
-int right = 1360;
-int top = 150;
-int bottom = 950;
 bool showCoords = true;
 double areaThreshold = 1300;
 
@@ -47,6 +43,12 @@ Vision::Vision(QObject* parent) : QObject(parent)
     // Initialize camera matrix and distortion coefficients
     cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
     distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
+
+    // Initialize coordinates of bounding box for computer vision consideration in world coordinates
+    boundingBoxCorners[0] = cv::Point3i(-100, -100, 0);
+    boundingBoxCorners[1] = cv::Point3i(1115, -100, 0);
+    boundingBoxCorners[2] = cv::Point3i(1115, 1225, 0);
+    boundingBoxCorners[3] = cv::Point3i(-100, 1225, 0);
 }
 
 void Vision::calibrate(const cv::Mat& calibrationImage)
@@ -159,6 +161,26 @@ void Vision::plotFiducialInfo(cv::Mat& image)
     cv::Point3i worldPoint = cv::Point3i(500, 0, -384);
     cv::Point imagePoint = projectWorldPoint(worldPoint);
     circle(image, imagePoint, 4, cv::Scalar(0, 0, 255), -1, cv::LINE_AA);
+}
+
+void Vision::plotBoundingBox(cv::Mat& image)
+{
+    // Project bounding box world coordinates to image coordinates
+    cv::Point imageCoordinatesL[4]; // Lower bounding box
+    cv::Point imageCoordinatesH[4]; // Upper bounding box
+    for (int i = 0; i < 4; ++i)
+    {
+        imageCoordinatesL[i] = projectWorldPoint(boundingBoxCorners[i]);
+        imageCoordinatesH[i] = projectWorldPoint(boundingBoxCorners[i] + cv::Point3i(0, 0, 7 * -64));
+    }
+
+    // Plot bounding box
+    for (int i = 0; i < 4; ++i) 
+    {
+        cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+        cv::line(image, imageCoordinatesH[i], imageCoordinatesH[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+        cv::line(image, imageCoordinatesL[i], imageCoordinatesH[i], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+    }
 }
 
 cv::Point Vision::getCentroid(const std::vector<cv::Point>& contour) const
@@ -337,38 +359,3 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 
 	return imagePoint;
 }
-
-//// Draw image box
-//cv::Scalar color(255, 255, 0);
-//int left = 15, top = 15, right = 112, bottom = 112;
-//cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
-//int thickness = 1;
-
-//// Line drawn using 8 connected
-//// Bresenham algorithm
-//line(temp, tl, tr, color, thickness, cv::LINE_8);
-//line(temp, tr, br, color, thickness, cv::LINE_8);
-//line(temp, br, bl, color, thickness, cv::LINE_8);
-//line(temp, bl, tl, color, thickness, cv::LINE_8);
-//line(temp, cv::Point2d(left, top + 32), cv::Point2d(right, top + 32), color, thickness, cv::LINE_8);
-//line(temp, cv::Point2d(left, top + 64), cv::Point2d(right, top + 64), color, thickness, cv::LINE_8);
-//line(temp, cv::Point2d(left + 32, bottom), cv::Point2d(left + 32, top), color, thickness, cv::LINE_8);
-//line(temp, cv::Point2d(left + 64, bottom), cv::Point2d(left + 64, top), color, thickness, cv::LINE_8);
-
-//for (int j = 0; j < 9; ++j)
-//    circle(temp, fiducialSamplePoints[j], 2, cv::Scalar(255, 255, 255), -1, cv::LINE_AA);
-
-//// Draw image box
-//cv::Scalar color(255, 255, 0);
-//cv::Point tl(left, top), bl(left, bottom), tr(right, top), br(right, bottom);
-//int thickness = 2;
-
-//// Line drawn using 8 connected
-//// Bresenham algorithm
-//line(image, tl, tr, color, thickness, cv::LINE_8);
-//line(image, tr, br, color, thickness, cv::LINE_8);
-//line(image, br, bl, color, thickness, cv::LINE_8);
-//line(image, bl, tl, color, thickness, cv::LINE_8);
-
-// Process contours of significant size in bounding box 
-//if (centroid.x > left && centroid.x < right && centroid.y > top && centroid.y < bottom && area > areaThreshold)

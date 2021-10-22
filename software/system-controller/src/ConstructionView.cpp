@@ -219,6 +219,7 @@ void ConstructionView::updateCameraFeed()
     Vision vision;
     vision.calibrate(input);
     vision.plotFiducialInfo(output);
+    //vision.plotBoundingBox(output);
 
     cv::resize(output, output, cv::Size(), 0.75, 0.75);
     //cv::imwrite("output1.jpg", output);

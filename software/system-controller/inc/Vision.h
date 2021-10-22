@@ -16,6 +16,9 @@ public:
 	*/
 	Vision(QObject* parent = Q_NULLPTR);
 
+	/*!
+	* Initialize vision system extrinsic rotation and translation matrices through the use of reference fiducials.
+	*/
 	void calibrate(const cv::Mat& image);
 
 	/*!
@@ -23,6 +26,18 @@ public:
 	* \param [in] image Image to add fiducial information to.
 	*/
 	void plotFiducialInfo(cv::Mat& image);
+
+	/*!
+	* Annotate image with cube information.
+	* \param [in] image Image to add cube information to.
+	*/
+	void plotCubeInfo(cv::Mat& image);
+
+	/*!
+	* Annotate image with the computer vision bounding box.
+	* \param [in] image Image to add bounding box to.
+	*/
+	void plotBoundingBox(cv::Mat& image);
 
 	/*!
 	* Compute the corresponding world point given an image point and the Z coordinate of the world point.
@@ -67,6 +82,7 @@ private:
 		std::vector<cv::Point> corners; /*! Set of four corners of the cube top-face in an anti-clockwise direction */
 	};
 
+	// Intrinsic camera parameters
 	double fx = 696.2920653066839 * 2; /*! Camera x-axis focal length */
 	double fy = 696.1538823160478 * 2; /*! Camera y-axis focal length */
 	double cx = 469.7644569362635 * 2; /*! Camera principal point x-coordinate */
@@ -80,6 +96,7 @@ private:
 	std::vector<CubeContour> cubeContours;  /*! Set of cube contours in the image frame */
 	QMap<int, cv::Point3i> fiducialWorldPoints; /*! Position in the world frame of each fiducial used */
 	bool calibrated = false; /*! Flag to indicate if the vision system has been calibrated with a valid extrinsic matrix */
+	cv::Point3i boundingBoxCorners[4]; /*! Coordinates of bounding box corners for computer vision system in the world frame */
 
 	/*!
 	* Get the contour centroid.
