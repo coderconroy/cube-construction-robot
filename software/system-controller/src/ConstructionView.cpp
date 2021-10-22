@@ -20,6 +20,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     overviewCameraFeed = new QLabel();
 
     // Initialize general robot controls
+    showVisionView = new QPushButton("Show Vision View");
+    showModelView = new QPushButton("Show Model View");
     loadModel = new QPushButton("Load Model");
     execute = new QPushButton("Start Construction");
     sleepRobot = new QPushButton("Sleep");
@@ -29,6 +31,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     actuateRobotActuator = new QPushButton("Actuator->Actuate");
     releaseRobotActuator = new QPushButton("Actuator->Release");
 
+    connect(showVisionView, &QPushButton::clicked, this, &ConstructionView::showVisionViewClicked);
+    connect(showModelView, &QPushButton::clicked, this, &ConstructionView::showModelViewClicked);
     connect(loadModel, &QPushButton::clicked, this, &ConstructionView::loadModelClicked);
     connect(execute, &QPushButton::clicked, this, &ConstructionView::executeConstruction);
     connect(sleepRobot, &QPushButton::clicked, this, &ConstructionView::sleepRobotClicked);
@@ -40,6 +44,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     robotControlLayout = new QHBoxLayout();
     robotControlLayout->addStretch();
+    robotControlLayout->addWidget(showVisionView);
+    robotControlLayout->addWidget(showModelView);
     robotControlLayout->addWidget(loadModel);
     robotControlLayout->addWidget(execute);
     robotControlLayout->addWidget(sleepRobot);
@@ -132,8 +138,14 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionStageGroup->addButton(visionContours);
     visionStageGroup->addButton(visionFiducials);
 
+    worldPointXPos->setMaximumWidth(100);
+    worldPointYPos->setMaximumWidth(100);
+    worldPointZPos->setMaximumWidth(100);
+    projectWorldPoint->setMaximumWidth(100);
+
     // Initialize comptuer vision controls layout
     visionControls = new QVBoxLayout();
+    visionControls->addStretch();
     visionControls->addWidget(visionInput);
     visionControls->addWidget(visionBlurred);
     visionControls->addWidget(visionThreshold);
@@ -146,14 +158,15 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionControls->addWidget(worldPointYPos);
     visionControls->addWidget(worldPointZPos);
     visionControls->addWidget(projectWorldPoint);
+    visionControls->addStretch();
 
     // Initialize computer vision visual
-    visionVisual = new QStackedLayout();
+    visionImage = new QLabel();
 
     // Initialize computer vision layout
     visionLayout = new QHBoxLayout();
     visionLayout->addLayout(visionControls);
-    visionLayout->addLayout(visionVisual);
+    visionLayout->addWidget(visionImage);
 
     visionWidget = new QWidget();
     visionWidget->setLayout(visionLayout);
@@ -225,30 +238,54 @@ void ConstructionView::updateShapeView()
 
 void ConstructionView::updateCameraFeed()
 {
+    QLabel* display;
+    float scaleFactor;
     if (baseLayout->currentWidget() == overviewWidget)
     {
-        // Capture frame from camera
-        cv::Mat input;
-        *camera >> input;
-
-        cv::Mat output;
-        input.copyTo(output);
-
-        Vision vision;
-        vision.calibrate(input);
-        vision.processScene(input);
-        vision.plotBoundingBox(output);
-        vision.plotFiducialInfo(output);
-        vision.plotCubeInfo(output);
-
-        cv::resize(output, output, cv::Size(), 0.5, 0.5);
-        //cv::imwrite("output1.jpg", output);
-
-        // Display image in camera feed
-        cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
-        QImage cameraFeedImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
-        overviewCameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));
+        display = overviewCameraFeed;
+        scaleFactor = 0.4;
     }
+    else if (baseLayout->currentWidget() == visionWidget)
+    {
+        display = visionImage;
+        scaleFactor = 0.8;
+    }
+    else
+    {
+        return;
+    }
+
+    // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+
+    cv::Mat output;
+    input.copyTo(output);
+
+    Vision vision;
+    vision.calibrate(input);
+    vision.processScene(input);
+    vision.plotBoundingBox(output);
+    vision.plotFiducialInfo(output);
+    vision.plotCubeInfo(output);
+
+    cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
+    //cv::imwrite("output1.jpg", output);
+
+    // Display image
+    cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
+    QImage outputImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
+    display->setPixmap(QPixmap::fromImage(outputImage));
+}
+
+void ConstructionView::showVisionViewClicked()
+{
+    baseLayout->setCurrentWidget(visionWidget);
+}
+
+void ConstructionView::showModelViewClicked()
+{
+    baseLayout->setCurrentWidget(modelWidget);
 }
 
 void ConstructionView::loadModelClicked()

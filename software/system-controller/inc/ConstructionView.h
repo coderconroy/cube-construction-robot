@@ -66,8 +66,10 @@ private:
     QVBoxLayout* overviewModelLayout; /*! Layout for 3D model view and supplementary widgets on the overview page */
     QLabel* overviewCameraFeed; /*! Display live images captured by camera */
 
-    QPushButton* loadModel; /* Load model to be constructed into the cube world model from JSON file */
-    QPushButton* execute; /* Initiate construction of cube world model */
+    QPushButton* showVisionView; /*! Show detailed computer vision view */
+    QPushButton* showModelView; /*! Show detailed model view */
+    QPushButton* loadModel; /*! Load model to be constructed into the cube world model from JSON file */
+    QPushButton* execute; /*! Initiate construction of cube world model */
     QList<CubeTask*> cubeTasks; /*! List of cube tasks to be completed for the current construction task */
 
     OpenGLView* shapeView; /*! OpenGL render of 3D shape to be constructed */
@@ -99,7 +101,6 @@ private:
     QWidget* visionWidget; /*! Widget for vision layout */
     QHBoxLayout* visionLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* visionControls; /*! Layout for the control widgets used to configure the computer vision display */
-    QStackedLayout* visionVisual; /*! Layout for the computer vision visual display component */
     QButtonGroup* visionStageGroup; /*! Radio button group for computer vision stage selection radio buttons */
     QRadioButton* visionInput; /*! Display computer vision image raw camera input */
     QRadioButton* visionBlurred; /*! Display computer vision image after blur and grayscale stages */
@@ -113,6 +114,7 @@ private:
     QSpinBox* worldPointYPos; /*! Y coordinate of world point to project to image frame */
     QSpinBox* worldPointZPos; /*! Z coordinate of world point to project to image frame */
     QPushButton* projectWorldPoint; /*! Project specified world point to the image frame */
+    QLabel* visionImage; /*! Display computer vision images */
 
     // Model layout widgets
     QWidget* modelWidget; /*! Widget for model layout */
@@ -132,6 +134,16 @@ private:
     * Request OpenGL redraw the shape view.
     */
     void updateShapeView();
+
+    /*!
+    * Show computer vision view.
+    */
+    void showVisionViewClicked();
+
+    /*!
+    * Show cube world model view.
+    */
+    void showModelViewClicked();
 
     /*!
     * Load cube world model from file.
