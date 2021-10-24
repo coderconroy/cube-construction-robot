@@ -138,6 +138,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionStageGroup->addButton(visionContours);
     visionStageGroup->addButton(visionFiducials);
 
+    visionInput->setChecked(true);
+
     worldPointXPos->setMaximumWidth(100);
     worldPointYPos->setMaximumWidth(100);
     worldPointZPos->setMaximumWidth(100);
@@ -259,18 +261,43 @@ void ConstructionView::updateCameraFeed()
     cv::Mat input;
     *camera >> input;
 
-    cv::Mat output;
-    input.copyTo(output);
-
+    // Process input
     Vision vision;
     vision.calibrate(input);
     vision.processScene(input);
-    vision.plotBoundingBox(output);
-    vision.plotFiducialInfo(output);
-    vision.plotCubeInfo(output);
 
+    // Select image to display based on user vision stage selection
+    cv::Mat output;
+    if (visionInput->isChecked())
+    {
+        input.copyTo(output);
+        if (boundingBox->isChecked())
+            vision.plotBoundingBox(output);
+        if (fiducialInfo->isChecked())
+            vision.plotFiducialInfo(output);
+        if (cubeInfo->isChecked())
+            vision.plotCubeInfo(output);
+    }
+    else if (visionBlurred->isChecked())
+    {
+        output = vision.getBlurredImage();
+    }
+    else if (visionThreshold->isChecked())
+    {
+        output = vision.getThresholdedImage();
+    }
+    else if (visionContours->isChecked())
+    {
+        output = vision.getContourImage();
+    }
+    else if (visionFiducials->isChecked())
+    {
+        if (vision.getFiducialImages().size() > 0)
+            output = vision.getFiducialImages()[0];
+    }
+
+    // Resize image for display label
     cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
-    //cv::imwrite("output1.jpg", output);
 
     // Display image
     cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
@@ -314,12 +341,18 @@ void ConstructionView::loadModelClicked()
     }
 }
 
-const int numCubes = 17;
-int xSrc[numCubes] = { 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873, 810, 747, 683, 620, 1000, 937, 873 };
-int ySrc[numCubes] = { 1110, 1110, 1110, 1109, 1109, 1109, 1109, 1046, 1046, 1046, 1045, 1045, 1045, 1045, 983, 983, 983 };
-int zSrc[numCubes] = { 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180, 180 };
-int xOffset = 500;
-int yOffset = 500;
+const int numCubes = 30;
+int xSrc[numCubes] = {825, 762, 699, 635, 572, 509, 446, 383, 320, 256, 193, 130,
+                      825, 762, 699, 635, 572, 509, 446, 383, 320, 256, 193, 130,
+                      825, 762, 699, 635, 572, 509};
+int ySrc[numCubes] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                      63, 63, 63, 63, 63, 63, 63, 63 ,63, 63, 63, 63,
+                      127, 127, 127, 127, 127, 127};
+int zSrc[numCubes] = {160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
+                      160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
+                      160, 160, 160, 160, 160, 160, 160, 160, 160, 160};
+int xOffset = 700;
+int yOffset = 1000;
 int cubeHeight = 318; // Vertical steps
 int cubeSideLength = 100;  // Horizontal steps
 
@@ -329,9 +362,47 @@ void ConstructionView::executeConstruction()
         delete cubeTasks[i];
     cubeTasks.clear();
 
-    // TODO: Sort cubes
+    // Copy list and sort cubes by z, x, y values respectively
+    QList<Cube*> cubes;
     for (int i = 0; i < cubeWorldModel->getCubeCount(); ++i) {
         Cube* cube = cubeWorldModel->getCubes()->at(i);
+        bool inserted = false;
+        for (int j = 0; j < cubes.size(); ++j)
+        {
+            int xCube = round(cube->getPosition().x);
+            int yCube = round(cube->getPosition().y);
+            int zCube = round(cube->getPosition().z);
+
+            int xList = round(cubes[j]->getPosition().x);
+            int yList = round(cubes[j]->getPosition().y);
+            int zList = round(cubes[j]->getPosition().z);
+                
+            if (yCube < yList)
+            {
+                cubes.insert(j, cube);
+                inserted = true;
+                break;
+            }
+            else if (yCube == yList && zCube > zList)
+            {
+                cubes.insert(j, cube);
+                inserted = true;
+                break;
+            }
+            else if (yCube == yList && zCube == zList && xCube < xList)
+            {
+                cubes.insert(j, cube);
+                inserted = true;
+                break;
+            }
+        }
+        if (inserted == false)
+            cubes.append(cube);
+    }
+
+    // Generate cube tasks
+    for (int i = 0; i < cubes.size(); ++i) {
+        Cube* cube = cubes[i];
         glm::vec3 destPos = cube->getPosition();
         int zRotation = glm::degrees(cube->getPitch()) / 1.8;
 
@@ -341,7 +412,9 @@ void ConstructionView::executeConstruction()
         cubeTasks.append(task);
     }
 
-    cubeTasks.first()->performNextStep(robot);
+    // Execute first task
+    if (cubeTasks.size() > 0)
+        cubeTasks.first()->performNextStep(robot);
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -357,7 +430,8 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
 
 void ConstructionView::sleepRobotClicked()
 {
-    robot->sleep();
+    //robot->sleep();
+    robot->requestPressureReading();
 }
 
 void ConstructionView::wakeRobotClicked()

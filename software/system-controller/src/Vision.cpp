@@ -139,15 +139,28 @@ void Vision::calibrate(const cv::Mat& calibrationImage)
 
 void Vision::processScene(const cv::Mat& image)
 {
+    // Reset stage images
+    fiducialImages.clear();
+
     // Process image
     cv::Mat processImage;
+
+    // Convert to grayscale and blur
     cv::cvtColor(image, processImage, cv::COLOR_BGR2GRAY);
     cv::blur(processImage, processImage, cv::Size(blurSize + 1, blurSize + 1));
+    processImage.copyTo(blurredImage);
+
+    // Apply binary threshold to image
     cv::threshold(processImage, processImage, thresh, maxThresh, cv::THRESH_BINARY);
+    processImage.copyTo(thresholdImage);
 
     // Apply contour detection
     std::vector<std::vector<cv::Point>> contours;
     cv::findContours(processImage, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+    // Plot contours for contour image
+    cv::cvtColor(processImage, contourImage, cv::COLOR_GRAY2BGR);
+    cv::drawContours(contourImage, contours, -1, cv::Scalar(0, 255, 0), 4);
 
     // Process contours for cubes and fiducials
     for (int i = 0; i < contours.size(); i++)
@@ -185,6 +198,8 @@ void Vision::processScene(const cv::Mat& image)
                 fiducial.corners = corners;
                 fiducial.homographyMatrix = homographyMatrix;
                 fiducialContours.push_back(fiducial);
+
+                fiducialImages.push_back(isolatedImage);
             }
             // Assume contour is cube and add to cube contour list
             // TODO: Add further checks to confirm cube nature
@@ -506,4 +521,24 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 	cv::Point2d imagePoint = cv::Point2d(imagePointMat.at<double>(0) / s, imagePointMat.at<double>(1) / s);
 
 	return imagePoint;
+}
+
+cv::Mat Vision::getBlurredImage()
+{
+    return blurredImage;
+}
+
+cv::Mat Vision::getThresholdedImage()
+{
+    return thresholdImage;
+}
+
+cv::Mat Vision::getContourImage()
+{
+    return contourImage;
+}
+
+std::vector<cv::Mat> Vision::getFiducialImages()
+{
+    return fiducialImages;
 }

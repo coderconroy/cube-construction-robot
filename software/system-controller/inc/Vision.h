@@ -61,6 +61,30 @@ public:
 	*/
 	cv::Point projectWorldPoint(const cv::Point3d& worldPoint) const;
 
+	/*!
+	* Getter for image after the grayscale and blur stage of processing.
+	* \return Image after grayscale conversion and blur.
+	*/
+	cv::Mat getBlurredImage();
+
+	/*!
+	* Getter for image after the thresholding stage of processing.
+	* \return Image after thresholding.
+	*/
+	cv::Mat getThresholdedImage();
+
+	/*!
+	* Getter for image after the contour detection stage of processing.
+	* \return Image after contour detection with contours plotted.
+	*/
+	cv::Mat getContourImage();
+
+	/*!
+	* Getter for the isolated fiducial images.
+	* \return List of isolated fiducial images.
+	*/
+	std::vector<cv::Mat> getFiducialImages();
+
 signals:
 	/*!
 	* Generated when a message is logged by an \class Vision instance.
@@ -105,6 +129,11 @@ private:
 	QMap<int, cv::Point3i> fiducialWorldPoints; /*! Position in the world frame of each fiducial used */
 	bool calibrated = false; /*! Flag to indicate if the vision system has been calibrated with a valid extrinsic matrix */
 	cv::Point3i boundingBoxCorners[4]; /*! Coordinates of bounding box corners for computer vision system in the world frame */
+
+	cv::Mat blurredImage; /*! image after the grayscale and blur stage of processing */
+	cv::Mat thresholdImage; /*! Image after the thresholding stage of processing */
+	cv::Mat contourImage; /*! Image after the contour detection stage of processing */
+	std::vector<cv::Mat> fiducialImages; /*! Isolated fiducial images */
 
 	/*!
 	* Get the contour centroid.

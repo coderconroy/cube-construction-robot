@@ -92,6 +92,16 @@ void Robot::resetGripper()
     transmitPacket(packet);
 }
 
+void Robot::requestPressureReading()
+{
+    // Form packet
+    Packet packet;
+    packet.setControl(6);
+
+    // Transmit packet
+    transmitPacket(packet);
+}
+
 void Robot::transmitPacket(const Packet &packet)
 {
     char buffer[9];
@@ -115,16 +125,19 @@ void Robot::serialDataReceived()
     {
         QByteArray data = port->read(9);
         Packet packet;
-        packet.setControl(data[0]);
-        packet.setDataWord(0, data[1] | (data[2] << 8));
-        packet.setDataWord(1, data[3] | (data[4] << 8));
-        packet.setDataWord(2, data[5] | (data[6] << 8));
-        packet.setDataWord(3, data[7] | (data[8] << 8));
+        packet.setControl((uint8_t) data[0]);
+        packet.setDataWord(0, (uint8_t) data[1] | ((uint8_t) data[2] << 8));
+        packet.setDataWord(1, (uint8_t) data[3] | ((uint8_t) data[4] << 8));
+        packet.setDataWord(2, (uint8_t) data[5] | ((uint8_t) data[6] << 8));
+        packet.setDataWord(3, (uint8_t) data[7] | ((uint8_t) data[8] << 8));
 
         switch (packet.getControl())
         {
         case 0x1:
             emit commandCompleted();
+            break;
+        case 0x6:
+            emit log(Message(MessageType::INFO_LOG, "Robot", QString::number(packet.getDataWord(0))));
             break;
         }
     }

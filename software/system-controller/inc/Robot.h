@@ -66,6 +66,11 @@ public:
 	void resetGripper();
 
 	/*!
+	* Request the internal pressure reading of the vacuum system. The robot will transmit a packet containing pressure sensor reading in response.
+	*/
+	void requestPressureReading();
+
+	/*!
 	* Pause briefly before continuing with next action
 	*/
 	void delay();

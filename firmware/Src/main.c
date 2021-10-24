@@ -28,7 +28,8 @@ int main(void)
 
 	while(1)
 	{
-		delay(1000);
+//		delay(1000000);
+//		ADC1->CR |= ADC_CR_ADSTART;
 		if (usart_packets_available() >0)
 		{
 			usart_receive_packet(&rx_packet);
@@ -68,6 +69,10 @@ int main(void)
 			case 0x5:
 				delay(2000000);
 				usart_transmit_packet(&tx_packet_complete);
+				break;
+			case 0x6:
+				// Trigger ADC conversion to read the vacuum system internal pressure
+				ADC1->CR |= ADC_CR_ADSTART;
 				break;
 			}
 		}
@@ -283,7 +288,13 @@ void ADC_COMP_IRQHandler()
 	if ((ADC1->ISR & ADC_ISR_EOC) == ADC_ISR_EOC)
 	{
 		value = ADC1->DR; // Read ADC (clears EOC interrupt flag)
-//		usart_transmit((uint8_t*) &value, 2);
+		packet_t tx_packet;
+		tx_packet.control = 0x6;
+		tx_packet.data[0] = value;
+		tx_packet.data[1] = 0x0;
+		tx_packet.data[2] = 0x0;
+		tx_packet.data[3] = 0x0;
+		usart_transmit_packet(&tx_packet);
 	}
 }
 
