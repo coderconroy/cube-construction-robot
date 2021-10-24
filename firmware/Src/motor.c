@@ -1,5 +1,23 @@
 #include "motor.h"
 #include "math.h"
+#include <stdlib.h>
+
+// Acceleration parameter defines
+#define X_ACC_MIN_PERIOD 49
+#define Y_ACC_MIN_PERIOD 99
+#define Z_ACC_MIN_PERIOD 29
+
+#define X_ACC_PERIOD_FULL_STEPS 50
+#define Y_ACC_PERIOD_FULL_STEPS 50
+#define Z_ACC_PERIOD_FULL_STEPS 50
+
+#define X_ACC_UPDATE_PERIOD 32
+#define Y_ACC_UPDATE_PERIOD 16
+#define Z_ACC_UPDATE_PERIOD 32
+
+#define X_ACC_PERIODS_SIZE (X_ACC_PERIOD_FULL_STEPS * X_STEP_MODE / X_ACC_UPDATE_PERIOD + 1)
+#define Y_ACC_PERIODS_SIZE (Y_ACC_PERIOD_FULL_STEPS * Y_STEP_MODE / Y_ACC_UPDATE_PERIOD + 1)
+#define Z_ACC_PERIODS_SIZE (Z_ACC_PERIOD_FULL_STEPS * Z_STEP_MODE / Z_ACC_UPDATE_PERIOD + 1)
 
 // State variables
 motor_sys_state_t system_state;
@@ -16,11 +34,28 @@ int y_pos;
 int z_pos;
 int r_pos;
 
+// Starting step position for each axis for current move (step size defined by the axis step mode)
+int x_start_pos;
+int y_start_pos;
+int z_start_pos;
+int r_start_pos;
+
 // Target step position for each axis (step size defined by the axis step mode)
 int x_target_pos;
 int y_target_pos;
 int z_target_pos;
 int r_target_pos;
+
+// Motor directions
+gpio_pin_state_t x_direction;
+gpio_pin_state_t y_direction;
+gpio_pin_state_t z_direction;
+gpio_pin_state_t r_direction;
+
+// Acceleration curve timer period lookup tables
+uint16_t y_acc_periods[Y_ACC_PERIODS_SIZE];
+uint16_t x_acc_periods[X_ACC_PERIODS_SIZE];
+uint16_t z_acc_periods[Z_ACC_PERIODS_SIZE];
 
 // Motor calibration enable flags
 bool x_cal_enable = false;
@@ -66,6 +101,27 @@ void initialize_motor()
 	gpio_pin_set(Y_MOT_RESET_GPIO_Port, Y_MOT_RESET_Pin);
 	gpio_pin_set(Z_MOT_RESET_GPIO_Port, Z_MOT_RESET_Pin);
 	gpio_pin_set(R_MOT_RESET_GPIO_Port, R_MOT_RESET_Pin);
+
+	// Initialize motor acceleration curves
+	float min_velocity_frac = 0.1;
+
+	for (int i = 0; i < Y_ACC_PERIODS_SIZE; i++)
+	{
+		float velocity = ((float) i / (Y_ACC_PERIOD_FULL_STEPS * Y_STEP_MODE / Y_ACC_UPDATE_PERIOD) + min_velocity_frac) / Y_ACC_MIN_PERIOD / (1 + min_velocity_frac);
+		y_acc_periods[i] = 1 / velocity;
+	}
+
+	for (int i = 0; i < X_ACC_PERIODS_SIZE; i++)
+	{
+		float velocity = ((float) i / (X_ACC_PERIOD_FULL_STEPS * X_STEP_MODE / X_ACC_UPDATE_PERIOD) + min_velocity_frac) / X_ACC_MIN_PERIOD / (1 + min_velocity_frac);
+		x_acc_periods[i] = 1 / velocity;
+	}
+
+	for (int i = 0; i < Z_ACC_PERIODS_SIZE; i++)
+	{
+		float velocity = ((float) i / (Z_ACC_PERIOD_FULL_STEPS * Z_STEP_MODE / Z_ACC_UPDATE_PERIOD) + min_velocity_frac) / Z_ACC_MIN_PERIOD / (1 + min_velocity_frac);
+		z_acc_periods[i] = 1 / velocity;
+	}
 }
 
 void motor_wake_all()
@@ -94,6 +150,12 @@ void motor_calibrate()
 	// Initialize state
 	system_state = CALIBRATE;
 	motor_wake_all(); // Enable all motors
+
+	// Initialize calibration velocities by setting the timer auto-reload register values
+	TIM6->ARR = (uint16_t) 199;
+	TIM7->ARR = (uint16_t) 399;
+	TIM21->ARR = (uint16_t) 99;
+	TIM22->ARR = (uint16_t) 199;
 
 	// Disable R motor to release rotational tension on the vacuum tube
 	gpio_pin_write(R_MOT_SLEEP_GPIO_Port, R_MOT_SLEEP_Pin, GPIO_PIN_LOW);
@@ -234,19 +296,12 @@ void motor_x_execute_step()
 		// Update position
 		if (x_pos != x_target_pos)
 		{
-			// Update direction
-			if (x_pos < x_target_pos)
-				gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_RIGHT);
-			else if (x_pos > x_target_pos)
-				gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
-
 			gpio_pin_state_t step = gpio_output_pin_read(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
-			gpio_pin_state_t direction = gpio_output_pin_read(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin);
 
 			// Update position count if falling edge
 			if (step == GPIO_PIN_HIGH)
 			{
-				if (direction == X_LEFT)
+				if (x_direction == X_LEFT)
 					x_pos--;
 				else
 					x_pos++;
@@ -254,6 +309,25 @@ void motor_x_execute_step()
 
 			// Execute step
 			gpio_pin_toggle(X_MOT_STEP_GPIO_Port, X_MOT_STEP_Pin);
+
+			// Update speed
+			if (x_pos % 32 == 0)
+			{
+				int x_steps_remain = abs(x_target_pos - x_pos);
+				int x_steps_complete = abs(x_start_pos - x_pos);
+
+				if (x_steps_complete < x_steps_remain)
+				{
+					if (x_steps_complete <= X_ACC_PERIOD_FULL_STEPS * X_STEP_MODE)
+						TIM6->ARR = x_acc_periods[x_steps_complete / X_ACC_UPDATE_PERIOD];
+				}
+				// Deceleration phase
+				else
+				{
+					if (x_steps_remain <= X_ACC_PERIOD_FULL_STEPS * X_STEP_MODE)
+						TIM6->ARR = x_acc_periods[x_steps_remain / X_ACC_UPDATE_PERIOD];
+				}
+			}
 
 			// Initiate RUN state review when target position is reached
 			if (x_pos == x_target_pos)
@@ -283,19 +357,12 @@ void motor_y_execute_step()
 		// Update position
 		if (y_pos != y_target_pos)
 		{
-			// Update direction
-			if (y_pos < y_target_pos)
-				gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_FORWARD);
-			else if (y_pos > y_target_pos)
-				gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
-
 			gpio_pin_state_t step = gpio_output_pin_read(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
-			gpio_pin_state_t direction = gpio_output_pin_read(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin);
 
 			// Update position count if falling edge
 			if (step == GPIO_PIN_HIGH)
 			{
-				if (direction == Y_BACKWARD)
+				if (y_direction == Y_BACKWARD)
 					y_pos--;
 				else
 					y_pos++;
@@ -304,9 +371,28 @@ void motor_y_execute_step()
 			// Execute step
 			gpio_pin_toggle(Y_MOT_STEP_GPIO_Port, Y_MOT_STEP_Pin);
 
-			// Initiate RUN state review when target position is reached
-			if (y_pos == y_target_pos)
-				update_run_state();
+			// Update speed
+			if (y_pos % 16 == 0)
+			{
+				int y_steps_remain = abs(y_target_pos - y_pos);
+				int y_steps_complete = abs(y_start_pos - y_pos);
+
+				if (y_steps_complete < y_steps_remain)
+				{
+					if (y_steps_complete <= Y_ACC_PERIOD_FULL_STEPS * Y_STEP_MODE)
+						TIM7->ARR = y_acc_periods[y_steps_complete / Y_ACC_UPDATE_PERIOD];
+				}
+				// Deceleration phase
+				else
+				{
+					if (y_steps_remain <= Y_ACC_PERIOD_FULL_STEPS * Y_STEP_MODE)
+						TIM7->ARR = y_acc_periods[y_steps_remain / Y_ACC_UPDATE_PERIOD];
+				}
+
+				// Initiate RUN state review when target position is reached
+				if (y_pos == y_target_pos)
+					update_run_state();
+			}
 		}
 	}
 }
@@ -332,19 +418,12 @@ void motor_z_execute_step()
 		// Update position
 		if (z_pos != z_target_pos)
 		{
-			// Update direction
-			if (z_pos < z_target_pos)
-				gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_UP);
-			else if (z_pos > z_target_pos)
-				gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
-
 			gpio_pin_state_t step = gpio_output_pin_read(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);
-			gpio_pin_state_t direction = gpio_output_pin_read(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin);
 
 			// Update position count if falling edge
 			if (step == GPIO_PIN_HIGH)
 			{
-				if (direction == Z_DOWN)
+				if (z_direction == Z_DOWN)
 					z_pos--;
 				else
 					z_pos++;
@@ -353,9 +432,28 @@ void motor_z_execute_step()
 			// Execute step
 			gpio_pin_toggle(Z_MOT_STEP_GPIO_Port, Z_MOT_STEP_Pin);
 
-			// Initiate RUN state review when target position is reached
-			if (z_pos == z_target_pos)
-				update_run_state();
+			// Update speed
+			if (z_pos % 32 == 0)
+			{
+				int z_steps_remain = abs(z_target_pos - z_pos);
+				int z_steps_complete = abs(z_start_pos - z_pos);
+
+				if (z_steps_complete < z_steps_remain)
+				{
+					if (z_steps_complete <= Z_ACC_PERIOD_FULL_STEPS * Z_STEP_MODE)
+						TIM21->ARR = z_acc_periods[z_steps_complete / Z_ACC_UPDATE_PERIOD];
+				}
+				// Deceleration phase
+				else
+				{
+					if (z_steps_remain <= Z_ACC_PERIOD_FULL_STEPS * Z_STEP_MODE)
+						TIM21->ARR = z_acc_periods[z_steps_remain / Z_ACC_UPDATE_PERIOD];
+				}
+
+				// Initiate RUN state review when target position is reached
+				if (z_pos == z_target_pos)
+					update_run_state();
+			}
 		}
 	}
 }
@@ -367,12 +465,6 @@ void motor_r_execute_step()
 		// Update position
 		if (r_pos != r_target_pos)
 		{
-			// Update direction
-			if (r_pos < r_target_pos)
-				gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
-			else if (r_pos > r_target_pos)
-				gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
-
 			gpio_pin_state_t step = gpio_output_pin_read(R_MOT_STEP_GPIO_Port, R_MOT_STEP_Pin);
 			gpio_pin_state_t direction = gpio_output_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
 
@@ -404,6 +496,38 @@ void motor_run()
 	// Check if any motors need to move to their targets
 	if ((x_pos == x_target_pos) && (y_pos == y_target_pos) && (z_pos == z_target_pos) && (r_pos == r_target_pos))
 		return;
+
+	// Initialize motor directions
+	if (x_pos < x_target_pos)
+		gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_RIGHT);
+	else if (x_pos > x_target_pos)
+		gpio_pin_write(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin, X_LEFT);
+
+	if (y_pos < y_target_pos)
+		gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_FORWARD);
+	else if (y_pos > y_target_pos)
+		gpio_pin_write(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin, Y_BACKWARD);
+
+	if (z_pos < z_target_pos)
+		gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_UP);
+	else if (z_pos > z_target_pos)
+		gpio_pin_write(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin, Z_DOWN);
+
+	if (r_pos < r_target_pos)
+		gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_CLOCKWISE);
+	else if (r_pos > r_target_pos)
+		gpio_pin_write(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin, R_COUNTERCLOCKWISE);
+
+	x_direction = gpio_output_pin_read(X_MOT_DIR_GPIO_Port, X_MOT_DIR_Pin);
+	y_direction = gpio_output_pin_read(Y_MOT_DIR_GPIO_Port, Y_MOT_DIR_Pin);
+	z_direction = gpio_output_pin_read(Z_MOT_DIR_GPIO_Port, Z_MOT_DIR_Pin);
+	r_direction = gpio_output_pin_read(R_MOT_DIR_GPIO_Port, R_MOT_DIR_Pin);
+
+	// Initialize motor starting positions
+	x_start_pos = x_pos;
+	y_start_pos = y_pos;
+	z_start_pos = z_pos;
+	r_start_pos = r_pos;
 
 	// Initialize state
 	reset_step_outputs();

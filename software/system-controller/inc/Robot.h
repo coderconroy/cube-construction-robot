@@ -49,6 +49,26 @@ public:
 	void setPosition(int xPos, int yPos, int zPos, int rPos);
 
 	/*!
+	* Getter for the x-axis stepper motor position.
+	*/
+	int getXPosition();
+
+	/*!
+	* Getter for the x-axis stepper motor position.
+	*/
+	int getYPosition();
+
+	/*!
+	* Getter for the x-axis stepper motor position.
+	*/
+	int getZPosition();
+
+	/*!
+	* Getter for the x-axis stepper motor position.
+	*/
+	int getRPosition();
+
+	/*!
 	* Set the vacuum actuator to ACTUATE positon. This generates a pressure lower than atmospheric pressure for the suction cup to grip an object.
 	*/
 	void actuateGripper();
@@ -68,7 +88,7 @@ public:
 	/*!
 	* Request the internal pressure reading of the vacuum system. The robot will transmit a packet containing pressure sensor reading in response.
 	*/
-	void requestPressureReading();
+	void requestPressure();
 
 	/*!
 	* Pause briefly before continuing with next action
@@ -88,6 +108,10 @@ signals:
 
 private:
 	QSerialPort* port = Q_NULLPTR; /*! Serial port for communication with robot */
+	int xPos; /*! Robot x-axis motor step position */
+	int yPos; /*! Robot y-axis motor step position */
+	int zPos; /*! Robot z-axis motor step position */
+	int rPos; /*! Robot r-axis motor step position */
 
 	/*!
 	* Transmit the packet over the serial port instance.

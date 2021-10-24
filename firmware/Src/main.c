@@ -1,6 +1,9 @@
 #include "main.h"
 #include "stdbool.h"
 
+// System state variables
+system_state_t sys_state = WAIT;
+
 void delay(uint32_t count)
 {
 	for(uint32_t i = 0; i < count; i++);
@@ -28,53 +31,91 @@ int main(void)
 
 	while(1)
 	{
-//		delay(1000000);
-//		ADC1->CR |= ADC_CR_ADSTART;
-		if (usart_packets_available() >0)
+		// Determine actions based on current system state
+		switch (sys_state)
 		{
-			usart_receive_packet(&rx_packet);
-			switch (rx_packet.control)
+		case WAIT:
+			if (usart_packets_available() >0)
 			{
-			// Calibrate motor system
-			case 0x1:
-				if (rx_packet.data[0] == 0x0)
-					motor_sleep_all();
-				else if (rx_packet.data[0] == 0x1)
-					motor_wake_all();
-				break;
-			case 0x2:
-				motor_calibrate();
-				break;
-			// Move to target position
-			case 0x3:
-				// Initialize target position
-				motor_x_target_pos(rx_packet.data[0]);
-				motor_y_target_pos(rx_packet.data[1]);
-				motor_z_target_pos(rx_packet.data[2]);
-				motor_r_target_pos(rx_packet.data[3]);
-				motor_run(); // Initiate motor run
+				usart_receive_packet(&rx_packet);
+				switch (rx_packet.control)
+				{
+				// Set motor wake state
+				case PACKET_WAKE:
+					if (rx_packet.data[0] == 0x0)
+						motor_sleep_all();
+					else if (rx_packet.data[0] == 0x1)
+						motor_wake_all();
+					break;
+				// Calibrate motors
+				case PACKET_CALIBRATE:
+					motor_calibrate();
+					break;
+				// Run motors to move to target position
+				case PACKET_MOTOR:
+					// Initialize target position
+					motor_x_target_pos(rx_packet.data[0]);
+					motor_y_target_pos(rx_packet.data[1]);
+					motor_z_target_pos(rx_packet.data[2]);
+					motor_r_target_pos(rx_packet.data[3]);
+					motor_run(); // Initiate motor run
 
-				while(motor_system_state() != READY); // Wait for run to complete
-				usart_transmit_packet(&tx_packet_complete);
-				break;
-			case 0x4:
-				if (rx_packet.data[0] == 0x0)
-					vacuum_actuate(SERVO_PERIOD_IDLE);
-				else if (rx_packet.data[0] == 0x1)
-					vacuum_actuate(SERVO_PERIOD_ACTUATE);
-				else if (rx_packet.data[0] == 0x2)
-					vacuum_actuate(SERVO_PERIOD_RELEASE);
-				usart_transmit_packet(&tx_packet_complete);
-				break;
-			case 0x5:
-				delay(2000000);
-				usart_transmit_packet(&tx_packet_complete);
-				break;
-			case 0x6:
-				// Trigger ADC conversion to read the vacuum system internal pressure
-				ADC1->CR |= ADC_CR_ADSTART;
-				break;
+					// Transition to active state
+					sys_state = ACTIVE;
+
+					break;
+				// Set vacuum system actuation state
+				case PACKET_VACUUM:
+					if (rx_packet.data[0] == 0x0)
+						vacuum_actuate(SERVO_PERIOD_IDLE);
+					else if (rx_packet.data[0] == 0x1)
+						vacuum_actuate(SERVO_PERIOD_ACTUATE);
+					else if (rx_packet.data[0] == 0x2)
+						vacuum_actuate(SERVO_PERIOD_RELEASE);
+					usart_transmit_packet(&tx_packet_complete);
+					break;
+				// Delay system
+				case PACKET_DELAY:
+					delay(1200000);
+					usart_transmit_packet(&tx_packet_complete);
+					break;
+				// Trigger ADC conversion to read the vacuum system internal pressure and return the reading
+				case PACKET_PRESSURE:
+					ADC1->CR |= ADC_CR_ADSTART;
+					break;
+				}
 			}
+			break;
+		case ACTIVE:
+			// Check if motors have completed run
+			if (motor_system_state() == READY)
+			{
+				// Transition to WAIT state
+				usart_transmit_packet(&tx_packet_complete);
+				sys_state = WAIT;
+			}
+			else if (usart_packets_available() >0)
+			{
+				usart_receive_packet(&rx_packet);
+				switch (rx_packet.control)
+				{
+				// Set vacuum system actuation state
+				case PACKET_VACUUM:
+					if (rx_packet.data[0] == 0x0)
+						vacuum_actuate(SERVO_PERIOD_IDLE);
+					else if (rx_packet.data[0] == 0x1)
+						vacuum_actuate(SERVO_PERIOD_ACTUATE);
+					else if (rx_packet.data[0] == 0x2)
+						vacuum_actuate(SERVO_PERIOD_RELEASE);
+					usart_transmit_packet(&tx_packet_complete);
+					break;
+				// Trigger ADC conversion to read the vacuum system internal pressure and return the reading
+				case PACKET_PRESSURE:
+					ADC1->CR |= ADC_CR_ADSTART;
+					break;
+				}
+			}
+			break;
 		}
 	}
 }

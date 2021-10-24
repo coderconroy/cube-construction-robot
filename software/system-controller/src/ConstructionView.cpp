@@ -297,12 +297,15 @@ void ConstructionView::updateCameraFeed()
     }
 
     // Resize image for display label
-    cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
+    if (output.size().height > 0 && output.size().width > 0)
+    {
+        cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
 
-    // Display image
-    cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
-    QImage outputImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
-    display->setPixmap(QPixmap::fromImage(outputImage));
+        // Display image
+        cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
+        QImage outputImage = QImage((uchar*)output.data, output.cols, output.rows, output.step, QImage::Format_RGB888);
+        display->setPixmap(QPixmap::fromImage(outputImage));
+    }
 }
 
 void ConstructionView::showVisionViewClicked()
@@ -351,8 +354,8 @@ int ySrc[numCubes] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 int zSrc[numCubes] = {160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
                       160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
                       160, 160, 160, 160, 160, 160, 160, 160, 160, 160};
-int xOffset = 700;
-int yOffset = 1000;
+int xOffset = 600;
+int yOffset = 800;
 int cubeHeight = 318; // Vertical steps
 int cubeSideLength = 100;  // Horizontal steps
 
@@ -412,9 +415,8 @@ void ConstructionView::executeConstruction()
         cubeTasks.append(task);
     }
 
-    // Execute first task
-    if (cubeTasks.size() > 0)
-        cubeTasks.first()->performNextStep(robot);
+    // Move robot to initial position
+    robot->setPosition(0, 0, 1000, 0);
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -430,8 +432,7 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
 
 void ConstructionView::sleepRobotClicked()
 {
-    //robot->sleep();
-    robot->requestPressureReading();
+    robot->sleep();
 }
 
 void ConstructionView::wakeRobotClicked()

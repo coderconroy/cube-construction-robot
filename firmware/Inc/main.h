@@ -32,6 +32,13 @@
 #define SERVO_PERIOD_IDLE 2100
 #define SERVO_PERIOD_ACTUATE 1000
 
+// Type definitions
+typedef enum
+{
+	WAIT = 0x1U,
+	ACTIVE = 0x2U
+} system_state_t;
+
 // Function prototypes
 void initialize_system();
 void initialize_tim2();

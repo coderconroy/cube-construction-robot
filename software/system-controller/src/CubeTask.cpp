@@ -31,9 +31,9 @@ void CubeTask::performNextStep(Robot* robot)
 {
 	switch (step)
 	{
-	// Pick up cube at source 
+	// Pick up cube at source
 	case 0:
-		robot->setPosition(srcPos[0], srcPos[1], srcPos[2] + moveOffset, 0);
+		robot->setPosition(srcPos[0], srcPos[1], robot->getZPosition(), 0);
 		break;
 	case 1:
 		robot->setPosition(srcPos[0], srcPos[1], srcPos[2] - bufferAction, 0);

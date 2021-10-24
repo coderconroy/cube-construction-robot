@@ -7,6 +7,12 @@ Robot::Robot(QObject* parent) : QObject(parent)
 
 void Robot::calibrate()
 {
+    // Initialize robot position
+    xPos = 0;
+    yPos = 0;
+    zPos = 0;
+    rPos = 0;
+
     // Form robot calibration packet
     Packet packet;
     packet.setControl(2); // Set calibration control byte
@@ -45,6 +51,11 @@ void Robot::setPort(QSerialPort* port)
 
 void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)
 {
+    this->xPos = xPos;
+    this->yPos = yPos;
+    this->zPos = zPos;
+    this->rPos = rPos;
+
     // Form packet
     Packet packet;
     packet.setControl(3);
@@ -55,6 +66,26 @@ void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)
 
     // Transmit packet
     transmitPacket(packet);
+}
+
+int Robot::getXPosition()
+{
+    return xPos;
+}
+
+int Robot::getYPosition()
+{
+    return yPos;
+}
+
+int Robot::getZPosition()
+{
+    return zPos;
+}
+
+int Robot::getRPosition()
+{
+    return rPos;
 }
 
 void Robot::actuateGripper()
@@ -92,7 +123,7 @@ void Robot::resetGripper()
     transmitPacket(packet);
 }
 
-void Robot::requestPressureReading()
+void Robot::requestPressure()
 {
     // Form packet
     Packet packet;
