@@ -73,7 +73,8 @@ private:
     QList<CubeTask*> cubeTasks; /*! List of cube tasks to be completed for the current construction task */
 
     OpenGLView* shapeView; /*! OpenGL render of 3D shape to be constructed */
-    CubeWorldModel* cubeWorldModel; /*! Model of cubes in world frame */
+    CubeWorldModel* cubeBuildModel; /*! Model of cubes for the shape to be built in world frame */
+    CubeWorldModel* cubeWorldModel; /*! Model of cubes during the construction process in world frame */
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
     QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
     QTimer* pressureTimer; /*! Timer to trigger a pressure reading request from the robot */
@@ -183,6 +184,11 @@ private:
     * Send next command to robot when previous command is complete.
     */
     void handleRobotCommand();
+
+    /*!
+    * Slot to update the model view when the cube world model input is changed.
+    */
+    void modelInputUpdate(QAbstractButton* button, bool checked);
 
     void sleepRobotClicked();
     void wakeRobotClicked();

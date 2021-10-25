@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Robot.h"
+#include "Cube.h"
+#include "Logger.h"
 #include <QObject>
 
 /*!
@@ -18,22 +20,32 @@ public:
 	CubeTask(QObject* parent = Q_NULLPTR);
 
 	/*!
-	* Set the initial pose of the cube. The position refers to the centre of the cube.
-	* \param [in] xPos Initial cube position along x-axis in horizontal steps.
-	* \param [in] yPos Initial cube position along y-axis in horizontal steps.
-	* \param [in] zPos Initial cube position along z-axis in vertical steps.
-	* \param [in] zRotation Initial cube rotation about z-axis in rotation steps.
+	* Set the cube in the world frame for which the cube task is to be performed.
+	* 
+	* \param [in] sourceCube Cube in the source position for which the cube task is performed.
 	*/
-	void setSourcePose(int xPos, int yPos, int zPos, int zRotation);
+	void setSourceCube(Cube* sourceCube);
 
 	/*!
-	* Set the final pose of the cube. The position refers to the centre of the cube.
-	* \param [in] xPos Final cube position along x-axis in horizontal steps.
-	* \param [in] yPos Final cube position along y-axis in horizontal steps.
-	* \param [in] zPos Final cube position along z-axis in vertical steps.
-	* \param [in] zRotation Final cube rotation about z-axis in rotation steps.
+	* Get the cube in the destination position of the source cube as defined in the build model.
+	*
+	* \param [in] sourceCube Cube in the build model destination position.
 	*/
-	void setDestinationPose(int xPos, int yPos, int zPos, int zRotation);
+	void setDestinationCube(Cube* destinationCube);
+
+	/*!
+	* Get the cube in the world frame for which the cube task is to be performed.
+	*
+	* \return Cube in the source position for which the cube task is performed.
+	*/
+	Cube* getSourceCube();
+
+	/*!
+	* Get the cube in the destination position of the source cube as defined in the build model.
+	*
+	* \return Cube in the build model destination position.
+	*/
+	Cube* getDestinationCube();
 
 	/*!
 	* Indicates if there are any steps remaining to be performed for the cube task.
@@ -43,12 +55,22 @@ public:
 
 	/*!
 	* Executes the next step in the cube task.
+	* 
 	* \param [out] robot Robot used to execute next cube task step.
 	*/
 	void performNextStep(Robot* robot);
 
 	/*!
+	* Indicates if the instruction to complete the first step in the task has been issued.
+	* 
+	* return True if the instruction to compelte the first step has been issued. False otherwise.
+	*/
+	bool isStarted();
+
+	/*!
 	* Indicates if the cube task expects the cube to be gripped for its current step.
+	* 
+	* \return True if the current step expects the cube to be gripped. False otherwise.
 	*/
 	bool expectGrippedCube();
 
@@ -57,17 +79,23 @@ public:
 	*/
 	void resetSteps(Robot* robot);
 
+signals:
+	/*!
+	* Generated when a message is logged by a \class CubeTask instance.
+	*/
+	void log(Message message) const;
+
 private:
-	unsigned int cubeHeight = 318; /*! Length of the cube edge in vertical steps */
-	int moveOffset = 200; /*! Number of vertical steps in clearance along z-axis during cube translation */
-	int bufferAction = 50; /*! Number of vertical steps the robot moves below the target z-axis position to ensure a reliable connection */
-	int srcPos[3]; /*! Position where the cube is picked up from (x, y, z) */
-	int destPos[3]; /*! Destination position to place the cube (x, y, z) */
-	int srcRot; /*! Rotation of cube about z-axis in its source position */
-	int destRot; /*! Rotation of cube about z-axis in its destination position */
+	Cube* destinationCube = Q_NULLPTR; /*! Reference cube in the destination position of the source cube as defined in the build model */
+	Cube* sourceCube = Q_NULLPTR; /*! Cube in the source position for which the cube task is performed */
+	int cubeLengthHSteps = 64; /*! Length of the cube edge in horizontal steps */
+	int cubeLengthVSteps = 318; /*! Length of the cube edge in vertical steps */
+	int bufferAction = 150; /*! Number of vertical steps the robot moves below the target z-axis position to ensure a reliable connection */
 
 	// TODO: Review perform step implementation
 	int step = 0;
 	bool taskComplete = false;
+	int xOffset = 600;
+	int yOffset = 800;
 };
 

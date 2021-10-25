@@ -41,30 +41,30 @@ public:
 
 	/*!
 	* Instructs the robot to move the end effector to specified position and orientation.
-	* \param [in] xPos X axis position (in full steps)
-	* \param [in] yPos Y axis position (in full steps)
-	* \param [in] zPos Z axis position (in full steps)
-	* \param [in] rPos R axis (rotation about Z axis) position (in full steps)
+	* \param [in] xPos X axis position (in horizontal steps)
+	* \param [in] yPos Y axis position (in horizontal steps)
+	* \param [in] zPos Z axis position (in vertical steps)
+	* \param [in] rPos R axis (rotation about Z axis) position (in rotational steps)
 	*/
 	void setPosition(int xPos, int yPos, int zPos, int rPos);
 
 	/*!
-	* Getter for the x-axis stepper motor position.
+	* Getter for the x-axis stepper motor position in horizontal steps.
 	*/
 	int getXPosition();
 
 	/*!
-	* Getter for the x-axis stepper motor position.
+	* Getter for the y-axis stepper motor position in horizontal steps.
 	*/
 	int getYPosition();
 
 	/*!
-	* Getter for the x-axis stepper motor position.
+	* Getter for the z-axis stepper motor position in vertical steps.
 	*/
 	int getZPosition();
 
 	/*!
-	* Getter for the x-axis stepper motor position.
+	* Getter for the r-axis stepper motor position in rotational steps.
 	*/
 	int getRPosition();
 

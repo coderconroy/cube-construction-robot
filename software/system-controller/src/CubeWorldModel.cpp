@@ -45,6 +45,19 @@ const Cube* CubeWorldModel::insertCube()
 	return newCube;
 }
 
+Cube* CubeWorldModel::insertCube(int xPos, int yPos, int zPos, float pitch)
+{
+	// Create new cube
+	Cube* newCube = new Cube(++lastCubeID, cubeSideLength, this);
+	newCube->setPosition(glm::vec3(xPos, yPos, zPos));
+	newCube->setOrientation(glm::vec3(0, pitch, 0));
+
+	// Add cube to cube world list
+	cubes.append(newCube);
+
+	return newCube;
+}
+
 void CubeWorldModel::removeCube(const Cube* cube)
 {
 	// Find cube to remove in cube list

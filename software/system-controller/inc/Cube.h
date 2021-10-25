@@ -12,7 +12,7 @@ enum class CubeState
 {
 	VALID,	  // Cube is not selected and does not intersect any other cube's margin space.
 	SELECTED, // Cube is selected ready for position and orientation updates.
-	COLLISION // Cube is not selected but intersectes at least one other cubes's margin space.
+	INVALID // Cube is not selected but intersectes at least one other cubes's margin space.
 };
 
 /*!

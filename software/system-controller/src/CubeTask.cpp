@@ -1,25 +1,25 @@
 #include "CubeTask.h"
 
-CubeTask::CubeTask(QObject* parent): QObject(parent)
-{
+CubeTask::CubeTask(QObject* parent): QObject(parent) {}
 
+void CubeTask::setSourceCube(Cube* sourceCube)
+{
+	this->sourceCube = sourceCube;
 }
 
-void CubeTask::setSourcePose(int xPos, int yPos, int zPos, int zRotation)
+void CubeTask::setDestinationCube(Cube* destinationCube)
 {
-	srcPos[0] = xPos;
-	srcPos[1] = yPos;
-	srcPos[2] = zPos;
-	srcRot = zRotation;
+	this->destinationCube = destinationCube;
 }
 
-
-void CubeTask::setDestinationPose(int xPos, int yPos, int zPos, int zRotation)
+Cube* CubeTask::getSourceCube()
 {
-	destPos[0] = xPos;
-	destPos[1] = yPos;
-	destPos[2] = zPos;
-	destRot = zRotation;
+	return sourceCube;
+}
+
+Cube* CubeTask::getDestinationCube()
+{
+	return destinationCube;
 }
 
 bool CubeTask::isComplete()
@@ -29,47 +29,74 @@ bool CubeTask::isComplete()
 
 void CubeTask::performNextStep(Robot* robot)
 {
-	switch (step)
+	// Verify that the source cube and destination cube positions have been initialized
+	if (sourceCube == Q_NULLPTR)
+	{
+		emit log(Message(MessageType::ERROR_LOG, "Cube Task", "Cannot perform cube task step since no source cube has been specified"));
+		return;
+	}
+	else if (destinationCube == Q_NULLPTR)
+	{
+		emit log(Message(MessageType::ERROR_LOG, "Cube Task", "Cannot perform cube task step since no destination cube has been specified"));
+		return;
+	}
+
+	// Initialize the position where the cube is picked up from (x, y, z)
+	// The OpenGL coordinates of the cube are converted to the robot coordinate system here
+	glm::vec3 sourceCubePos = sourceCube->getPosition();
+	int srcRot = round(glm::degrees(sourceCube->getPitch()) / 1.8);
+	int srcPos[3] = {round(sourceCubePos.x),
+		round(sourceCubePos.z), 
+		round((sourceCubePos.y + 32) * cubeLengthVSteps / cubeLengthHSteps)};
+
+	// Initialize the position where the cube is placed (x, y, z)
+	// The OpenGL coordinates of the cube are converted to the robot coordinate system here
+	glm::vec3 destinationCubePos = destinationCube->getPosition();
+	int destRot = round(glm::degrees(destinationCube->getPitch()) / 1.8);
+	int destPos[3] = { round(destinationCubePos.x) + xOffset, 
+		round(destinationCubePos.z) + yOffset,
+		round((destinationCubePos.y + 32) * cubeLengthVSteps / cubeLengthHSteps)};
+
+	// Instruct robot to perform next step
+	switch (++step)
 	{
 	// Pick up cube at source
-	case 0:
-		robot->setPosition(srcPos[0], srcPos[1], robot->getZPosition(), 0);
-		break;
 	case 1:
-		robot->setPosition(srcPos[0], srcPos[1], srcPos[2] - bufferAction, 0);
+		robot->setPosition(srcPos[0], srcPos[1], robot->getZPosition(), srcRot);
 		break;
 	case 2:
-		robot->actuateGripper();
+		robot->setPosition(srcPos[0], srcPos[1], srcPos[2] - bufferAction, srcRot);
 		break;
 	case 3:
-		robot->delay();
+		robot->actuateGripper();
 		break;
 	case 4:
-		robot->setPosition(srcPos[0], srcPos[1], destPos[2] + moveOffset + cubeHeight, 0);
-		break;
-	// Place cube at destination
-	case 5:
-		robot->setPosition(destPos[0], destPos[1], destPos[2] + moveOffset + cubeHeight, destRot);
-		break;
-	case 6:
-		robot->setPosition(destPos[0], destPos[1], destPos[2] - bufferAction, destRot);
-		break;
-	case 7:
-		robot->releaseGripper();
-		break;
-	case 8:
 		robot->delay();
 		break;
+	case 5:
+		robot->setPosition(srcPos[0], srcPos[1], destPos[2] + cubeLengthVSteps, srcRot);
+		break;
+	// Place cube at destination
+	case 6:
+		robot->setPosition(destPos[0], destPos[1], destPos[2] + cubeLengthVSteps, destRot);
+		break;
+	case 7:
+		robot->setPosition(destPos[0], destPos[1], destPos[2] - bufferAction, destRot);
+		break;
+	case 8:
+		robot->releaseGripper();
+		break;
 	case 9:
-		robot->setPosition(destPos[0], destPos[1], destPos[2] + moveOffset, destRot);
+		robot->delay();
 		break;
 	case 10:
+		robot->setPosition(destPos[0], destPos[1], destPos[2], destRot);
+		break;
+	case 11:
 		robot->resetGripper();
 		taskComplete = true;
 		break;
 	}
-
-	step++;
 }
 
 void CubeTask::resetSteps(Robot* robot)
@@ -82,4 +109,9 @@ void CubeTask::resetSteps(Robot* robot)
 bool CubeTask::expectGrippedCube()
 {
 	return step == 5 || step == 6 || step == 7;
+}
+
+bool CubeTask::isStarted()
+{
+	return step > 0;
 }

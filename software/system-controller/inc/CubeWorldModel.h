@@ -31,10 +31,19 @@ public:
 	const QList<Cube*>* getCubes() const;
 
 	/*!
-	* Insert cube into the cube world at the specified position relative to the world origin.
+	* Insert cube into the cube world at the world origin such that the bottom face is on the base plane.
 	* The inserted cube has a yaw of 0 radians about the z-axis.
 	*/
 	const Cube* insertCube();
+
+	/*!
+	* Insert cube into the cube world at the specified position relative to the world origin.
+	* \param [in] xPos Position of the cube centroid along the x axis in steps.
+	* \param [in] yPos Position of the cube centroid along the y axis in steps.
+	* \param [in] zPos Position of the cube centroid along the z axis in steps.
+	* \param [in] pitch Rotation about the y axis in radians.
+	*/
+	Cube* insertCube(int xPos, int yPos, int zPos, float pitch);
 
 	/*!
 	* Remove cube from the cube world.

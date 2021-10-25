@@ -100,7 +100,7 @@ private:
     unsigned int vertArrayObj; /*! Vertex array buffer object ID */
     unsigned int cubeTexture; /*! Texture applied to each valid cube face */
     unsigned int cubeTextureSelected; /*! Texture applied to each selected cube face */
-    unsigned int cubeTextureCollision; /*! Texture applied to each collided cube face */
+    unsigned int cubeTextureInvalid; /*! Texture applied to each invalid cube face */
     const QList<Cube*>* cubes = Q_NULLPTR; /*! Cubes in the world reference frame to be rendered */
 
     // Viewport parameters
@@ -114,4 +114,5 @@ private:
     // Texture resource paths
     const char* CUBE_TEXTURE_PATH = "res/cube-texture.jpg";
     const char* CUBE_TEXTURE_SELECTED_PATH = "res/cube-texture-selected.jpg";
+    const char* CUBE_TEXTURE_INVALID_PATH = "res/cube-texture-invalid.jpg";
 };

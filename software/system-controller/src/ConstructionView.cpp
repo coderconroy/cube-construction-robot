@@ -4,15 +4,21 @@
 #include <QTextStream>
 #include <QList>
 
+QVector<Cube*> sourceCubes;
+
 ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 {
     // Initialize cube world model
+    cubeBuildModel = new CubeWorldModel(64, 10, this);
     cubeWorldModel = new CubeWorldModel(64, 10, this);
-    connect(cubeWorldModel, &CubeWorldModel::log, this, &ConstructionView::log); // Propagate log signal
+
+    // Propagate log signals
+    connect(cubeBuildModel, &CubeWorldModel::log, this, &ConstructionView::log);
+    connect(cubeWorldModel, &CubeWorldModel::log, this, &ConstructionView::log);
 
     // Initialize OpenGL view for the 3D shapes
     shapeView = new OpenGLView();
-    shapeView->setCubes(cubeWorldModel->getCubes());
+    shapeView->setCubes(cubeBuildModel->getCubes());
 
     connect(shapeView, &OpenGLView::log, this, &ConstructionView::log); // Propagate log signal
 
@@ -189,11 +195,15 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     modelInputGroup->addButton(showBuildModel);
     modelInputGroup->addButton(showWorldModel);
 
+    showBuildModel->setChecked(true);
+    modelView->setCubes(cubeBuildModel->getCubes());
+
     modelBack->setMaximumWidth(170);
     showBuildModel->setMaximumWidth(170);
     showWorldModel->setMaximumWidth(170);
 
     connect(modelBack, &QPushButton::clicked, this, &ConstructionView::modelBackClicked);
+    connect(modelInputGroup, &QButtonGroup::buttonToggled, this, &ConstructionView::modelInputUpdate);
 
     // Initialize model controls layout
     modelControls = new QVBoxLayout();
@@ -238,6 +248,36 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     // Initialize robot pressure reading request timer
     pressureTimer = new QTimer(this);
     connect(pressureTimer, &QTimer::timeout, this, &ConstructionView::requestPressureUpdate);
+
+    // Initialize source cubes in the world space model
+    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(446, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(383, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(320, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(256, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(193, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(130, 32, 16, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(446, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(383, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(320, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(256, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(193, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(130, 32, 79, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 143, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 143, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 143, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 143, 0));
 }
 
 void ConstructionView::showView()
@@ -379,7 +419,7 @@ void ConstructionView::loadModelClicked()
         }
 
         // Initialize cube world model with JSON object
-        cubeWorldModel->read(document.object());
+        cubeBuildModel->read(document.object());
         emit log(Message(MessageType::INFO_LOG, "Construction View", "Cube world model successfully loaded from file"));
     }
 }
@@ -394,34 +434,37 @@ void ConstructionView::modelBackClicked()
     baseLayout->setCurrentWidget(overviewWidget);
 }
 
-const int numCubes = 30;
-int xSrc[numCubes] = {825, 762, 699, 635, 572, 509, 446, 383, 320, 256, 193, 130,
-                      825, 762, 699, 635, 572, 509, 446, 383, 320, 256, 193, 130,
-                      825, 762, 699, 635, 572, 509};
-int ySrc[numCubes] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                      63, 63, 63, 63, 63, 63, 63, 63 ,63, 63, 63, 63,
-                      127, 127, 127, 127, 127, 127};
-int zSrc[numCubes] = {160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
-                      160, 160, 160, 160, 160, 160, 160, 160, 160, 160, 
-                      160, 160, 160, 160, 160, 160, 160, 160, 160, 160};
-int xOffset = 600;
-int yOffset = 800;
-int cubeHeight = 318; // Vertical steps
-int cubeSideLength = 100;  // Horizontal steps
+void ConstructionView::modelInputUpdate(QAbstractButton* button, bool checked)
+{
+    // Set the list of cubes to render based on the cube model input selection
+    if (showBuildModel->isChecked())
+    {
+        shapeView->setCubes(cubeBuildModel->getCubes());
+        modelView->setCubes(cubeBuildModel->getCubes());
+    }
+    else if (showWorldModel->isChecked())
+    {
+        shapeView->setCubes(cubeWorldModel->getCubes());
+        modelView->setCubes(cubeWorldModel->getCubes());
+    }
+
+}
 
 void ConstructionView::executeConstruction()
 {
+    // Clear any incomplete cube tasks from the previous construction event
     for (int i = 0; i < cubeTasks.size(); ++i)
         delete cubeTasks[i];
     cubeTasks.clear();
 
     // Copy list and sort cubes by z, x, y values respectively
     QList<Cube*> cubes;
-    for (int i = 0; i < cubeWorldModel->getCubeCount(); ++i) {
-        Cube* cube = cubeWorldModel->getCubes()->at(i);
+    for (int i = 0; i < cubeBuildModel->getCubeCount(); ++i) {
+        Cube* cube = cubeBuildModel->getCubes()->at(i);
         bool inserted = false;
         for (int j = 0; j < cubes.size(); ++j)
         {
+            // Initialize the position comparision variables
             int xCube = round(cube->getPosition().x);
             int yCube = round(cube->getPosition().y);
             int zCube = round(cube->getPosition().z);
@@ -430,6 +473,7 @@ void ConstructionView::executeConstruction()
             int yList = round(cubes[j]->getPosition().y);
             int zList = round(cubes[j]->getPosition().z);
                 
+            // Insert in place of list cube if placed earlier in the construction process
             if (yCube < yList)
             {
                 cubes.insert(j, cube);
@@ -449,19 +493,16 @@ void ConstructionView::executeConstruction()
                 break;
             }
         }
+
+        // Append to the end of the list if the cube does not precede any existing cubes in the construction process
         if (inserted == false)
             cubes.append(cube);
     }
 
     // Generate cube tasks
     for (int i = 0; i < cubes.size(); ++i) {
-        Cube* cube = cubes[i];
-        glm::vec3 destPos = cube->getPosition();
-        int zRotation = glm::degrees(cube->getPitch()) / 1.8;
-
         CubeTask* task = new CubeTask();
-        task->setSourcePose(xSrc[i], ySrc[i], zSrc[i], 0);
-        task->setDestinationPose(destPos.x + xOffset, destPos.z  + yOffset, destPos.y * 318 / 64, zRotation);
+        task->setDestinationCube(cubes[i]);
         cubeTasks.append(task);
     }
 
@@ -474,10 +515,92 @@ void ConstructionView::executeConstruction()
 
 void ConstructionView::setRobot(Robot* robot)
 {
+    // Initialize robot reference and signal connections
     this->robot = robot;
     connect(robot, &Robot::commandCompleted, this, &ConstructionView::handleRobotCommand);
     connect(robot, &Robot::pressureUpdated, this, &ConstructionView::pressureUpdated);
 }
+
+int pressureThreshold = 500;
+void ConstructionView::handleRobotCommand()
+{
+    // Check if there are any cube tasks to be performed
+    if (cubeTasks.isEmpty())
+        return;
+
+    CubeTask* task = cubeTasks.first();
+
+    // Check if task complete
+    if (task->isComplete())
+    {
+        // Update the status of the completed source cube in the cube world model
+
+        // Remove completed cube task from the list of incomplete cube tasks
+        delete cubeTasks.first();
+        cubeTasks.removeFirst();
+        task = Q_NULLPTR;
+
+        // Select next cube task if available
+        if (!cubeTasks.isEmpty())
+        {
+            task = cubeTasks.first();
+        }
+        // Construction complete
+        else
+        {
+            // Move robot to xy origin
+            robot->setPosition(0, 0, robot->getZPosition(), 0);
+
+            // Stop pressure sensor requests
+            pressureTimer->stop();
+
+            return;
+        }
+    }
+
+    // Initialize source position if task has not been started
+    if (!task->isStarted())
+    {
+        if (sourceCubes.size() > 0)
+        {
+            task->setSourceCube(sourceCubes.takeFirst());
+        }
+        else
+        {
+            emit log(Message(MessageType::ERROR_LOG, "Construction View", "No source cubes remain to build the structure"));
+            return;
+        }
+    }
+
+    // Check if the cube is gripped if the cube task step expects the cube to be gripped
+    if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
+    {
+        // Update the source cube list
+
+
+        // Update the status of the failed source cube in the cube world view
+        task->getSourceCube()->setState(CubeState::INVALID);
+
+        // Restart the task
+        emit log(Message(MessageType::INFO_LOG, "Construction", "Cube grip fail"));
+        task->resetSteps(robot);
+        return;
+    }
+
+    // Set the source cube position to that of the robot if the cube is gripped
+    // The coodinates are converted from the robot coordinate system to the OpenGL coordinate system
+    if (robot->getPressure() >= pressureThreshold)
+    {
+        glm::vec3 position(robot->getXPosition(), robot->getZPosition() * 64 / 318 - 32, robot->getYPosition());
+        glm::vec3 orientation(0, glm::radians(robot->getRPosition() * 1.8), 0);
+        task->getSourceCube()->setPosition(position);
+        task->getSourceCube()->setOrientation(orientation);
+    }
+
+    // Instruct the robot to perform the next step in the task
+    task->performNextStep(robot);
+}
+
 
 void ConstructionView::setCamera(cv::VideoCapture* camera)
 {
@@ -517,49 +640,4 @@ void ConstructionView::actuateRobotActuatorClicked()
 void ConstructionView::releaseRobotActuatorClicked()
 {
     robot->releaseGripper();
-}
-
-int pressureThreshold = 500;
-void ConstructionView::handleRobotCommand()
-{
-    // Check if there are any cube tasks to be performed
-    if (!cubeTasks.isEmpty())
-    {
-        CubeTask* task = cubeTasks.first();
-
-        // Continue processing current cube task if not complete
-        if (!task->isComplete())
-        {
-            // Check if the cube is gripped if the cube task step expects the cube to be gripped
-            if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
-            {
-                emit log(Message(MessageType::INFO_LOG, "Construction", "Cube grip fail"));
-                task->resetSteps(robot);
-            }
-            else
-                task->performNextStep(robot);
-        }
-        else
-        {
-            // Remove completed cube task from the list of incomplete cube tasks
-            delete cubeTasks.first();
-            cubeTasks.removeFirst();
-            task = Q_NULLPTR;
-
-            // Start next cube task if available
-            if (cubeTasks.size() > 0)
-            {
-                cubeTasks.first()->performNextStep(robot);
-            }
-            // Construction complete
-            else
-            {
-                // Move robot to xy origin
-                robot->setPosition(0, 0, robot->getZPosition(), 0);
-
-                // Stop pressure sensor requests
-                pressureTimer->stop();
-            }
-        }
-    }
 }

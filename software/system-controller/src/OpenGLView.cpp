@@ -134,6 +134,28 @@ void OpenGLView::initializeGL()
     }
     stbi_image_free(data);
 
+    // Initialize invalid cube texture
+    glGenTextures(1, &cubeTextureInvalid);
+    glBindTexture(GL_TEXTURE_2D, cubeTextureInvalid); // Bind texture to current context
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // Texture mapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); // Texture filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load selected cube texture source image
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load(CUBE_TEXTURE_INVALID_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
     // Initialize the shader program's texture sampler's
     shaderProgram->useProgram();
     shaderProgram->setUniformInt("cubeTexture", 0);
@@ -199,8 +221,8 @@ void OpenGLView::paintGL()
                 glBindTexture(GL_TEXTURE_2D, cubeTexture);
             else if (cube->getState() == CubeState::SELECTED)
                 glBindTexture(GL_TEXTURE_2D, cubeTextureSelected);
-            else if (cube->getState() == CubeState::COLLISION)
-                glBindTexture(GL_TEXTURE_2D, cubeTextureSelected);
+            else if (cube->getState() == CubeState::INVALID)
+                glBindTexture(GL_TEXTURE_2D, cubeTextureInvalid);
 
             // Compute model matrix
             glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local frame to the world frame
