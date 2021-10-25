@@ -120,6 +120,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     overviewWidget->setLayout(overviewLayout);
 
     // Initialize computer vision controls
+    visionBack = new QPushButton("Back");
     visionStageGroup = new QButtonGroup(this);
     visionInput = new QRadioButton("Camera Feed");
     visionBlurred = new QRadioButton("Grayscale and Blurring");
@@ -147,9 +148,12 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     worldPointZPos->setMaximumWidth(100);
     projectWorldPoint->setMaximumWidth(100);
 
+    connect(visionBack, &QPushButton::clicked, this, &ConstructionView::visionBackClicked);
+
     // Initialize comptuer vision controls layout
     visionControls = new QVBoxLayout();
     visionControls->addStretch();
+    visionControls->addWidget(visionBack);
     visionControls->addWidget(visionInput);
     visionControls->addWidget(visionBlurred);
     visionControls->addWidget(visionThreshold);
@@ -176,6 +180,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionWidget->setLayout(visionLayout);
 
     // Initialize model controls and view
+    modelBack = new QPushButton("Back");
     modelInputGroup = new QButtonGroup();
     showBuildModel = new QRadioButton("Shape Model");
     showWorldModel = new QRadioButton("Construction Visualizaton");
@@ -184,8 +189,15 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     modelInputGroup->addButton(showBuildModel);
     modelInputGroup->addButton(showWorldModel);
 
+    modelBack->setMaximumWidth(170);
+    showBuildModel->setMaximumWidth(170);
+    showWorldModel->setMaximumWidth(170);
+
+    connect(modelBack, &QPushButton::clicked, this, &ConstructionView::modelBackClicked);
+
     // Initialize model controls layout
     modelControls = new QVBoxLayout();
+    modelControls->addWidget(modelBack);
     modelControls->addWidget(showBuildModel);
     modelControls->addWidget(showWorldModel);
     modelControls->addStretch();
@@ -205,6 +217,10 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     baseLayout->addWidget(modelWidget);
     // NOTE: The program throws a debug error on close when the overviewWidget is added to the stackWidget before the model widget
     // The cause of the issue is likely related to the OpenGL components both widgets contain
+    // UPDATE: The cause appears to be the if the shapeView is added to the widget node graph, it must be displayed on screen before
+    // the program terminates to prevent the debug error. Hiding the OpenGL widget before it is added to the widget graph and only
+    // showing it when the screen is displayed seems to fix the issue.
+    shapeView->hide();
     baseLayout->addWidget(overviewWidget);
 
     baseLayout->setCurrentWidget(overviewWidget);
@@ -226,6 +242,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
 void ConstructionView::showView()
 {
+    shapeView->show();
     cameraFeedTimer->start(500); // Update camera feed every 20ms
     openGLTimer->start(20); // Refresh OpenGL render every 20ms
 }
@@ -319,8 +336,6 @@ void ConstructionView::updateCameraFeed()
     // Resize image for display label
     if (output.size().height > 0 && output.size().width > 0)
     {
-        cv::imwrite("output.png", output);
-
         if (visionFiducials->isChecked())
             cv::resize(output, output, cv::Size(), 1, 1);
         else
@@ -367,6 +382,16 @@ void ConstructionView::loadModelClicked()
         cubeWorldModel->read(document.object());
         emit log(Message(MessageType::INFO_LOG, "Construction View", "Cube world model successfully loaded from file"));
     }
+}
+
+void ConstructionView::visionBackClicked()
+{
+    baseLayout->setCurrentWidget(overviewWidget);
+}
+
+void ConstructionView::modelBackClicked()
+{
+    baseLayout->setCurrentWidget(overviewWidget);
 }
 
 const int numCubes = 30;

@@ -103,6 +103,7 @@ private:
     QWidget* visionWidget; /*! Widget for vision layout */
     QHBoxLayout* visionLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* visionControls; /*! Layout for the control widgets used to configure the computer vision display */
+    QPushButton* visionBack; /*! Navigation button to return the the construction overview screen */
     QButtonGroup* visionStageGroup; /*! Radio button group for computer vision stage selection radio buttons */
     QRadioButton* visionInput; /*! Display computer vision image raw camera input */
     QRadioButton* visionBlurred; /*! Display computer vision image after blur and grayscale stages */
@@ -122,6 +123,7 @@ private:
     QWidget* modelWidget; /*! Widget for model layout */
     QHBoxLayout* modelLayout; /*! Layout showing the computer vision system process and output */
     QVBoxLayout* modelControls; /*! Layout for the control widgets used to configure the computer vision display */
+    QPushButton* modelBack; /*! Navigation button to return the the construction overview screen */
     QButtonGroup* modelInputGroup; /*! Radio button group for 3D model display input selection */
     QRadioButton* showBuildModel; /*! Select the model to be built as input the the 3D display */
     QRadioButton* showWorldModel; /*! Select the model of cubes in world during construction as input the the 3D display */
@@ -161,6 +163,16 @@ private:
     * Load cube world model from file.
     */
     void loadModelClicked();
+
+    /*!
+    * Return from vision view to the construction overview view
+    */
+    void visionBackClicked();
+
+    /*!
+    * Return from the model view to the construction overview view
+    */
+    void modelBackClicked();
 
     /*!
     * Control robot to construct cube world model.
