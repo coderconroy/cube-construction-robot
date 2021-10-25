@@ -308,14 +308,23 @@ void ConstructionView::updateCameraFeed()
     }
     else if (visionFiducials->isChecked())
     {
-        if (vision.getFiducialImages().size() > 0)
+        if (vision.getFiducialImages().size() > 0) {
             output = vision.getFiducialImages()[0];
+
+            for (int i = 1; i < vision.getFiducialImages().size(); ++i)
+                cv::hconcat(output, vision.getFiducialImages()[i], output);
+        }
     }
 
     // Resize image for display label
     if (output.size().height > 0 && output.size().width > 0)
     {
-        cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
+        cv::imwrite("output.png", output);
+
+        if (visionFiducials->isChecked())
+            cv::resize(output, output, cv::Size(), 1, 1);
+        else
+            cv::resize(output, output, cv::Size(), scaleFactor, scaleFactor);
 
         // Display image
         cvtColor(output, output, cv::COLOR_BGR2RGB); // Convert from BGR to RGB

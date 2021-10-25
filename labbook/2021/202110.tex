@@ -107,3 +107,26 @@ The following features were completed regarding the OpenGL 3D shape definition c
 \end{compactitem}
 
 \pendsign
+
+\section[2021/10/14]{Sunday, 24 October 2021}
+
+\subsection{Computer Vision Component}
+
+The computer vision component of the project was one of the first components explored in depth. As such, the most recent work performed regarding this component took place on Thursday, 16 June 2021. The reader is referred back to this section as the theoretical point of reference on which further development of this component is based. As such, concepts such as the intrinsic and extrinsic matrices are not repeated. The most recent work provided a theoretical avenue to localize the cubes in 3D space without providing an implementation. Therefore, this was the focus at this stage of the project.
+
+The extrinsic matrix requires an additional piece of information when mapping points from the image frame to the world frame as a piece of information is lost during the inverse operation. It was postulated that this information could be obtained from the cube edge. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. As such, it was decided to make use of the computer vision component looking for a cube in an expected layer where the z-axis world coordinate of the cube can be provided. This is sufficient information to use the extrinsic and camera matrices in conjunction with the image points to locate the x and y coordinates of the cube in the world frame.
+
+The camera matrix had already been formed during the checkerboard calibration process. However, the extrinsic translation and rotation matrices still needed to be created. These matrices were attained using the $\textit{solvePnP}$ function from the OpenCV library. This functions relies on points whose location in both the image frame as well as the world frame are known. Given at least four of these points, it is possible to estimate the rotation and translation matrices. However, in practice, it was found that at least five points are required for these matrices to be successfully be determined. 
+
+In order to provide these point correspondences, fiducials were used to mark the known points in the world location. The location of these fiducials in the camera image provided the corresponding image frame coordinates. In order to ensure the rotation and translation matrices were successfully determined, six fiducials were placed at known locations in the image frame. The fiducials were structured as a square with a white border with an imaginary internal grid of 3x3 squares such that black squares correspond with a binary 0 and white squares correspond with a binary 0. In order to uniquely determine the orientation of the fiducial, the squares at coordinates $(0, 0)$, $(2, 0)$ and $(2,2)$ were assigned binary values of 0, 0 and 1 respectively. This left 6 squares which could represent $2^6=64$ unique identifiers. The fiducials themselves were detected by applying a binary and contour detection in a similar manner to the top cube faces discussed in the previous computer vision work.
+
+The detection of both the cubes and the fiducials were extended through the addition of corner detection algorithm. The algorithm was developed from first principles and required the use of the centroid of the contour. The first corner was selected as the contour point with the greatest Euclidean distance from the centroid. Following this the contour was divided into four quadrants with the first detected corner centred in a quadrant. The furthest points from the centroid were identified in the remaining quadrants and taken as the remaining corners. Using these corners it was possible to determine the orientation of the cube top face as well as determine the homography matrix that could be used to map the fiducial to a 2D image which could be analysed further. The binary array data of the fiducial was extracted by sampling the centre pixel in each fiducial block and using this to calculate the unique fiducial identifier. The corresponding world point location is drawn from a lookup table and used in conjunction with the fiducial centroid image location to compute the rotation and translation matrices. With these matrices formed, it is possible to calculate the world point location of a detected cube given the expected Z plane. Finally in order to visualise the 3D information the computer vision system has of the scene, a bounding box of the workspace was defined in the world space and mapped to the image frame. These components, namely the fiducial detection, cube pose detection and bounding box visualisation were all integrated with the desktop software component and are shown in \FigRef{fig:computer-vision-overview} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\linewidth]{figures/202110/computer-vision-overview.png}
+	\caption{Screen capture of the desktop software component showing the fiducial detection, cube detection and bounding box visualisation aspects of the computer vision system.}
+	\label{fig:computer-vision-overview}
+\end{figure}
+
+\pendsign
