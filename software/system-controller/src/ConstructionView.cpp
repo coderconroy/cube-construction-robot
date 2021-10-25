@@ -435,7 +435,7 @@ void ConstructionView::executeConstruction()
     robot->setPosition(0, 0, 1000, 0);
 
     // Initiate pressure sensor requests
-    //pressureTimer->start(1000); // Request pressure every 100 ms
+    pressureTimer->start(50); // Request pressure every 50 ms
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -485,10 +485,9 @@ void ConstructionView::releaseRobotActuatorClicked()
     robot->releaseGripper();
 }
 
+int pressureThreshold = 500;
 void ConstructionView::handleRobotCommand()
 {
-    emit log(Message(MessageType::INFO_LOG, "Construction view", "Command Complete"));
-
     // Check if there are any cube tasks to be performed
     if (!cubeTasks.isEmpty())
     {
@@ -497,7 +496,14 @@ void ConstructionView::handleRobotCommand()
         // Continue processing current cube task if not complete
         if (!task->isComplete())
         {
-            task->performNextStep(robot);
+            // Check if the cube is gripped if the cube task step expects the cube to be gripped
+            if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
+            {
+                emit log(Message(MessageType::INFO_LOG, "Construction", "Cube grip fail"));
+                task->resetSteps(robot);
+            }
+            else
+                task->performNextStep(robot);
         }
         else
         {

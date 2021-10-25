@@ -72,8 +72,14 @@ void CubeTask::performNextStep(Robot* robot)
 	step++;
 }
 
-void CubeTask::resetSteps()
+void CubeTask::resetSteps(Robot* robot)
 {
 	step = 0;
 	taskComplete = false;
+	robot->resetGripper();
+}
+
+bool CubeTask::expectGrippedCube()
+{
+	return step == 5 || step == 6 || step == 7;
 }

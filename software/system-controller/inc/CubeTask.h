@@ -48,9 +48,14 @@ public:
 	void performNextStep(Robot* robot);
 
 	/*!
+	* Indicates if the cube task expects the cube to be gripped for its current step.
+	*/
+	bool expectGrippedCube();
+
+	/*!
 	* Reset the cube step counter to the first step.
 	*/
-	void resetSteps();
+	void resetSteps(Robot* robot);
 
 private:
 	unsigned int cubeHeight = 318; /*! Length of the cube edge in vertical steps */
