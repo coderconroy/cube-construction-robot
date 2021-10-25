@@ -76,6 +76,7 @@ private:
     CubeWorldModel* cubeWorldModel; /*! Model of cubes in world frame */
     QTimer* cameraFeedTimer; /*! Timebase to refresh camera feed display */
     QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
+    QTimer* pressureTimer; /*! Timer to trigger a pressure reading request from the robot */
     cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
@@ -96,6 +97,7 @@ private:
     QSpinBox* yPosition;
     QSpinBox* zPosition;
     QSpinBox* rPosition;
+    QLabel* pressureLabel; /*! Display for internal robot vacuum pressure reading */
 
     // Vision layout widgets
     QWidget* visionWidget; /*! Widget for vision layout */
@@ -134,6 +136,16 @@ private:
     * Request OpenGL redraw the shape view.
     */
     void updateShapeView();
+
+    /*! 
+    * Timer to trigger a pressure reading request from the robot
+    */
+    void requestPressureUpdate();
+
+    /*!
+    * Slot called in response the the robot's pressure update signal
+    */
+    void pressureUpdated();
 
     /*!
     * Show computer vision view.

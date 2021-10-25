@@ -71,8 +71,8 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	viewLayout->addWidget(homeView);
 	viewLayout->addWidget(designView);
 	viewLayout->addWidget(constructionView);
-	viewLayout->setCurrentWidget(constructionView);
-	constructionView->showView();
+	viewLayout->setCurrentWidget(homeView);
+	homeView->showView();
 
 	// Initialize the base layout
 	baseLayout = new QVBoxLayout();

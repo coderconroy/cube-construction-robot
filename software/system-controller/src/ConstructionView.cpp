@@ -65,6 +65,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     yPosition = new QSpinBox();
     zPosition = new QSpinBox();
     rPosition = new QSpinBox();
+    pressureLabel = new QLabel("Pressure: No Reading");
     setRobotPosition = new QPushButton("Initiate Move");
 
     xPosition->setMinimum(0);
@@ -80,6 +81,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     robotPositionLayout = new QHBoxLayout();
     robotPositionLayout->addStretch();
+    robotPositionLayout->addWidget(pressureLabel);
     robotPositionLayout->addWidget(xPositionLabel);
     robotPositionLayout->addWidget(xPosition);
     robotPositionLayout->addWidget(yPositionLabel);
@@ -216,12 +218,16 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     // Initialize OpenGL shape view timer
     openGLTimer = new QTimer(this);
     connect(openGLTimer, &QTimer::timeout, this, &ConstructionView::updateShapeView);
+
+    // Initialize robot pressure reading request timer
+    pressureTimer = new QTimer(this);
+    connect(pressureTimer, &QTimer::timeout, this, &ConstructionView::requestPressureUpdate);
 }
 
 void ConstructionView::showView()
 {
     cameraFeedTimer->start(500); // Update camera feed every 20ms
-    openGLTimer->start(2); // Refresh OpenGL render every 20ms
+    openGLTimer->start(20); // Refresh OpenGL render every 20ms
 }
 
 void ConstructionView::hideView()
@@ -236,6 +242,16 @@ void ConstructionView::updateShapeView()
         shapeView->update();
     else if (baseLayout->currentWidget() == modelWidget)
         modelView->update();
+}
+
+void ConstructionView::requestPressureUpdate()
+{
+    robot->requestPressure();
+}
+
+void ConstructionView::pressureUpdated()
+{
+    pressureLabel->setText("Pressure: " + QString::number(robot->getPressure()));
 }
 
 void ConstructionView::updateCameraFeed()
@@ -417,12 +433,16 @@ void ConstructionView::executeConstruction()
 
     // Move robot to initial position
     robot->setPosition(0, 0, 1000, 0);
+
+    // Initiate pressure sensor requests
+    //pressureTimer->start(1000); // Request pressure every 100 ms
 }
 
 void ConstructionView::setRobot(Robot* robot)
 {
     this->robot = robot;
     connect(robot, &Robot::commandCompleted, this, &ConstructionView::handleRobotCommand);
+    connect(robot, &Robot::pressureUpdated, this, &ConstructionView::pressureUpdated);
 }
 
 void ConstructionView::setCamera(cv::VideoCapture* camera)
@@ -469,22 +489,37 @@ void ConstructionView::handleRobotCommand()
 {
     emit log(Message(MessageType::INFO_LOG, "Construction view", "Command Complete"));
 
+    // Check if there are any cube tasks to be performed
     if (!cubeTasks.isEmpty())
     {
         CubeTask* task = cubeTasks.first();
 
+        // Continue processing current cube task if not complete
         if (!task->isComplete())
         {
             task->performNextStep(robot);
         }
         else
         {
+            // Remove completed cube task from the list of incomplete cube tasks
             delete cubeTasks.first();
             cubeTasks.removeFirst();
             task = Q_NULLPTR;
 
+            // Start next cube task if available
             if (cubeTasks.size() > 0)
+            {
                 cubeTasks.first()->performNextStep(robot);
+            }
+            // Construction complete
+            else
+            {
+                // Move robot to xy origin
+                robot->setPosition(0, 0, robot->getZPosition(), 0);
+
+                // Stop pressure sensor requests
+                pressureTimer->stop();
+            }
         }
     }
 }

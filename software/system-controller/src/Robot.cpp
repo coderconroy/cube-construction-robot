@@ -7,6 +7,9 @@ Robot::Robot(QObject* parent) : QObject(parent)
 
 void Robot::calibrate()
 {
+    // Initialize internal vacuum system pressure reading
+    requestPressure();
+
     // Initialize robot position
     xPos = 0;
     yPos = 0;
@@ -45,12 +48,14 @@ void Robot::wake()
 
 void Robot::setPort(QSerialPort* port)
 {
+    // Initialize serial port
     this->port = port;
     connect(port, &QSerialPort::readyRead, this, &Robot::serialDataReceived);
 }
 
 void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)
 {
+    // Update internal position state
     this->xPos = xPos;
     this->yPos = yPos;
     this->zPos = zPos;
@@ -86,6 +91,11 @@ int Robot::getZPosition()
 int Robot::getRPosition()
 {
     return rPos;
+}
+
+int Robot::getPressure()
+{
+    return pressure;
 }
 
 void Robot::actuateGripper()
@@ -135,6 +145,7 @@ void Robot::requestPressure()
 
 void Robot::transmitPacket(const Packet &packet)
 {
+    // Initialize and transmit packet via the robot's serial port connection
     char buffer[9];
     packet.getTransmissionData(buffer);
     port->write(buffer, packet.getSize());
@@ -154,6 +165,7 @@ void Robot::serialDataReceived()
 {
     while (port->bytesAvailable() >= 9)
     {
+        // Read serial data into packet
         QByteArray data = port->read(9);
         Packet packet;
         packet.setControl((uint8_t) data[0]);
@@ -162,13 +174,17 @@ void Robot::serialDataReceived()
         packet.setDataWord(2, (uint8_t) data[5] | ((uint8_t) data[6] << 8));
         packet.setDataWord(3, (uint8_t) data[7] | ((uint8_t) data[8] << 8));
 
+        // Process packets based on type
         switch (packet.getControl())
         {
+        // Process command completion packet
         case 0x1:
             emit commandCompleted();
             break;
+        // Process pressure update packet
         case 0x6:
-            emit log(Message(MessageType::INFO_LOG, "Robot", QString::number(packet.getDataWord(0))));
+            pressure = packet.getDataWord(0);
+            emit pressureUpdated();
             break;
         }
     }

@@ -42,12 +42,14 @@ void usart_transmit(const uint8_t* data, const uint8_t size)
 	if (size <= 0)
 		return;
 
-	// Reset transmission buffer read and write indices
+	// Reset transmission buffer read and write indices if transmission buffer is empty
+	__disable_irq();
 	if (usart_bytes_waiting() == 0)
 	{
 		tx_write_index = 0;
 		tx_read_index = 0;
 	}
+	__enable_irq();
 
 	// Copy data to TX buffer
 	for (uint8_t i = 0; i < size; i++)
@@ -67,11 +69,22 @@ void usart_receive(uint8_t* const data, const uint8_t size)
 	{
 		// Copy bytes from RX buffer to read destination
 		if (usart_bytes_available() > 0)
+		{
 			data[i] = rx_buffer[rx_read_index];
+			rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
+		}
 		else
 			data[i] = 0x0;
-		rx_read_index = (rx_read_index + 1) % RX_BUFFER_SIZE;
 	}
+
+	// Reset receive buffer read and write indices if receive buffer is empty
+	__disable_irq();
+	if (usart_bytes_available() == 0)
+	{
+		rx_write_index = 0;
+		rx_read_index = 0;
+	}
+	__enable_irq();
 }
 
 void usart_transmit_packet(const packet_t* packet)
@@ -99,7 +112,7 @@ void usart_receive_packet(packet_t* const packet)
 
 uint16_t usart_bytes_available()
 {
-	return (((int16_t) rx_write_index) - rx_read_index) % RX_BUFFER_SIZE;
+	return (((uint16_t) rx_write_index) - rx_read_index) % RX_BUFFER_SIZE;
 }
 
 uint16_t usart_bytes_waiting()

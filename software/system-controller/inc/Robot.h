@@ -69,6 +69,11 @@ public:
 	int getRPosition();
 
 	/*!
+	* Getter for the internal vacuum system pressure reading.
+	*/
+	int getPressure();
+
+	/*!
 	* Set the vacuum actuator to ACTUATE positon. This generates a pressure lower than atmospheric pressure for the suction cup to grip an object.
 	*/
 	void actuateGripper();
@@ -102,6 +107,11 @@ signals:
 	void commandCompleted() const;
 
 	/*!
+	* Signal generated when the robot returns a pressure reading update in response to the pressure request.
+	*/
+	void pressureUpdated() const;
+
+	/*!
 	* Generated when a message is logged by an \class Robot instance.
 	*/
 	void log(Message message) const;
@@ -112,6 +122,7 @@ private:
 	int yPos; /*! Robot y-axis motor step position */
 	int zPos; /*! Robot z-axis motor step position */
 	int rPos; /*! Robot r-axis motor step position */
+	int pressure; /*! Pressure inside vaccum system updated on request */
 
 	/*!
 	* Transmit the packet over the serial port instance.
