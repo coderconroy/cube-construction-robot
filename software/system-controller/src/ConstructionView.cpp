@@ -521,84 +521,117 @@ void ConstructionView::setRobot(Robot* robot)
     connect(robot, &Robot::pressureUpdated, this, &ConstructionView::pressureUpdated);
 }
 
+
+enum class ConstructionState
+{
+    CONSTRUCT_TASK,
+    CONSTRUCT_VISION
+};
+
 int pressureThreshold = 500;
+ConstructionState constructState = ConstructionState::CONSTRUCT_VISION;
+
 void ConstructionView::handleRobotCommand()
 {
-    // Check if there are any cube tasks to be performed
-    if (cubeTasks.isEmpty())
-        return;
+    CubeTask* task = Q_NULLPTR;
 
-    CubeTask* task = cubeTasks.first();
-
-    // Check if task complete
-    if (task->isComplete())
+    switch (constructState)
     {
-        // Update the status of the completed source cube in the cube world model
+    case ConstructionState::CONSTRUCT_TASK:
+        // Check if there are any cube tasks to be performed
+        if (cubeTasks.isEmpty())
+            return;
 
-        // Remove completed cube task from the list of incomplete cube tasks
-        delete cubeTasks.first();
-        cubeTasks.removeFirst();
-        task = Q_NULLPTR;
+        task = cubeTasks.first();
 
-        // Select next cube task if available
-        if (!cubeTasks.isEmpty())
+        // Check if task complete
+        if (task->isComplete())
         {
-            task = cubeTasks.first();
-        }
-        // Construction complete
-        else
-        {
-            // Move robot to xy origin
-            robot->setPosition(0, 0, robot->getZPosition(), 0);
+            // Remove completed cube task from the list of incomplete cube tasks
+            delete cubeTasks.first();
+            cubeTasks.removeFirst();
+            task = Q_NULLPTR;
 
-            // Stop pressure sensor requests
-            pressureTimer->stop();
+            // Check if construction is complete
+            if (cubeTasks.isEmpty())
+            {
+                // Move robot to xy origin
+                robot->setPosition(0, 0, robot->getZPosition(), 0);
+
+                // Stop pressure sensor requests
+                pressureTimer->stop();
+
+            }
+            else
+            {
+                // Activate the computer vision phase of the construction state to detect the cube
+                constructState = ConstructionState::CONSTRUCT_VISION;
+                handleRobotCommand();
+            }
 
             return;
         }
-    }
 
-    // Initialize source position if task has not been started
-    if (!task->isStarted())
-    {
-        if (sourceCubes.size() > 0)
+        // Initialize source position if task has not been started
+        if (!task->isStarted())
         {
-            task->setSourceCube(sourceCubes.takeFirst());
+            if (sourceCubes.size() > 0)
+            {
+                task->setSourceCube(sourceCubes.takeFirst());
+            }
+            else
+            {
+                emit log(Message(MessageType::ERROR_LOG, "Construction View", "No source cubes remain to build the structure"));
+                return;
+            }
         }
-        else
+
+        // Check if the cube is gripped if the cube task step expects the cube to be gripped
+        if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
         {
-            emit log(Message(MessageType::ERROR_LOG, "Construction View", "No source cubes remain to build the structure"));
+            emit log(Message(MessageType::INFO_LOG, "Construction", "Cube grip fail"));
+
+            // Activate the computer vision phase of the construction state to detect the cube
+            constructState = ConstructionState::CONSTRUCT_VISION;
+
+            // Update the status of the failed source cube in the cube world view
+            task->getSourceCube()->setState(CubeState::INVALID);
+
+            // Restart the task
+            task->resetSteps(robot);
             return;
         }
+
+        // Set the source cube position to that of the robot if the cube is gripped
+        // The coodinates are converted from the robot coordinate system to the OpenGL coordinate system
+        if (robot->getPressure() >= pressureThreshold)
+        {
+            glm::vec3 position(robot->getXPosition(), robot->getZPosition() * 64 / 318 - 32, robot->getYPosition());
+            glm::vec3 orientation(0, glm::radians(robot->getRPosition() * 1.8), 0);
+            task->getSourceCube()->setPosition(position);
+            task->getSourceCube()->setOrientation(orientation);
+        }
+
+        // Instruct the robot to perform the next step in the task
+        task->performNextStep(robot);
+
+        break;
+
+    case ConstructionState::CONSTRUCT_VISION:
+        // Verify robot is in the correct position to ensure there are no occlusions
+        if (robot->getXPosition() != 507 || robot->getYPosition() != 0 || robot->getZPosition() != 2000)
+        {
+            // Instruct robot to go to computer vison position
+            robot->setPosition(507, 0, 2000, 0);
+            return;
+        }
+
+        // Process image
+        emit log(Message(MessageType::INFO_LOG, "Construction", "Processing image..."));
+        constructState = ConstructionState::CONSTRUCT_TASK;
+        handleRobotCommand();
+        break;
     }
-
-    // Check if the cube is gripped if the cube task step expects the cube to be gripped
-    if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
-    {
-        // Update the source cube list
-
-
-        // Update the status of the failed source cube in the cube world view
-        task->getSourceCube()->setState(CubeState::INVALID);
-
-        // Restart the task
-        emit log(Message(MessageType::INFO_LOG, "Construction", "Cube grip fail"));
-        task->resetSteps(robot);
-        return;
-    }
-
-    // Set the source cube position to that of the robot if the cube is gripped
-    // The coodinates are converted from the robot coordinate system to the OpenGL coordinate system
-    if (robot->getPressure() >= pressureThreshold)
-    {
-        glm::vec3 position(robot->getXPosition(), robot->getZPosition() * 64 / 318 - 32, robot->getYPosition());
-        glm::vec3 orientation(0, glm::radians(robot->getRPosition() * 1.8), 0);
-        task->getSourceCube()->setPosition(position);
-        task->getSourceCube()->setOrientation(orientation);
-    }
-
-    // Instruct the robot to perform the next step in the task
-    task->performNextStep(robot);
 }
 
 
