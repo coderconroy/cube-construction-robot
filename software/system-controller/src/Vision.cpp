@@ -21,13 +21,24 @@ double areaThreshold = 1300;
 
 Vision::Vision(QObject* parent) : QObject(parent)
 {
+    //fiducialWorldPoints.insert(10, cv::Point3i(-32, -397, 0));
+    //fiducialWorldPoints.insert(0, cv::Point3i(944, -383, 0));
+    //fiducialWorldPoints.insert(50, cv::Point3i(-277, -63, 0));
+    //fiducialWorldPoints.insert(11, cv::Point3i(1188, -58, 0));
+    //fiducialWorldPoints.insert(3, cv::Point3i(-278, 984, 0));
+    //fiducialWorldPoints.insert(41, cv::Point3i(1186, 979, 0));
+    //fiducialWorldPoints.insert(6, cv::Point3i(-36, 1316, 0));
+    //fiducialWorldPoints.insert(37, cv::Point3i(951, 1320, 0));
+
     // Initialize world point of each fiducial
-    fiducialWorldPoints.insert(11, cv::Point3i(0, 0, 0));
-    fiducialWorldPoints.insert(37, cv::Point3i(0, 562, 0));
-    fiducialWorldPoints.insert(10, cv::Point3i(0, 1125, 0));
-    fiducialWorldPoints.insert(3, cv::Point3i(1015, 0, 0));
-    fiducialWorldPoints.insert(6, cv::Point3i(1015, 562, 0));
-    fiducialWorldPoints.insert(41, cv::Point3i(1015, 1125, 0));
+    fiducialWorldPoints.insert(10, cv::Point3i(-32, -387, 0));
+    fiducialWorldPoints.insert(0, cv::Point3i(944, -377, 0));
+    fiducialWorldPoints.insert(50, cv::Point3i(-277, -53, 0));
+    fiducialWorldPoints.insert(11, cv::Point3i(1188, -52, 0));
+    fiducialWorldPoints.insert(3, cv::Point3i(-278, 986, 0));
+    fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
+    fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
+    fiducialWorldPoints.insert(37, cv::Point3i(953, 1322, 0));
 
     // Initialize fiducial sample points
     fiducialSamplePoints.push_back(cv::Point(31, 31));
@@ -51,95 +62,20 @@ Vision::Vision(QObject* parent) : QObject(parent)
     boundingBoxCorners[3] = cv::Point3i(-100, 1225, 0);
 }
 
-void Vision::calibrate(const cv::Mat& calibrationImage)
+void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::Point3i>* sourceCentroids, 
+    std::vector<cv::Point3i>* structCentroids)
 {
     // Reset vision system to uncalibrated state
+    if (calibrate)
+        calibrated = false;
+
+    // Reset image contour containers
     fiducialContours.clear();
     cubeContours.clear();
-    calibrated = false;
+    sourceCubeContours.clear();
+    structCubeContours.clear();
 
-    // Process image
-    cv::Mat processImage;
-    cv::cvtColor(calibrationImage, processImage, cv::COLOR_BGR2GRAY);
-    cv::blur(processImage, processImage, cv::Size(blurSize + 1, blurSize + 1));
-    cv::threshold(processImage, processImage, thresh, maxThresh, cv::THRESH_BINARY);
-
-    // Apply contour detection
-    std::vector<std::vector<cv::Point>> contours;
-    cv::findContours(processImage, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
-
-    // Process contours for cubes and fiducials
-    for (int i = 0; i < contours.size(); i++)
-    {
-        // Get contour
-        std::vector<cv::Point> contour = contours[i];
-
-        // Get contour centroid and area
-        cv::Point2d centroid = getCentroid(contour);
-        double area = cv::contourArea(contours[i]);
-
-        // Process contours of significant size in bounding box 
-        if (area > areaThreshold)
-        {
-            // Find corners
-            std::vector<cv::Point> corners = findSquareCorners(contour);
-
-            // Isolate rectangle
-            cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
-            cv::Mat homographyMatrix;
-            isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
-            cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
-
-            // Process fiducial
-            int fiducialId = processFiducial(isolatedImage, isolatedImage);
-
-            // Add to fiducial list if fiducial
-            if (fiducialId >= 0) 
-            {
-                FiducialContour fiducial;
-                fiducial.id = fiducialId;
-                fiducial.centroid = centroid;
-                fiducial.contour = contour;
-                fiducial.corners = corners;
-                fiducial.homographyMatrix = homographyMatrix;
-                fiducialContours.push_back(fiducial);
-            }
-        }
-    }
-
-    // Get world points and corresponding image points from fiducial set
-    std::vector<cv::Point3d> worldPoints;
-    std::vector<cv::Point2d> imagePoints;
-    for (int i = 0; i < fiducialContours.size(); ++i)
-    {
-        FiducialContour f = fiducialContours[i];
-        
-        // Check if world point is defined for fiducial
-        if (fiducialWorldPoints.contains(f.id))
-        {
-            worldPoints.push_back(fiducialWorldPoints.value(f.id)); // Get known world point of fiducial
-            imagePoints.push_back(f.centroid); // Use centroid of fiducial contour as image point
-        }
-    }
-
-    // Compute pose of world frame with respect to the fixed camera frame
-    if (worldPoints.size() > 4)
-    {
-        // Solve for pose
-        cv::Mat rotationVector;
-        cv::solvePnP(worldPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
-
-        // Convert rotation vector to rotation matrix
-        cv::Rodrigues(rotationVector, rotationMatrix);
-
-        // Transition system to calibrated state
-        calibrated = true;
-    }
-}
-
-void Vision::processScene(const cv::Mat& image)
-{
-    // Reset stage images
+    // Reset fiducial stage images
     fiducialImages.clear();
 
     // Process image
@@ -213,6 +149,105 @@ void Vision::processScene(const cv::Mat& image)
             }
         }
     }
+
+    // Use fiducials to calibrate for rotation and translation matrices
+    if (calibrate)
+    {
+        // Get world points and corresponding image points from fiducial set
+        std::vector<cv::Point3d> worldPoints;
+        std::vector<cv::Point2d> imagePoints;
+        for (int i = 0; i < fiducialContours.size(); ++i)
+        {
+            FiducialContour f = fiducialContours[i];
+
+            // Check if world point is defined for fiducial
+            if (fiducialWorldPoints.contains(f.id))
+            {
+                worldPoints.push_back(fiducialWorldPoints.value(f.id)); // Get known world point of fiducial
+                imagePoints.push_back(f.centroid); // Use centroid of fiducial contour as image point
+            }
+        }
+
+        // Compute pose of world frame with respect to the fixed camera frame
+        // At least four point correspondences are required to solve for the extrinsic parameters
+        if (worldPoints.size() >= 4)
+        {
+            // Solve for pose
+            cv::Mat rotationVector;
+            cv::solvePnP(worldPoints, imagePoints, cameraMatrix, distCoeffs, rotationVector, translationVector);
+
+            // Convert rotation vector to rotation matrix
+            cv::Rodrigues(rotationVector, rotationMatrix);
+
+            // Transition system to calibrated state
+            calibrated = true;
+        }
+    }
+
+    // Determine if any of the non-fiducial contours are artifacts originating from source cubes
+    // The contour is considered a source cube artifact if its centroid is sufficiently close to a source cube centroid
+    if (sourceCentroids != Q_NULLPTR)
+    {
+        for (std::vector<CubeContour>::iterator iter = cubeContours.begin(); iter != cubeContours.end();)
+        {
+            bool sourceContour = false;
+            for (int j = 0; j < sourceCentroids->size(); ++j)
+            {
+                // Project contour centroid to the world frame in the source cube plane
+                cv::Point3i worldCentroid = projectImagePoint(iter->centroid, -sourceCentroids->at(j).z);
+                cv::Point3i sourceCentroid = cv::Point3i(sourceCentroids->at(j).x, sourceCentroids->at(j).y, -sourceCentroids->at(j).z);
+
+                // Compute Euclidean distance between points in the world space
+                float dist = computeEuclidDist(worldCentroid, sourceCentroid);
+
+                // Check if centroid is sufficiently close to source cube centroid
+                if (dist <= 64)
+                {
+                    // Classify contour as source cube contour
+                    sourceContour = true;
+                    sourceCubeContours.push_back(*iter);
+                    iter = cubeContours.erase(iter);
+                    break;
+                }
+            }
+            // Increment iterator if no contour was removed from the cube contour list
+            if (!sourceContour)
+                ++iter;
+        }
+    }
+
+    // Determine if any of the non-fiducial contours are artifacts originating from structure cubes
+    // The contour is considered a source cube artifact if its centroid is sufficiently close to a structure cube centroid
+    if (structCentroids != Q_NULLPTR)
+    {
+        for (std::vector<CubeContour>::iterator iter = cubeContours.begin(); iter != cubeContours.end();)
+        {
+            bool structContour = false;
+            for (int j = 0; j < structCentroids->size(); ++j)
+            {
+                // Project contour centroid to the world frame in the structure cube plane
+                cv::Point3i worldCentroid = projectImagePoint(iter->centroid, -structCentroids->at(j).z);
+                cv::Point3i structCentroid = cv::Point3i(structCentroids->at(j).x, structCentroids->at(j).y, -structCentroids->at(j).z);
+
+                // Compute Euclidean distance between points in the world space
+                float dist = computeEuclidDist(worldCentroid, structCentroid);
+
+                // Check if centroid is sufficiently close to source cube centroid
+                if (dist <= 64)
+                {
+                    // Classify contour as source cube contour
+                    structContour = true;
+                    structCubeContours.push_back(*iter);
+                    iter = cubeContours.erase(iter);
+                    break;
+                }
+            }
+            // Increment iterator if no contour was removed from the cube contour list
+            if (!structContour)
+                ++iter;
+        }
+    }
+    
 }
 
 void Vision::plotFiducialInfo(cv::Mat& image)
@@ -227,9 +262,17 @@ void Vision::plotFiducialInfo(cv::Mat& image)
         std::vector<std::vector<cv::Point>> contours = { f.contour };
         //cv::drawContours(image, contours, 0, cv::Scalar(0, 255, 0), 4);
 
+        //cv::Point3i worldPoint = projectImagePoint(f.centroid, 0); // Project image point to world 
+        //QString coordinateText = "(" + QString::number(worldPoint.x) + ", " + QString::number(worldPoint.y) + ")";
+        //cv::Point coordinateTextPoint(f.centroid.x - 70, f.centroid.y + 50);
+        //cv::putText(image, coordinateText.toStdString(), coordinateTextPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
+
         // Plot identifier
         cv::Point textPoint(f.centroid.x - 20, f.centroid.y + 10);
         cv::putText(image, std::to_string(f.id), textPoint, cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(0, 0, 255), 2);
+
+        //// Plot centroid
+        //circle(image, f.centroid, 4, cv::Scalar(255, 0, 128), -1, cv::LINE_AA);
 
         // Plot corners
         for (int j = 0; j < f.corners.size(); ++j)
@@ -239,10 +282,10 @@ void Vision::plotFiducialInfo(cv::Mat& image)
 
 void Vision::plotCubeInfo(cv::Mat& image)
 {
-    // Plot fiducial information
+    // Plot independent cube information
     for (int i = 0; i < cubeContours.size(); ++i)
     {
-        // Get fiducial
+        // Get contour
         CubeContour c = cubeContours[i];
 
         // Plot contour
@@ -275,6 +318,40 @@ void Vision::plotCubeInfo(cv::Mat& image)
         // Plot corners
         for (int j = 0; j < c.corners.size(); ++j)
             circle(image, c.corners[j], 4, cv::Scalar(255, 255, 0), -1, cv::LINE_AA);
+    }
+}
+
+void Vision::plotSourceCubeInfo(cv::Mat& image)
+{
+    // Plot source cube information
+    for (int i = 0; i < sourceCubeContours.size(); ++i)
+    {
+        // Get contour
+        CubeContour c = sourceCubeContours[i];
+
+        // Plot contour
+        std::vector<std::vector<cv::Point>> contours = { c.contour };
+        cv::drawContours(image, contours, 0, cv::Scalar(255, 0, 0), 4);
+
+        //// Plot centroid
+        //circle(image, c.centroid, 4, cv::Scalar(255, 0, 128), -1, cv::LINE_AA);
+    }
+}
+
+void Vision::plotStructCubeInfo(cv::Mat& image)
+{
+    // Plot source cube information
+    for (int i = 0; i < structCubeContours.size(); ++i)
+    {
+        // Get contour
+        CubeContour c = structCubeContours[i];
+
+        // Plot contour
+        std::vector<std::vector<cv::Point>> contours = { c.contour };
+        cv::drawContours(image, contours, 0, cv::Scalar(0, 255, 0), 4);
+
+        //// Plot centroid
+        //circle(image, c.centroid, 4, cv::Scalar(255, 0, 128), -1, cv::LINE_AA);
     }
 }
 
@@ -521,6 +598,11 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 	cv::Point2d imagePoint = cv::Point2d(imagePointMat.at<double>(0) / s, imagePointMat.at<double>(1) / s);
 
 	return imagePoint;
+}
+
+double Vision::computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB)
+{
+    return sqrt(pow(pointA.x - pointB.x, 2) + pow(pointA.y - pointB.y, 2) + pow(pointA.z - pointB.z, 2));
 }
 
 cv::Mat Vision::getBlurredImage()

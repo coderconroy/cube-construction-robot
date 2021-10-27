@@ -129,6 +129,7 @@ private:
     QRadioButton* showBuildModel; /*! Select the model to be built as input the the 3D display */
     QRadioButton* showWorldModel; /*! Select the model of cubes in world during construction as input the the 3D display */
     OpenGLView* modelView; /*! OpenGL render of 3D shape or construction process */
+    Vision vision;
 
     /*!
     * Captures new image from camera and updates the camera feed.
