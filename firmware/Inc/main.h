@@ -30,7 +30,7 @@
 #define SERVO_PERIOD_MAX  2400 // Pulse high time (microseconds)
 #define SERVO_PERIOD_RELEASE SERVO_PERIOD_MAX
 #define SERVO_PERIOD_IDLE 2100
-#define SERVO_PERIOD_ACTUATE 1000
+#define SERVO_PERIOD_ACTUATE 1500
 
 // Type definitions
 typedef enum

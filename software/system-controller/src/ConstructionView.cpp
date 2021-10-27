@@ -684,7 +684,7 @@ void ConstructionView::handleRobotCommand()
                 emit log(Message(MessageType::INFO_LOG, "Construction", "Missing cube detected"));
 
                 // Update the position of the missing cube
-                glm::vec3 detectedPos(detectedCubes[0].x, detectedCubes[0].z, detectedCubes[0].y);
+                glm::vec3 detectedPos(detectedCubes[0].x, detectedCubes[0].z - 32, detectedCubes[0].y);
                 task = cubeTasks.first();
                 task->getSourceCube()->setPosition(detectedPos);
 
@@ -692,6 +692,10 @@ void ConstructionView::handleRobotCommand()
                 sourceCubes.insert(0, task->getSourceCube());
             }
         }
+
+        // Update state to indicate missing cube has been processed if cube was missing
+        if (missingCubes > 0)
+            missingCubes--;
 
 
         // Activate the cube task execution phase of the construction state to place the cube
