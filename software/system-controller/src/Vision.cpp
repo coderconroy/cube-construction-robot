@@ -600,27 +600,42 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 	return imagePoint;
 }
 
-double Vision::computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB)
+double Vision::computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB) const
 {
     return sqrt(pow(pointA.x - pointB.x, 2) + pow(pointA.y - pointB.y, 2) + pow(pointA.z - pointB.z, 2));
 }
 
-cv::Mat Vision::getBlurredImage()
+cv::Mat Vision::getBlurredImage() const
 {
     return blurredImage;
 }
 
-cv::Mat Vision::getThresholdedImage()
+cv::Mat Vision::getThresholdedImage() const
 {
     return thresholdImage;
 }
 
-cv::Mat Vision::getContourImage()
+cv::Mat Vision::getContourImage() const
 {
     return contourImage;
 }
 
-std::vector<cv::Mat> Vision::getFiducialImages()
+std::vector<cv::Mat> Vision::getFiducialImages() const
 {
     return fiducialImages;
+}
+
+std::vector<cv::Point3i> Vision::getCubeCentroids(const int z) const
+{
+    // Compile list of cube centroids from the cube contour list for a given plane in the world frame
+    std::vector<cv::Point3i> centroids;
+    for (int i = 0; i < cubeContours.size(); ++i)
+    {
+        // Project centroid to the world frame and add to centroid list
+        cv::Point3i worldCentroid = projectImagePoint(cubeContours[i].centroid, -z);
+        worldCentroid.z = -worldCentroid.z;
+        centroids.push_back(worldCentroid);
+    }
+
+    return centroids;
 }

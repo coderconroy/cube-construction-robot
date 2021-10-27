@@ -6,6 +6,8 @@
 
 QVector<Cube*> sourceCubes;
 QVector<Cube*> structCubes;
+int missingCubes = 0;
+int externalCubes = 0;
 
 ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 {
@@ -594,6 +596,7 @@ void ConstructionView::handleRobotCommand()
             emit log(Message(MessageType::INFO_LOG, "Construction", "Failed to grip the cube"));
 
             // Activate the computer vision phase of the construction state to detect the cube
+            missingCubes++;
             constructState = ConstructionState::CONSTRUCT_VISION;
 
             // Update the status of the failed source cube in the cube world model
@@ -660,6 +663,36 @@ void ConstructionView::handleRobotCommand()
 
         // Process image
         vision.processScene(input, true, &sourceCentroids, &structCentroids);
+
+        // Analyze cubes detected in the workspace that are not part of the source cubes or 3D shape structure
+        std::vector<cv::Point3i> detectedCubes = vision.getCubeCentroids(64);
+        if (detectedCubes.size() > 0)
+        {
+            // Check if the construction has failed
+            // This is assumed when there are more independent cubes detected than expected
+            int expectedCubes = missingCubes + externalCubes;
+            if (detectedCubes.size() > expectedCubes)
+            {
+                // TODO: Reset construction state
+                emit log(Message(MessageType::INFO_LOG, "Construction", "Construction failure detected"));
+                cubeTasks.clear();
+                break;
+            }
+            // The missing cube has been detected in the workspace
+            else if (detectedCubes.size() == expectedCubes)
+            {
+                emit log(Message(MessageType::INFO_LOG, "Construction", "Missing cube detected"));
+
+                // Update the position of the missing cube
+                glm::vec3 detectedPos(detectedCubes[0].x, detectedCubes[0].z, detectedCubes[0].y);
+                task = cubeTasks.first();
+                task->getSourceCube()->setPosition(detectedPos);
+
+                // Use the detected missing cube as the next source cube
+                sourceCubes.insert(0, task->getSourceCube());
+            }
+        }
+
 
         // Activate the cube task execution phase of the construction state to place the cube
         constructState = ConstructionState::CONSTRUCT_TASK;

@@ -89,28 +89,36 @@ public:
 	* 
 	* \return Image after grayscale conversion and blur.
 	*/
-	cv::Mat getBlurredImage();
+	cv::Mat getBlurredImage() const;
 
 	/*!
 	* Getter for image after the thresholding stage of processing.
 	* 
 	* \return Image after thresholding.
 	*/
-	cv::Mat getThresholdedImage();
+	cv::Mat getThresholdedImage() const;
 
 	/*!
 	* Getter for image after the contour detection stage of processing.
 	* 
 	* \return Image after contour detection with contours plotted.
 	*/
-	cv::Mat getContourImage();
+	cv::Mat getContourImage() const;
 
 	/*!
 	* Getter for the isolated fiducial images.
 	* 
 	* \return List of isolated fiducial images.
 	*/
-	std::vector<cv::Mat> getFiducialImages();
+	std::vector<cv::Mat> getFiducialImages() const;
+
+	/*!
+	* Getter for the independent cube contour centroids.
+	*
+	* \param [in] z Z world coordinate of the xy plane the centroids are projeced to.
+	* \return List of independent cube contour centroids for the top face of the cube in the world frame.
+	*/
+	std::vector<cv::Point3i> getCubeCentroids(const int z) const;
 
 signals:
 	/*!
@@ -230,5 +238,5 @@ private:
 	* \param [in] pointA Coordinates of the first coordinate.
 	* \param [in] pointB Coordinates of the second coordinate.
 	*/
-	double computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB);
+	double computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB) const;
 };
