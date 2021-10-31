@@ -1,0 +1,40 @@
+\babel@toc {british}{}
+\contentsline {part}{Part 1. Preamble}{i}{}%
+\contentsline {part}{Part 2. Project definition: approved Project Proposal}{vi}{}%
+\contentsline {part}{Part 3. Main Report}{vii}{}%
+\contentsline {section}{\numberline {1}Literature study}{1}{}%
+\contentsline {section}{\numberline {2}Approach}{5}{}%
+\contentsline {section}{\numberline {3}Design and implementation}{6}{}%
+\contentsline {subsection}{\numberline {3.1}Design summary}{6}{}%
+\contentsline {subsection}{\numberline {3.2}Theoretical analysis and modelling}{6}{}%
+\contentsline {section}{\numberline {4}Results}{7}{}%
+\contentsline {subsection}{\numberline {4.1}Summary of results achieved}{7}{}%
+\contentsline {subsection}{\numberline {4.2}Qualification tests}{7}{}%
+\contentsline {section}{\numberline {5}Discussion}{8}{}%
+\contentsline {subsection}{\numberline {5.1}Interpretation of results}{8}{}%
+\contentsline {subsection}{\numberline {5.2}Critical evaluation of the design}{8}{}%
+\contentsline {subsection}{\numberline {5.3}Design ergonomics}{8}{}%
+\contentsline {subsection}{\numberline {5.4}Health, safety and environmental impact}{8}{}%
+\contentsline {subsection}{\numberline {5.5}Social and legal impact of the design}{8}{}%
+\contentsline {section}{\numberline {6}Conclusion}{9}{}%
+\contentsline {subsection}{\numberline {6.1}Summary of the work completed}{9}{}%
+\contentsline {subsection}{\numberline {6.2}Summary of the observations and findings}{9}{}%
+\contentsline {subsection}{\numberline {6.3}Contribution}{9}{}%
+\contentsline {subsection}{\numberline {6.4}Future work}{9}{}%
+\contentsline {section}{\numberline {7}References}{10}{}%
+\contentsline {part}{Part 4. Appendix: technical documentation}{12}{}%
+\contentsline {section}{HARDWARE part of the project}{13}{}%
+\contentsline {subsection}{Record 1. System block diagram}{13}{}%
+\contentsline {subsection}{Record 2. Systems level description of the design}{13}{}%
+\contentsline {subsection}{Record 3. Complete circuit diagrams and description}{13}{}%
+\contentsline {subsection}{Record 4. Hardware acceptance test procedure}{13}{}%
+\contentsline {subsection}{Record 5. User guide}{13}{}%
+\contentsline {section}{SOFTWARE part of the project}{13}{}%
+\contentsline {subsection}{Record 6. Software process flow diagrams}{13}{}%
+\contentsline {subsection}{Record 7. Explanation of software modules}{13}{}%
+\contentsline {subsection}{Record 8. Complete source code}{13}{}%
+\contentsline {subsection}{Record 9. Software acceptance test procedure}{13}{}%
+\contentsline {subsection}{Record 10. Software user guide}{13}{}%
+\contentsline {section}{EXPERIMENTAL DATA}{13}{}%
+\contentsline {subsection}{Record 11. Experimental data}{13}{}%
+\contentsfinish 
