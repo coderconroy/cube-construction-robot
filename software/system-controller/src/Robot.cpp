@@ -67,7 +67,7 @@ void Robot::setPosition(int xPos, int yPos, int zPos, int rPos)
     packet.setDataWord(0, xPos);
     packet.setDataWord(1, yPos);
     packet.setDataWord(2, zPos);
-    packet.setDataWord(3, rPos);
+    packet.setDataWord(3, -rPos);
 
     // Transmit packet
     transmitPacket(packet);

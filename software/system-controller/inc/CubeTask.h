@@ -90,7 +90,7 @@ private:
 	Cube* sourceCube = Q_NULLPTR; /*! Cube in the source position for which the cube task is performed */
 	int cubeLengthHSteps = 64; /*! Length of the cube edge in horizontal steps */
 	int cubeLengthVSteps = 318; /*! Length of the cube edge in vertical steps */
-	int bufferAction = 200; /*! Number of vertical steps the robot moves below the target z-axis position to ensure a reliable connection */
+	int bufferAction = 150; /*! Number of vertical steps the robot moves below the target z-axis position to ensure a reliable connection */
 
 	// TODO: Review perform step implementation
 	int step = 0;

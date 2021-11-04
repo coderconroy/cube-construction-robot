@@ -57,7 +57,7 @@ int main(void)
 					motor_x_target_pos(rx_packet.data[0]);
 					motor_y_target_pos(rx_packet.data[1]);
 					motor_z_target_pos(rx_packet.data[2]);
-					motor_r_target_pos(rx_packet.data[3]);
+					motor_r_target_pos((int16_t) rx_packet.data[3]);
 					motor_run(); // Initiate motor run
 
 					// Transition to active state

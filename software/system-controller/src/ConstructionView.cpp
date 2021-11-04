@@ -281,6 +281,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     sourceCubes.append(cubeWorldModel->insertCube(762, 32, 143, 0));
     sourceCubes.append(cubeWorldModel->insertCube(699, 32, 143, 0));
     sourceCubes.append(cubeWorldModel->insertCube(635, 32, 143, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 143, 0));
+    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 143, 0));
 }
 
 void ConstructionView::showView()
@@ -316,6 +318,10 @@ void ConstructionView::pressureUpdated()
 
 void ConstructionView::updateCameraFeed()
 {
+    // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+
     QLabel* display;
     float scaleFactor;
     if (baseLayout->currentWidget() == overviewWidget)
@@ -333,17 +339,13 @@ void ConstructionView::updateCameraFeed()
         return;
     }
 
-    // Capture frame from camera
-    cv::Mat input;
-    *camera >> input;
-
     // Select image to display based on user vision stage selection
     cv::Mat output;
     if (visionInput->isChecked())
     {
         input.copyTo(output);
         if (boundingBox->isChecked())
-            vision.plotBoundingBox(output);
+            vision.plotVisionBoundBox(output);
         if (fiducialInfo->isChecked())
             vision.plotFiducialInfo(output);
         if (cubeInfo->isChecked())
@@ -665,13 +667,14 @@ void ConstructionView::handleRobotCommand()
         vision.processScene(input, true, &sourceCentroids, &structCentroids);
 
         // Analyze cubes detected in the workspace that are not part of the source cubes or 3D shape structure
-        std::vector<cv::Point3i> detectedCubes = vision.getCubeCentroids(64);
-        if (detectedCubes.size() > 0)
+        std::vector<cv::Point3i> detectedCubeCentroids = vision.getCubeCentroids(64);
+        std::vector<float> detectedCubeRotations = vision.getCubeRotations(64);
+        if (detectedCubeCentroids.size() > 0)
         {
             // Check if the construction has failed
             // This is assumed when there are more independent cubes detected than expected
             int expectedCubes = missingCubes + externalCubes;
-            if (detectedCubes.size() > expectedCubes)
+            if (detectedCubeCentroids.size() > expectedCubes)
             {
                 // TODO: Reset construction state
                 emit log(Message(MessageType::INFO_LOG, "Construction", "Construction failure detected"));
@@ -679,14 +682,16 @@ void ConstructionView::handleRobotCommand()
                 break;
             }
             // The missing cube has been detected in the workspace
-            else if (detectedCubes.size() == expectedCubes)
+            else if (detectedCubeCentroids.size() == expectedCubes)
             {
                 emit log(Message(MessageType::INFO_LOG, "Construction", "Missing cube detected"));
 
-                // Update the position of the missing cube
-                glm::vec3 detectedPos(detectedCubes[0].x, detectedCubes[0].z - 32, detectedCubes[0].y);
+                // Update the position and state of the missing cube
+                glm::vec3 detectedPos(detectedCubeCentroids[0].x, detectedCubeCentroids[0].z - 32, detectedCubeCentroids[0].y);
                 task = cubeTasks.first();
                 task->getSourceCube()->setPosition(detectedPos);
+                task->getSourceCube()->setOrientation(glm::vec3(0, detectedCubeRotations[0], 0));
+                task->getSourceCube()->setState(CubeState::VALID);
 
                 // Use the detected missing cube as the next source cube
                 sourceCubes.insert(0, task->getSourceCube());

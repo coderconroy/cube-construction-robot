@@ -47,6 +47,7 @@ void initialize_tim7();
 void initialize_tim21();
 void initialize_tim22();
 void initialize_adc();
+int16_t two_comp_to_dec(uint16_t value);
 
 /**
  * Set vacuum actuator actuation degree by through the PWM pulse width.

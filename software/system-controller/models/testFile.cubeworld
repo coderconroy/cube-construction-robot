@@ -20,12 +20,12 @@
             "cubeID": 2,
             "orientation": [
                 0,
-                0.15707962214946747,
+                0,
                 0
             ],
             "position": [
-                0,
-                96,
+                -69,
+                32,
                 0
             ],
             "sideLength": 64
@@ -34,12 +34,12 @@
             "cubeID": 3,
             "orientation": [
                 0,
-                0.3141592741012573,
+                0,
                 0
             ],
             "position": [
-                0,
-                160,
+                -138,
+                32,
                 0
             ],
             "sideLength": 64
@@ -48,12 +48,12 @@
             "cubeID": 4,
             "orientation": [
                 0,
-                0.47123897075653076,
+                0,
                 0
             ],
             "position": [
-                0,
-                224,
+                -207,
+                32,
                 0
             ],
             "sideLength": 64
@@ -62,13 +62,13 @@
             "cubeID": 5,
             "orientation": [
                 0,
-                0.6283186674118042,
+                0,
                 0
             ],
             "position": [
                 0,
-                288,
-                0
+                32,
+                -69
             ],
             "sideLength": 64
         },
@@ -76,16 +76,352 @@
             "cubeID": 6,
             "orientation": [
                 0,
-                0.7853983640670776,
+                0,
                 0
             ],
             "position": [
                 0,
-                352,
+                32,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 7,
+            "orientation": [
+                0,
+                0,
                 0
+            ],
+            "position": [
+                0,
+                32,
+                -207
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 8,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -69,
+                32,
+                -207
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 9,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -138,
+                32,
+                -207
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 10,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -207,
+                32,
+                -207
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 11,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -207,
+                32,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 12,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -207,
+                32,
+                -69
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 13,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -69,
+                32,
+                -69
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 14,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -138,
+                32,
+                -69
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 15,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -69,
+                32,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 16,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -138,
+                32,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 17,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -103,
+                96,
+                -215
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 19,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -158,
+                96,
+                -160
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 20,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -48,
+                96,
+                -160
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 21,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -213,
+                96,
+                -105
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 22,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -104,
+                96,
+                -106
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 23,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                7,
+                96,
+                -105
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 24,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -158,
+                96,
+                -50
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 25,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -48,
+                96,
+                -50
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 26,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -103,
+                96,
+                5
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 27,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -138,
+                160,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 28,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -69,
+                160,
+                -138
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 29,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -138,
+                160,
+                -69
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 30,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                -69,
+                160,
+                -69
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 31,
+            "orientation": [
+                0,
+                0.7853983640670776,
+                0
+            ],
+            "position": [
+                -104,
+                224,
+                -106
             ],
             "sideLength": 64
         }
     ],
-    "lastCubeID": 6
+    "lastCubeID": 31
 }

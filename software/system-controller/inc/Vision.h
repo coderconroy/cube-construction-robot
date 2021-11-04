@@ -61,11 +61,18 @@ public:
 	void plotStructCubeInfo(cv::Mat& image);
 
 	/*!
-	* Annotate image with the computer vision bounding box.
+	* Annotate image with the robot end-effector workspace bounding box.
+	*
+	* \param [in] image Image to add bounding box to.
+	*/
+	void plotWorkspaceBoundBox(cv::Mat& image);
+
+	/*!
+	* Annotate image with the computer vision region of interest bounding box.
 	* 
 	* \param [in] image Image to add bounding box to.
 	*/
-	void plotBoundingBox(cv::Mat& image);
+	void plotVisionBoundBox(cv::Mat& image);
 
 	/*!
 	* Compute the corresponding world point given an image point and the Z coordinate of the world point.
@@ -120,6 +127,14 @@ public:
 	*/
 	std::vector<cv::Point3i> getCubeCentroids(const int z) const;
 
+	/*!
+	* Getter for the independent cube contour orientations. This is a parallel vector with the centroids vector returned by getCubeCentroids.
+	* 
+	* \param [in] z Z world coordinate of the xy plane the cube contours are projeced to.
+	* \return List of independent cube contour rotations in radians about the vertical axis for the the cube in the world frame.
+	*/
+	std::vector<float> Vision::getCubeRotations(const int z) const;
+
 signals:
 	/*!
 	* Generated when a message is logged by an \class Vision instance.
@@ -165,12 +180,18 @@ private:
 	std::vector<CubeContour> structCubeContours;  /*! Set of structure cube contours in the image frame */
 	QMap<int, cv::Point3i> fiducialWorldPoints; /*! Position in the world frame of each fiducial used */
 	bool calibrated = false; /*! Flag to indicate if the vision system has been calibrated with a valid extrinsic matrix */
-	cv::Point3i boundingBoxCorners[4]; /*! Coordinates of bounding box corners for computer vision system in the world frame */
+	int visionBoundBox[4]; /*! Bounding box planes for computer vision region of interest in the world frame [X min, X max, Y min, Y max] */
 
 	cv::Mat blurredImage; /*! image after the grayscale and blur stage of processing */
 	cv::Mat thresholdImage; /*! Image after the thresholding stage of processing */
 	cv::Mat contourImage; /*! Image after the contour detection stage of processing */
 	std::vector<cv::Mat> fiducialImages; /*! Isolated fiducial images */
+
+	// Robot constant parameters
+	const int ROBOT_X_MIN = 0; /*! Minimum step position of robot end-effector along x-axis */
+	const int ROBOT_X_MAX = 1015; /*! Maximum step position of robot end-effector along x-axis */
+	const int ROBOT_Y_MIN = 0; /*! Minimum step position of robot end-effector along y-axis */
+	const int ROBOT_Y_MAX = 1125; /*! Maximum step position of robot end-effector along y-axis */
 
 	/*!
 	* Get the contour centroid.

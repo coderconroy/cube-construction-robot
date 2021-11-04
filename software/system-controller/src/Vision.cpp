@@ -55,11 +55,11 @@ Vision::Vision(QObject* parent) : QObject(parent)
     cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
     distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
-    // Initialize coordinates of bounding box for computer vision consideration in world coordinates
-    boundingBoxCorners[0] = cv::Point3i(-100, -100, 0);
-    boundingBoxCorners[1] = cv::Point3i(1115, -100, 0);
-    boundingBoxCorners[2] = cv::Point3i(1115, 1225, 0);
-    boundingBoxCorners[3] = cv::Point3i(-100, 1225, 0);
+    // Initialize coordinates of bounding box for computer vision region of interest in world coordinates
+    visionBoundBox[0] = ROBOT_X_MIN - 100;
+    visionBoundBox[1] = ROBOT_X_MAX + 200;
+    visionBoundBox[2] = ROBOT_Y_MIN - 200;
+    visionBoundBox[3] = ROBOT_Y_MAX + 300;
 }
 
 void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::Point3i>* sourceCentroids, 
@@ -181,6 +181,32 @@ void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::
 
             // Transition system to calibrated state
             calibrated = true;
+        }
+    }
+
+    // The following image processing requires a calibrated system
+    if (!calibrated)
+        return;
+
+    // Remove centroids that do not fall within the computer vision region of interest
+    // The computer vision region of interest bounding box is defined on the base plane so all centroids are projected to
+    // and evaluated on this plane
+    for (std::vector<CubeContour>::iterator iter = cubeContours.begin(); iter != cubeContours.end();)
+    {
+        // Project centroid to the base plane
+        cv::Point3i worldCentroid = projectImagePoint(iter->centroid, 0);
+
+        // Identify if the cube is located within the compute vision region of interest bounding box
+        if (worldCentroid.x >= visionBoundBox[0] && worldCentroid.x <= visionBoundBox[1]
+            && worldCentroid.y >= visionBoundBox[2] && worldCentroid.y <= visionBoundBox[3])
+        {
+            // Increment iterator since no contour is removed from the cube contour list
+            ++iter;
+        }
+        else
+        {
+            // Remove contour as it does not fall within the compute vision bounding region of interest
+            iter = cubeContours.erase(iter);
         }
     }
 
@@ -355,24 +381,36 @@ void Vision::plotStructCubeInfo(cv::Mat& image)
     }
 }
 
-void Vision::plotBoundingBox(cv::Mat& image)
+void Vision::plotWorkspaceBoundBox(cv::Mat& image)
 {
     // Project bounding box world coordinates to image coordinates
     cv::Point imageCoordinatesL[4]; // Lower bounding box
     cv::Point imageCoordinatesH[4]; // Upper bounding box
+
+    imageCoordinatesL[0] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[2], 0));
+    imageCoordinatesL[1] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[3], 0));
+    imageCoordinatesL[2] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[3], 0));
+    imageCoordinatesL[3] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[2], 0));
+
+    // Plot bounding box
     for (int i = 0; i < 4; ++i)
-    {
-        imageCoordinatesL[i] = projectWorldPoint(boundingBoxCorners[i]);
-        imageCoordinatesH[i] = projectWorldPoint(boundingBoxCorners[i] + cv::Point3i(0, 0, 7 * -64));
-    }
+        cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+}
+
+void Vision::plotVisionBoundBox(cv::Mat& image)
+{
+    // Project bounding box world coordinates to image coordinates
+    cv::Point imageCoordinatesL[4]; // Lower bounding box
+    cv::Point imageCoordinatesH[4]; // Upper bounding box
+
+    imageCoordinatesL[0] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[2], 0));
+    imageCoordinatesL[1] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[3], 0));
+    imageCoordinatesL[2] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[3], 0));
+    imageCoordinatesL[3] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[2], 0));
 
     // Plot bounding box
     for (int i = 0; i < 4; ++i) 
-    {
         cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
-        cv::line(image, imageCoordinatesH[i], imageCoordinatesH[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
-        cv::line(image, imageCoordinatesL[i], imageCoordinatesH[i], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
-    }
 }
 
 cv::Point Vision::getCentroid(const std::vector<cv::Point>& contour) const
@@ -549,7 +587,7 @@ float Vision::computeCubeZRotation(const std::vector<cv::Point>& corners, const 
         angles[i] = mapAngle(angles[i] + M_PI / 4);
     }
 
-    // Compute average of angle estimates using the individual corners, map to (- PI / 4, PI / 4) and return single angle estimate
+    // Compute average of angle estimates using the individual corners, map to (- PI / 4, PI / 4] and return single angle estimate
     float ySum = 0;
     float xSum = 0;
     for (int i = 0; i < 4; ++i)
@@ -560,7 +598,7 @@ float Vision::computeCubeZRotation(const std::vector<cv::Point>& corners, const 
 
     float angle = mapToCubeAngle(atan2(ySum / 4, xSum / 4));
 
-    return angle;
+    return -angle;
 }
 
 cv::Point3i Vision::projectImagePoint(const cv::Point2d& imagePoint, double z) const
@@ -638,4 +676,21 @@ std::vector<cv::Point3i> Vision::getCubeCentroids(const int z) const
     }
 
     return centroids;
+}
+
+std::vector<float> Vision::getCubeRotations(const int z) const
+{
+    // Compile list of cube centroids from the cube contour list for a given plane in the world frame
+    std::vector<float> rotations;
+    for (int i = 0; i < cubeContours.size(); ++i)
+    {
+        // Get contour
+        CubeContour c = cubeContours[i];
+
+        // Compute cube rotation and add to the roatations list
+        float angle = computeCubeZRotation(c.corners, c.centroid, -z);
+        rotations.push_back(angle);
+    }
+
+    return rotations;
 }
