@@ -56,10 +56,10 @@ Vision::Vision(QObject* parent) : QObject(parent)
     distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
 
     // Initialize coordinates of bounding box for computer vision region of interest in world coordinates
-    visionBoundBox[0] = ROBOT_X_MIN - 100;
-    visionBoundBox[1] = ROBOT_X_MAX + 200;
-    visionBoundBox[2] = ROBOT_Y_MIN - 200;
-    visionBoundBox[3] = ROBOT_Y_MAX + 300;
+    visionBoundBox[0] = ROBOT_X_MIN - 340;
+    visionBoundBox[1] = ROBOT_X_MAX + 240;
+    visionBoundBox[2] = ROBOT_Y_MIN - 100;
+    visionBoundBox[3] = ROBOT_Y_MAX + 260;
 }
 
 void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::Point3i>* sourceCentroids, 
@@ -387,21 +387,29 @@ void Vision::plotWorkspaceBoundBox(cv::Mat& image)
     cv::Point imageCoordinatesL[4]; // Lower bounding box
     cv::Point imageCoordinatesH[4]; // Upper bounding box
 
-    imageCoordinatesL[0] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[2], 0));
-    imageCoordinatesL[1] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[3], 0));
-    imageCoordinatesL[2] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[3], 0));
-    imageCoordinatesL[3] = projectWorldPoint(cv::Point3i(visionBoundBox[1], visionBoundBox[2], 0));
+    imageCoordinatesL[0] = projectWorldPoint(cv::Point3i(ROBOT_X_MIN, ROBOT_Y_MIN, 0));
+    imageCoordinatesL[1] = projectWorldPoint(cv::Point3i(ROBOT_X_MIN, ROBOT_Y_MAX, 0));
+    imageCoordinatesL[2] = projectWorldPoint(cv::Point3i(ROBOT_X_MAX, ROBOT_Y_MAX, 0));
+    imageCoordinatesL[3] = projectWorldPoint(cv::Point3i(ROBOT_X_MAX, ROBOT_Y_MIN, 0));
+
+    imageCoordinatesH[0] = projectWorldPoint(cv::Point3i(ROBOT_X_MIN, ROBOT_Y_MIN, 6 * -64));
+    imageCoordinatesH[1] = projectWorldPoint(cv::Point3i(ROBOT_X_MIN, ROBOT_Y_MAX, 6 * -64));
+    imageCoordinatesH[2] = projectWorldPoint(cv::Point3i(ROBOT_X_MAX, ROBOT_Y_MAX, 6 * -64));
+    imageCoordinatesH[3] = projectWorldPoint(cv::Point3i(ROBOT_X_MAX, ROBOT_Y_MIN, 6 * -64));
 
     // Plot bounding box
     for (int i = 0; i < 4; ++i)
+    {
         cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+        cv::line(image, imageCoordinatesH[i], imageCoordinatesH[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+        cv::line(image, imageCoordinatesL[i], imageCoordinatesH[i], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+    }
 }
 
 void Vision::plotVisionBoundBox(cv::Mat& image)
 {
     // Project bounding box world coordinates to image coordinates
     cv::Point imageCoordinatesL[4]; // Lower bounding box
-    cv::Point imageCoordinatesH[4]; // Upper bounding box
 
     imageCoordinatesL[0] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[2], 0));
     imageCoordinatesL[1] = projectWorldPoint(cv::Point3i(visionBoundBox[0], visionBoundBox[3], 0));
@@ -410,7 +418,7 @@ void Vision::plotVisionBoundBox(cv::Mat& image)
 
     // Plot bounding box
     for (int i = 0; i < 4; ++i) 
-        cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 255, 0), 3, cv::LINE_8);
+        cv::line(image, imageCoordinatesL[i], imageCoordinatesL[(i + 1) % 4], cv::Scalar(255, 0, 128), 3, cv::LINE_8);
 }
 
 cv::Point Vision::getCentroid(const std::vector<cv::Point>& contour) const

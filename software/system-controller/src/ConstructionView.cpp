@@ -33,6 +33,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     showModelView = new QPushButton("Show Model View");
     loadModel = new QPushButton("Load Model");
     execute = new QPushButton("Start Construction");
+    processScene = new QPushButton("Process Scene");
     sleepRobot = new QPushButton("Sleep");
     wakeRobot = new QPushButton("Wake");
     calibrateRobot = new QPushButton("Calibrate");
@@ -40,10 +41,12 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     actuateRobotActuator = new QPushButton("Actuator->Actuate");
     releaseRobotActuator = new QPushButton("Actuator->Release");
 
+    // Connect button click events to handler slots
     connect(showVisionView, &QPushButton::clicked, this, &ConstructionView::showVisionViewClicked);
     connect(showModelView, &QPushButton::clicked, this, &ConstructionView::showModelViewClicked);
     connect(loadModel, &QPushButton::clicked, this, &ConstructionView::loadModelClicked);
     connect(execute, &QPushButton::clicked, this, &ConstructionView::executeConstruction);
+    connect(processScene, &QPushButton::clicked, this, &ConstructionView::processSceneClicked);
     connect(sleepRobot, &QPushButton::clicked, this, &ConstructionView::sleepRobotClicked);
     connect(wakeRobot, &QPushButton::clicked, this, &ConstructionView::wakeRobotClicked);
     connect(calibrateRobot, &QPushButton::clicked, this, &ConstructionView::calibrateRobotClicked);
@@ -51,12 +54,14 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(actuateRobotActuator, &QPushButton::clicked, this, &ConstructionView::actuateRobotActuatorClicked);
     connect(releaseRobotActuator, &QPushButton::clicked, this, &ConstructionView::releaseRobotActuatorClicked);
 
+    // Initialize robot controls layout
     robotControlLayout = new QHBoxLayout();
     robotControlLayout->addStretch();
     robotControlLayout->addWidget(showVisionView);
     robotControlLayout->addWidget(showModelView);
     robotControlLayout->addWidget(loadModel);
     robotControlLayout->addWidget(execute);
+    robotControlLayout->addWidget(processScene);
     robotControlLayout->addWidget(sleepRobot);
     robotControlLayout->addWidget(wakeRobot);
     robotControlLayout->addWidget(calibrateRobot);
@@ -77,6 +82,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     pressureLabel = new QLabel("Pressure: No Reading");
     setRobotPosition = new QPushButton("Initiate Move");
 
+    // Initialize robot position control sizes
     xPosition->setMinimum(0);
     xPosition->setMaximum(1015);
     yPosition->setMinimum(0);
@@ -88,6 +94,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     connect(setRobotPosition, &QPushButton::clicked, this, &ConstructionView::setRobotPositionClicked);
 
+    // Initialize robot position controls layout
     robotPositionLayout = new QHBoxLayout();
     robotPositionLayout->addStretch();
     robotPositionLayout->addWidget(pressureLabel);
@@ -136,9 +143,12 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionThreshold = new QRadioButton("Thresholding");
     visionContours = new QRadioButton("Contour Detection");
     visionFiducials = new QRadioButton("Fiducial Processing");
-    boundingBox = new QCheckBox("Bounding Box");
+    workspaceBoundBox = new QCheckBox("Workspace Bounding Box");
+    visionBoundBox = new QCheckBox("Vision Bounding Box");
     fiducialInfo = new QCheckBox("Fiducial Info");
     cubeInfo = new QCheckBox("Cube Info");
+    sourceCubeInfo = new QCheckBox("Source Cubes");
+    structCubeInfo = new QCheckBox("Structure Cubes");
     worldPointXPos = new QSpinBox();
     worldPointYPos = new QSpinBox();
     worldPointZPos = new QSpinBox();
@@ -168,9 +178,12 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     visionControls->addWidget(visionThreshold);
     visionControls->addWidget(visionContours);
     visionControls->addWidget(visionFiducials);
-    visionControls->addWidget(boundingBox);
+    visionControls->addWidget(workspaceBoundBox);
+    visionControls->addWidget(visionBoundBox);
     visionControls->addWidget(fiducialInfo);
     visionControls->addWidget(cubeInfo);
+    visionControls->addWidget(sourceCubeInfo);
+    visionControls->addWidget(structCubeInfo);
     visionControls->addWidget(worldPointXPos);
     visionControls->addWidget(worldPointYPos);
     visionControls->addWidget(worldPointZPos);
@@ -318,10 +331,7 @@ void ConstructionView::pressureUpdated()
 
 void ConstructionView::updateCameraFeed()
 {
-    // Capture frame from camera
-    cv::Mat input;
-    *camera >> input;
-
+    // Initialize camera feed display based on the currently displayed view
     QLabel* display;
     float scaleFactor;
     if (baseLayout->currentWidget() == overviewWidget)
@@ -339,19 +349,29 @@ void ConstructionView::updateCameraFeed()
         return;
     }
 
+    // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+
     // Select image to display based on user vision stage selection
     cv::Mat output;
     if (visionInput->isChecked())
     {
         input.copyTo(output);
-        if (boundingBox->isChecked())
+
+        // Annotate image based on user selection
+        if (workspaceBoundBox->isChecked())
+            vision.plotWorkspaceBoundBox(output);
+        if (visionBoundBox->isChecked())
             vision.plotVisionBoundBox(output);
         if (fiducialInfo->isChecked())
             vision.plotFiducialInfo(output);
         if (cubeInfo->isChecked())
             vision.plotCubeInfo(output);
-        vision.plotSourceCubeInfo(output);
-        vision.plotStructCubeInfo(output);
+        if (sourceCubeInfo->isChecked())
+            vision.plotSourceCubeInfo(output);
+        if (structCubeInfo->isChecked())
+            vision.plotStructCubeInfo(output);
     }
     else if (visionBlurred->isChecked())
     {
@@ -524,196 +544,251 @@ void ConstructionView::setRobot(Robot* robot)
 }
 
 
-enum class ConstructionState
+enum class RobotCommandState
 {
+    IDLE,
     CONSTRUCT_TASK,
-    CONSTRUCT_VISION
+    CONSTRUCT_VISION,
+    PROCESS_SCENE
 };
 
 int pressureThreshold = 500;
-ConstructionState constructState = ConstructionState::CONSTRUCT_VISION;
+RobotCommandState robotCommandState = RobotCommandState::CONSTRUCT_VISION;
 
 void ConstructionView::handleRobotCommand()
 {
-    CubeTask* task = Q_NULLPTR;
-
-    // Check if there are any cube tasks to be performed
-    if (cubeTasks.isEmpty())
-        return;
-
-    switch (constructState)
+    switch (robotCommandState)
     {
-    case ConstructionState::CONSTRUCT_TASK:
-
-        task = cubeTasks.first();
-
-        // Check if task complete
-        if (task->isComplete())
-        {
-            // Add source cube to list of sucessfully placed cubes in the 3D shape structure
-            structCubes.append(task->getSourceCube());
-
-            // Remove completed cube task from the list of incomplete cube tasks
-            delete cubeTasks.first();
-            cubeTasks.removeFirst();
-            task = Q_NULLPTR;
-
-            // Check if construction is complete
-            if (cubeTasks.isEmpty())
-            {
-                // Move robot to xy origin
-                robot->setPosition(0, 0, robot->getZPosition(), 0);
-
-                // Stop the pressure sensor reading requests
-                pressureTimer->stop();
-            }
-            else
-            {
-                // Activate the computer vision phase of the construction state to detect the cube
-                constructState = ConstructionState::CONSTRUCT_VISION;
-                handleRobotCommand();
-            }
-
-            return;
-        }
-
-        // Initialize source position if task has not been started
-        if (!task->isStarted())
-        {
-            // Check if any source cubes remain
-            if (sourceCubes.size() > 0)
-            {
-                task->setSourceCube(sourceCubes.takeFirst());
-            }
-            else
-            {
-                emit log(Message(MessageType::ERROR_LOG, "Construction View", "No source cubes remain to build the structure"));
-                return;
-            }
-        }
-
-        // Check if the cube is not gripped when the task step expects it to be gripped
-        if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
-        {
-            emit log(Message(MessageType::INFO_LOG, "Construction", "Failed to grip the cube"));
-
-            // Activate the computer vision phase of the construction state to detect the cube
-            missingCubes++;
-            constructState = ConstructionState::CONSTRUCT_VISION;
-
-            // Update the status of the failed source cube in the cube world model
-            task->getSourceCube()->setState(CubeState::INVALID);
-
-            // Restart the task
-            task->resetSteps(robot);
-            return;
-        }
-
-        // Set the source cube position in the cube world model to that of the robot if the cube is gripped
-        // The coodinates are converted from the robot coordinate system to the OpenGL coordinate system
-        if (robot->getPressure() >= pressureThreshold)
-        {
-            glm::vec3 position(robot->getXPosition(), robot->getZPosition() * 64 / 318 - 32, robot->getYPosition());
-            glm::vec3 orientation(0, glm::radians(robot->getRPosition() * 1.8), 0);
-            task->getSourceCube()->setPosition(position);
-            task->getSourceCube()->setOrientation(orientation);
-        }
-
-        // Instruct the robot to perform the next step in the task
-        task->performNextStep(robot);
-
+    case RobotCommandState::CONSTRUCT_TASK:
+        handleConstructTaskState();
         break;
-
-    case ConstructionState::CONSTRUCT_VISION:
-        // Verify robot is in the correct position to ensure there are no occlusions
-        if (robot->getXPosition() != 507 || robot->getYPosition() != 0 || robot->getZPosition() != 2000)
-        {
-            // Instruct robot to go to computer vison position
-            robot->setPosition(507, 0, 2000, 0);
-            return;
-        }
-
-        emit log(Message(MessageType::INFO_LOG, "Construction", "Processing image..."));
-
-        // Create list of source cube top face centroids excluding source cube being processed by current task
-        std::vector<cv::Point3i> sourceCentroids;
-        for (int i = 0; i < sourceCubes.size(); ++i)
-        {
-            // Get cube position in the OpenGL coordinate system
-            glm::vec3 cubePos = sourceCubes[i]->getPosition();
-
-            // Convert position to top face centroid position in robot coordinate system
-            cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
-            sourceCentroids.push_back(centroid);
-        }
-
-        // Create list of successfully placed structure cube top face centroids
-        std::vector<cv::Point3i> structCentroids;
-        for (int i = 0; i < structCubes.size(); ++i)
-        {
-            // Get cube position in the OpenGL coordinate system
-            glm::vec3 cubePos = structCubes[i]->getPosition();
-
-            // Convert position to top face centroid position in robot coordinate system
-            cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
-            structCentroids.push_back(centroid);
-        }
-
-        // Capture frame from camera
-        cv::Mat input;
-        *camera >> input;
-
-        // Process image
-        vision.processScene(input, true, &sourceCentroids, &structCentroids);
-
-        // Analyze cubes detected in the workspace that are not part of the source cubes or 3D shape structure
-        std::vector<cv::Point3i> detectedCubeCentroids = vision.getCubeCentroids(64);
-        std::vector<float> detectedCubeRotations = vision.getCubeRotations(64);
-        if (detectedCubeCentroids.size() > 0)
-        {
-            // Check if the construction has failed
-            // This is assumed when there are more independent cubes detected than expected
-            int expectedCubes = missingCubes + externalCubes;
-            if (detectedCubeCentroids.size() > expectedCubes)
-            {
-                // TODO: Reset construction state
-                emit log(Message(MessageType::INFO_LOG, "Construction", "Construction failure detected"));
-                cubeTasks.clear();
-                break;
-            }
-            // The missing cube has been detected in the workspace
-            else if (detectedCubeCentroids.size() == expectedCubes)
-            {
-                emit log(Message(MessageType::INFO_LOG, "Construction", "Missing cube detected"));
-
-                // Update the position and state of the missing cube
-                glm::vec3 detectedPos(detectedCubeCentroids[0].x, detectedCubeCentroids[0].z - 32, detectedCubeCentroids[0].y);
-                task = cubeTasks.first();
-                task->getSourceCube()->setPosition(detectedPos);
-                task->getSourceCube()->setOrientation(glm::vec3(0, detectedCubeRotations[0], 0));
-                task->getSourceCube()->setState(CubeState::VALID);
-
-                // Use the detected missing cube as the next source cube
-                sourceCubes.insert(0, task->getSourceCube());
-            }
-        }
-
-        // Update state to indicate missing cube has been processed if cube was missing
-        if (missingCubes > 0)
-            missingCubes--;
-
-
-        // Activate the cube task execution phase of the construction state to place the cube
-        constructState = ConstructionState::CONSTRUCT_TASK;
-        handleRobotCommand();
+    case RobotCommandState::CONSTRUCT_VISION:
+        handleConstructVisionState();
+        break;
+    case RobotCommandState::PROCESS_SCENE:
+        handleProcessSceneState();
         break;
     }
 }
 
+void ConstructionView::handleConstructTaskState()
+{
+    // Check if there are any cube tasks to be performed
+    if (cubeTasks.isEmpty())
+        return;
+
+    CubeTask* task = cubeTasks.first();
+
+    // Check if task complete
+    if (task->isComplete())
+    {
+        // Add source cube to list of sucessfully placed cubes in the 3D shape structure
+        structCubes.append(task->getSourceCube());
+
+        // Remove completed cube task from the list of incomplete cube tasks
+        delete cubeTasks.first();
+        cubeTasks.removeFirst();
+        task = Q_NULLPTR;
+
+        // Check if construction is complete
+        if (cubeTasks.isEmpty())
+        {
+            // Move robot to xy origin
+            robot->setPosition(0, 0, robot->getZPosition(), 0);
+
+            // Stop the pressure sensor reading requests
+            pressureTimer->stop();
+        }
+        else
+        {
+            // Activate the computer vision phase of the construction state to detect the cube
+            robotCommandState = RobotCommandState::CONSTRUCT_VISION;
+            handleRobotCommand();
+        }
+
+        return;
+    }
+
+    // Initialize source position if task has not been started
+    if (!task->isStarted())
+    {
+        // Check if any source cubes remain
+        if (sourceCubes.size() > 0)
+        {
+            task->setSourceCube(sourceCubes.takeFirst());
+        }
+        else
+        {
+            emit log(Message(MessageType::ERROR_LOG, "Construction View", "No source cubes remain to build the structure"));
+            return;
+        }
+    }
+
+    // Check if the cube is not gripped when the task step expects it to be gripped
+    if (task->expectGrippedCube() && robot->getPressure() < pressureThreshold)
+    {
+        emit log(Message(MessageType::INFO_LOG, "Construction", "Failed to grip the cube"));
+
+        // Activate the computer vision phase of the construction state to detect the cube
+        missingCubes++;
+        robotCommandState = RobotCommandState::CONSTRUCT_VISION;
+
+        // Update the status of the failed source cube in the cube world model
+        task->getSourceCube()->setState(CubeState::INVALID);
+
+        // Restart the task
+        task->resetSteps(robot);
+        return;
+    }
+
+    // Set the source cube position in the cube world model to that of the robot if the cube is gripped
+    // The coodinates are converted from the robot coordinate system to the OpenGL coordinate system
+    if (robot->getPressure() >= pressureThreshold)
+    {
+        glm::vec3 position(robot->getXPosition(), robot->getZPosition() * 64 / 318 - 32, robot->getYPosition());
+        glm::vec3 orientation(0, glm::radians(robot->getRPosition() * 1.8), 0);
+        task->getSourceCube()->setPosition(position);
+        task->getSourceCube()->setOrientation(orientation);
+    }
+
+    // Instruct the robot to perform the next step in the task
+    task->performNextStep(robot);
+}
+
+void ConstructionView::handleConstructVisionState()
+{
+    // Check if there are any cube tasks to be performed
+    if (cubeTasks.isEmpty())
+        return;
+
+    // Verify robot is in the correct position to ensure there are no occlusions
+    if (robot->getXPosition() != ROBOT_VISION_POS.x || robot->getYPosition() != ROBOT_VISION_POS.y || robot->getZPosition() != ROBOT_VISION_POS.z)
+    {
+        // Instruct robot to go to computer vison position
+        robot->setPosition(ROBOT_VISION_POS.x, ROBOT_VISION_POS.y, ROBOT_VISION_POS.z, 0);
+        return;
+    }
+
+    emit log(Message(MessageType::INFO_LOG, "Construction", "Processing image..."));
+
+    // Create list of source cube top face centroids excluding source cube being processed by current task
+    std::vector<cv::Point3i> sourceCentroids;
+    for (int i = 0; i < sourceCubes.size(); ++i)
+    {
+        // Get cube position in the OpenGL coordinate system
+        glm::vec3 cubePos = sourceCubes[i]->getPosition();
+
+        // Convert position to top face centroid position in robot coordinate system
+        cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
+        sourceCentroids.push_back(centroid);
+    }
+
+    // Create list of successfully placed structure cube top face centroids
+    std::vector<cv::Point3i> structCentroids;
+    for (int i = 0; i < structCubes.size(); ++i)
+    {
+        // Get cube position in the OpenGL coordinate system
+        glm::vec3 cubePos = structCubes[i]->getPosition();
+
+        // Convert position to top face centroid position in robot coordinate system
+        cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
+        structCentroids.push_back(centroid);
+    }
+
+    // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+    *camera >> input;
+
+    // Process image
+    vision.processScene(input, true, &sourceCentroids, &structCentroids);
+
+    // Analyze cubes detected in the workspace that are not part of the source cubes or 3D shape structure
+    std::vector<cv::Point3i> detectedCubeCentroids = vision.getCubeCentroids(64);
+    std::vector<float> detectedCubeRotations = vision.getCubeRotations(64);
+    if (detectedCubeCentroids.size() > 0)
+    {
+        // Check if the construction has failed
+        // This is assumed when there are more independent cubes detected than expected
+        int expectedCubes = missingCubes + externalCubes;
+        if (detectedCubeCentroids.size() > expectedCubes)
+        {
+            // TODO: Reset construction state
+            emit log(Message(MessageType::INFO_LOG, "Construction", "Construction failure detected"));
+            cubeTasks.clear();
+            return;
+        }
+        // The missing cube has been detected in the workspace
+        else if (detectedCubeCentroids.size() == expectedCubes)
+        {
+            emit log(Message(MessageType::INFO_LOG, "Construction", "Missing cube detected"));
+
+            // Update the position and state of the missing cube
+            glm::vec3 detectedPos(detectedCubeCentroids[0].x, detectedCubeCentroids[0].z - 32, detectedCubeCentroids[0].y);
+            CubeTask* task = cubeTasks.first();
+            task->getSourceCube()->setPosition(detectedPos);
+            task->getSourceCube()->setOrientation(glm::vec3(0, detectedCubeRotations[0], 0));
+            task->getSourceCube()->setState(CubeState::VALID);
+
+            // Use the detected missing cube as the next source cube
+            sourceCubes.insert(0, task->getSourceCube());
+        }
+    }
+
+    // Update state to indicate missing cube has been processed if cube was missing
+    if (missingCubes > 0)
+        missingCubes--;
+
+    // Activate the cube task execution phase of the construction state to place the cube
+    robotCommandState = RobotCommandState::CONSTRUCT_TASK;
+    handleRobotCommand();
+}
+
+void ConstructionView::handleProcessSceneState()
+{
+    // Verify robot is in the correct position to ensure there are no occlusions
+    if (robot->getXPosition() != ROBOT_VISION_POS.x || robot->getYPosition() != ROBOT_VISION_POS.y || robot->getZPosition() != ROBOT_VISION_POS.z)
+    {
+        // Instruct robot to go to computer vison position
+        robot->setPosition(ROBOT_VISION_POS.x, ROBOT_VISION_POS.y, ROBOT_VISION_POS.z, 0);
+        return;
+    }
+
+    emit log(Message(MessageType::INFO_LOG, "Construction", "Processing image..."));
+
+    // Create list of source cube top face centroids excluding source cube being processed by current task
+    std::vector<cv::Point3i> sourceCentroids;
+    for (int i = 0; i < sourceCubes.size(); ++i)
+    {
+        // Get cube position in the OpenGL coordinate system
+        glm::vec3 cubePos = sourceCubes[i]->getPosition();
+
+        // Convert position to top face centroid position in robot coordinate system
+        cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
+        sourceCentroids.push_back(centroid);
+    }
+
+    // Capture frame from camera
+    cv::Mat input;
+    *camera >> input;
+    *camera >> input;
+
+    // Process image
+    vision.processScene(input, true, &sourceCentroids);
+
+    robotCommandState = RobotCommandState::IDLE;
+}
 
 void ConstructionView::setCamera(cv::VideoCapture* camera)
 {
     this->camera = camera;
+}
+
+void ConstructionView::processSceneClicked()
+{
+    // Set robot command state to process scene and initiate robot command handler
+    robotCommandState = RobotCommandState::PROCESS_SCENE;
+    handleRobotCommand();
 }
 
 void ConstructionView::sleepRobotClicked()

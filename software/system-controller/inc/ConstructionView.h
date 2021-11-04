@@ -83,6 +83,7 @@ private:
 
     QHBoxLayout* robotPositionLayout;
     QHBoxLayout* robotControlLayout;
+    QPushButton* processScene;
     QPushButton* sleepRobot;
     QPushButton* wakeRobot;
     QPushButton* calibrateRobot;
@@ -111,7 +112,10 @@ private:
     QRadioButton* visionThreshold; /*! Display computer vision image after threshold stage */
     QRadioButton* visionContours; /*! Display computer vision image after contour detection stage */
     QRadioButton* visionFiducials; /*! Display computer vision fiducial processing stage */
-    QCheckBox* boundingBox; /*! Annotate plain computer vision raw image input with bounding box */
+    QCheckBox* visionBoundBox; /*! Annotate plain computer vision raw image input with computer vision bounding box */
+    QCheckBox* workspaceBoundBox; /*! Annotate plain computer vision raw image input with workspace bounding box */
+    QCheckBox* sourceCubeInfo; /*! Annotate plain computer vision raw image input with source cube location info */
+    QCheckBox* structCubeInfo; /*! Annotate plain computer vision raw image input with structure cube location info */
     QCheckBox* fiducialInfo; /*! Annotate plain computer vision raw image input with fiducial information */
     QCheckBox* cubeInfo; /*! Annotate plain computer vision raw image input with cube information */
     QSpinBox* worldPointXPos; /*! X coordinate of world point to project to image frame */
@@ -130,6 +134,9 @@ private:
     QRadioButton* showWorldModel; /*! Select the model of cubes in world during construction as input the the 3D display */
     OpenGLView* modelView; /*! OpenGL render of 3D shape or construction process */
     Vision vision;
+
+    // Constant robot parameters
+    const cv::Point3i ROBOT_VISION_POS = cv::Point3i(507, 0, 2000); /*! Position of robot to ensure there are no occlusions for the computer vision system */
 
     /*!
     * Captures new image from camera and updates the camera feed.
@@ -187,9 +194,29 @@ private:
     void handleRobotCommand();
 
     /*!
+    * Handle the robot command when the robot is in the task construction state
+    */
+    void handleConstructTaskState();
+
+    /*!
+    * Handle the robot command when the robot is in the construction vision state
+    */
+    void handleConstructVisionState();
+
+    /*!
+    * Handle the robot command when the robot is in the process scene state
+    */
+    void handleProcessSceneState();
+
+    /*!
     * Slot to update the model view when the cube world model input is changed.
     */
     void modelInputUpdate(QAbstractButton* button, bool checked);
+
+    /*!
+    * Slot to initiate sequence to capture and process scene using computer vision system
+    */
+    void processSceneClicked();
 
     void sleepRobotClicked();
     void wakeRobotClicked();
