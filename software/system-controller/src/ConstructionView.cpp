@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QList>
+#include <QFileDialog>
 
 QVector<Cube*> sourceCubes;
 QVector<Cube*> structCubes;
@@ -95,7 +96,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(setRobotPosition, &QPushButton::clicked, this, &ConstructionView::setRobotPositionClicked);
 
     // Initialize robot position controls layout
-    robotPositionLayout = new QHBoxLayout();
+    robotPositionLayout = new QVBoxLayout();
     robotPositionLayout->addStretch();
     robotPositionLayout->addWidget(pressureLabel);
     robotPositionLayout->addWidget(xPositionLabel);
@@ -422,8 +423,15 @@ void ConstructionView::showModelViewClicked()
 
 void ConstructionView::loadModelClicked()
 {
+    // Select JSON cube world model file from file system
+    QString fileName = QFileDialog::getOpenFileName(this, "Open Cube World Model", "", "Cube Model Files (*.cubeworld)");
+
+    // Verify a file was selected
+    if (fileName.isNull())
+        return;
+
     // Read JSON cube world model from file
-    QFile jsonFile("models/testFile.cubeworld");
+    QFile jsonFile(fileName);
     if (jsonFile.open(QIODevice::ReadOnly))
     {
         // Read file into byte array

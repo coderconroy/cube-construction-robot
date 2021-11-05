@@ -30,6 +30,8 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
     connectButton = new QPushButton("Connect to Robot");
     connectButton->setEnabled(false);
     disconnectButton = new QPushButton("Disconnect from Robot");
+
+    portList->setMaximumWidth(400);
     
     connect(portList, &QListWidget::itemSelectionChanged, this, &HomeView::portListSelectionChange);
     connect(refreshButton, &QPushButton::clicked, this, &HomeView::refreshAvailablePorts);
@@ -53,9 +55,11 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
 
     // Initialize hardware layout
     hardwareLayout = new QHBoxLayout();
+    hardwareLayout->addStretch();
     hardwareLayout->addLayout(cameraLayout);
     hardwareLayout->addSpacing(20);
     hardwareLayout->addLayout(robotLayout);
+    hardwareLayout->addStretch();
 
     // Initialize base layout
     baseLayout = new QVBoxLayout();
@@ -73,7 +77,7 @@ HomeView::HomeView(QWidget* parent) : QWidget(parent)
 
 void HomeView::showView()
 {
-    cameraFeedTimer->start(20); // Update camera feed every 20ms
+    cameraFeedTimer->start(200); // Update camera feed every 20ms
 }
 
 void HomeView::hideView()
@@ -108,7 +112,7 @@ void HomeView::updateCameraFeed()
     *camera >> frame;
 
     // Display image in camera feed
-    cv::resize(frame, frame, cv::Size(), 0.5, 0.5);
+    cv::resize(frame, frame, cv::Size(), 0.4, 0.4);
     cvtColor(frame, frame, cv::COLOR_BGR2RGB); // Convert from BGR to RGB
     QImage cameraFeedImage = QImage((uchar*) frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
     cameraFeed->setPixmap(QPixmap::fromImage(cameraFeedImage));

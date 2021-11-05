@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QList>
+#include <QFileDialog>
 
 DesignView::DesignView(QWidget* parent): QWidget(parent) 
 {
@@ -110,6 +111,13 @@ void DesignView::removeCubeClicked()
 
 void DesignView::saveModelClicked()
 {
+	// Select JSON cube world model file to save to
+	QString fileName = QFileDialog::getSaveFileName(this, "Save Cube World Model", "", "Cube Model Files (*.cubeworld)");
+
+	// Verify a file was selected
+	if (fileName.isNull())
+		return;
+
 	// Convert cube world model to JSON object
 	QJsonObject jsonCubeWorldModel;
 	cubeWorldModel->write(jsonCubeWorldModel);
@@ -118,7 +126,7 @@ void DesignView::saveModelClicked()
 	QJsonDocument document;
 	document.setObject(jsonCubeWorldModel);
 	QByteArray jsonBytes = document.toJson(QJsonDocument::Indented);
-	QFile jsonFile("models/testFile.cubeworld");
+	QFile jsonFile(fileName);
 	if (jsonFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
 	{
 		QTextStream textStream(&jsonFile);
@@ -138,8 +146,15 @@ void DesignView::saveModelClicked()
 
 void DesignView::loadModelClicked()
 {
+	// Select JSON cube world model file from file system
+	QString fileName = QFileDialog::getOpenFileName(this, "Open Cube World Model", "", "Cube Model Files (*.cubeworld)");
+
+	// Verify a file was selected
+	if (fileName.isNull())
+		return;
+
 	// Read JSON cube world model from file
-	QFile jsonFile("models/testFile.cubeworld");
+	QFile jsonFile(fileName);
 	if (jsonFile.open(QIODevice::ReadOnly))
 	{
 		// Read file into byte array
