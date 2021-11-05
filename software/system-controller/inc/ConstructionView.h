@@ -81,9 +81,11 @@ private:
     cv::VideoCapture* camera = Q_NULLPTR; /*! Reference to source of live camera images */
     Robot* robot = Q_NULLPTR; /*! Reference to interface with the robotic subsystem */
 
+    QHBoxLayout* controlLayout;
+    QVBoxLayout* generalControlLayout;
+    QVBoxLayout* robotCommandLayout;
     QVBoxLayout* robotPositionLayout;
-    QHBoxLayout* robotControlLayout;
-
+    QVBoxLayout* robotStatsLayout;
 
     QPushButton* processScene;
     QPushButton* sleepRobot;

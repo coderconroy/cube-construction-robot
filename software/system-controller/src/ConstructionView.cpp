@@ -10,6 +10,17 @@ QVector<Cube*> structCubes;
 int missingCubes = 0;
 int externalCubes = 0;
 
+enum class RobotCommandState
+{
+    IDLE,
+    CONSTRUCT_TASK,
+    CONSTRUCT_VISION,
+    PROCESS_SCENE
+};
+
+int pressureThreshold = 500;
+RobotCommandState robotCommandState = RobotCommandState::CONSTRUCT_VISION;
+
 ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 {
     // Initialize cube world model
@@ -42,6 +53,19 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     actuateRobotActuator = new QPushButton("Actuator->Actuate");
     releaseRobotActuator = new QPushButton("Actuator->Release");
 
+    int maxWidth = 200;
+    showVisionView->setMaximumWidth(maxWidth);
+    showModelView->setMaximumWidth(maxWidth);
+    loadModel->setMaximumWidth(maxWidth);
+    execute->setMaximumWidth(maxWidth);
+    processScene->setMaximumWidth(maxWidth);
+    sleepRobot->setMaximumWidth(maxWidth);
+    wakeRobot->setMaximumWidth(maxWidth);
+    calibrateRobot->setMaximumWidth(maxWidth);
+    idleRobotActuator->setMaximumWidth(maxWidth);
+    actuateRobotActuator->setMaximumWidth(maxWidth);
+    releaseRobotActuator->setMaximumWidth(maxWidth);
+
     // Connect button click events to handler slots
     connect(showVisionView, &QPushButton::clicked, this, &ConstructionView::showVisionViewClicked);
     connect(showModelView, &QPushButton::clicked, this, &ConstructionView::showModelViewClicked);
@@ -55,21 +79,22 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(actuateRobotActuator, &QPushButton::clicked, this, &ConstructionView::actuateRobotActuatorClicked);
     connect(releaseRobotActuator, &QPushButton::clicked, this, &ConstructionView::releaseRobotActuatorClicked);
 
-    // Initialize robot controls layout
-    robotControlLayout = new QHBoxLayout();
-    robotControlLayout->addStretch();
-    robotControlLayout->addWidget(showVisionView);
-    robotControlLayout->addWidget(showModelView);
-    robotControlLayout->addWidget(loadModel);
-    robotControlLayout->addWidget(execute);
-    robotControlLayout->addWidget(processScene);
-    robotControlLayout->addWidget(sleepRobot);
-    robotControlLayout->addWidget(wakeRobot);
-    robotControlLayout->addWidget(calibrateRobot);
-    robotControlLayout->addWidget(idleRobotActuator);
-    robotControlLayout->addWidget(actuateRobotActuator);
-    robotControlLayout->addWidget(releaseRobotActuator);
-    robotControlLayout->addStretch();
+    // Initialize general controls layout
+    generalControlLayout = new QVBoxLayout();
+    generalControlLayout->addWidget(showVisionView);
+    generalControlLayout->addWidget(showModelView);
+    generalControlLayout->addWidget(loadModel);
+    generalControlLayout->addWidget(calibrateRobot);
+    generalControlLayout->addWidget(execute);
+    generalControlLayout->addWidget(processScene);
+
+    // Initialize robot commands layout
+    robotCommandLayout = new QVBoxLayout();
+    robotCommandLayout->addWidget(sleepRobot);
+    robotCommandLayout->addWidget(wakeRobot);
+    robotCommandLayout->addWidget(idleRobotActuator);
+    robotCommandLayout->addWidget(actuateRobotActuator);
+    robotCommandLayout->addWidget(releaseRobotActuator);
 
     // Initialize robot position control
     xPositionLabel = new QLabel("X steps: [0, 1015]");
@@ -80,8 +105,14 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     yPosition = new QSpinBox();
     zPosition = new QSpinBox();
     rPosition = new QSpinBox();
-    pressureLabel = new QLabel("Pressure: No Reading");
     setRobotPosition = new QPushButton("Initiate Move");
+
+    maxWidth = 200;
+    xPosition->setMaximumWidth(maxWidth);
+    yPosition->setMaximumWidth(maxWidth);
+    zPosition->setMaximumWidth(maxWidth);
+    rPosition->setMaximumWidth(maxWidth);
+    setRobotPosition->setMaximumWidth(maxWidth);
 
     // Initialize robot position control sizes
     xPosition->setMinimum(0);
@@ -97,8 +128,6 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
 
     // Initialize robot position controls layout
     robotPositionLayout = new QVBoxLayout();
-    robotPositionLayout->addStretch();
-    robotPositionLayout->addWidget(pressureLabel);
     robotPositionLayout->addWidget(xPositionLabel);
     robotPositionLayout->addWidget(xPosition);
     robotPositionLayout->addWidget(yPositionLabel);
@@ -108,7 +137,22 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotPositionLayout->addWidget(rPositionLabel);
     robotPositionLayout->addWidget(rPosition);
     robotPositionLayout->addWidget(setRobotPosition);
-    robotPositionLayout->addStretch();
+
+    // Initialize robot statistics
+    pressureLabel = new QLabel("Pressure: No Reading");
+    
+    pressureLabel->setMaximumWidth(200);
+
+    // Initialize robot statistics layout
+    robotStatsLayout = new QVBoxLayout();
+    robotStatsLayout->addWidget(pressureLabel);
+
+    // Initialize robot controls layout
+    controlLayout = new QHBoxLayout();
+    controlLayout->addLayout(generalControlLayout);
+    controlLayout->addLayout(robotCommandLayout);
+    controlLayout->addLayout(robotPositionLayout);
+    controlLayout->addLayout(robotStatsLayout);
 
     // Initialize camera overview layout
     overviewCameraLayout = new QVBoxLayout();
@@ -128,7 +172,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     overviewLayout->addStretch();
     overviewLayout->addLayout(visualLayout);
     overviewLayout->addSpacing(20);
-    overviewLayout->addLayout(robotControlLayout);
+    overviewLayout->addLayout(controlLayout);
     overviewLayout->addSpacing(20);
     overviewLayout->addLayout(robotPositionLayout);
     overviewLayout->addStretch();
@@ -536,11 +580,12 @@ void ConstructionView::executeConstruction()
         cubeTasks.append(task);
     }
 
-    // Move robot to initial position
-    robot->setPosition(0, 0, 1000, 0);
-
     // Initiate pressure sensor requests
     pressureTimer->start(50); // Request pressure every 50 ms
+
+    // Initiate construction with computer vision assessment
+    robotCommandState = RobotCommandState::CONSTRUCT_VISION;
+    robot->setPosition(0, 0, ROBOT_VISION_POS.z, 0);
 }
 
 void ConstructionView::setRobot(Robot* robot)
@@ -550,18 +595,6 @@ void ConstructionView::setRobot(Robot* robot)
     connect(robot, &Robot::commandCompleted, this, &ConstructionView::handleRobotCommand);
     connect(robot, &Robot::pressureUpdated, this, &ConstructionView::pressureUpdated);
 }
-
-
-enum class RobotCommandState
-{
-    IDLE,
-    CONSTRUCT_TASK,
-    CONSTRUCT_VISION,
-    PROCESS_SCENE
-};
-
-int pressureThreshold = 500;
-RobotCommandState robotCommandState = RobotCommandState::CONSTRUCT_VISION;
 
 void ConstructionView::handleRobotCommand()
 {
@@ -601,8 +634,9 @@ void ConstructionView::handleConstructTaskState()
         // Check if construction is complete
         if (cubeTasks.isEmpty())
         {
-            // Move robot to xy origin
-            robot->setPosition(0, 0, robot->getZPosition(), 0);
+            // Update vision view last time
+            robotCommandState = RobotCommandState::PROCESS_SCENE;
+            handleRobotCommand();
 
             // Stop the pressure sensor reading requests
             pressureTimer->stop();
@@ -774,6 +808,18 @@ void ConstructionView::handleProcessSceneState()
         // Convert position to top face centroid position in robot coordinate system
         cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
         sourceCentroids.push_back(centroid);
+    }
+
+    // Create list of successfully placed structure cube top face centroids
+    std::vector<cv::Point3i> structCentroids;
+    for (int i = 0; i < structCubes.size(); ++i)
+    {
+        // Get cube position in the OpenGL coordinate system
+        glm::vec3 cubePos = structCubes[i]->getPosition();
+
+        // Convert position to top face centroid position in robot coordinate system
+        cv::Point3i centroid(cubePos.x, cubePos.z, cubePos.y + 32);
+        structCentroids.push_back(centroid);
     }
 
     // Capture frame from camera
