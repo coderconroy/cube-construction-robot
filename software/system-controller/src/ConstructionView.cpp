@@ -9,6 +9,7 @@ QVector<Cube*> sourceCubes;
 QVector<Cube*> structCubes;
 int missingCubes = 0;
 int externalCubes = 0;
+bool captureVisionImages = false;
 
 enum class RobotCommandState
 {
@@ -440,6 +441,13 @@ void ConstructionView::updateCameraFeed()
         }
     }
 
+    // Save image to file system
+    if (captureVisionImages)
+    {
+        captureVisionImages = false;
+        cv::imwrite("captures/vision-output.png", output);
+    }
+
     // Resize image for display label
     if (output.size().height > 0 && output.size().width > 0)
     {
@@ -840,6 +848,9 @@ void ConstructionView::setCamera(cv::VideoCapture* camera)
 
 void ConstructionView::processSceneClicked()
 {
+    // Enable single capture of computer vision images
+    captureVisionImages = true;
+
     // Set robot command state to process scene and initiate robot command handler
     robotCommandState = RobotCommandState::PROCESS_SCENE;
     handleRobotCommand();
