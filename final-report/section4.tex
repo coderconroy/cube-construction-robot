@@ -65,9 +65,232 @@
 
 \subsection{Qualification tests}
 
-%\ldots
+This section presents the inital draft of the experimental plan required to demonstrate conformance to the system specifications. Prior to the commencement of any of the qualification tests, the following setup steps must have been completed:
 
+\begin{compactenum}
+	\item Ensure robotic manipulator's workspace is completely empty.
+	\item Power on the PC that will run the system control software.
+	\item Ensure the system camera has a clear view of the system workspace and connect the camera to the PC.
+	\item Connect the robotic subsystem to the PC.
+	\item Power on the robotic subsystem.
+	\item Start the system control software on the PC and verify a connection is established with the camera and robotic subsystem.
+	\item Initialise the system calibration process using the system control software GUI and verify the calibration completes successfully.
+\end{compactenum}
 
+The following 3D shapes are defined for use in multiple qualification tests (where the dimensions are in number of cubes):
+
+\begin{compactenum}
+	\item A cube consisting of three 3 x 3 layers.
+	\item A pyramid with a 4 x 4 square base which is followed by a 3 x 3 layer, 2 x 2 layer and finally a single cube in the top layer.
+	\item A pyramid with a 4 x 4 square base similar to the above pyramid, but with the 3 x 3 layer rotated 20 degrees clockwise relative to the layer below and both the 2 x 2 layer and top layer rotated 45 degrees relative the layer below.
+\end{compactenum}
+
+\subsubsection{Qualification Test 1: Test of the system's capability to build 3D shapes}
+
+\paragraph{\textit{Test Objectives}}
+
+The aim of this test is to determine if the system is capable of constructing a variety of novel and moderately complex 3D shapes using small cubes each with a side length of between 10mm and 15mm. Novel and moderately complex 3D shapes consitute shapes containing up to at least 30 cubes where each cube has a face parallel to the base plane.
+
+\paragraph{\textit{Equipment}} 
+
+The following items are required for this qualification test:
+
+\begin{compactitem}
+	\item Final 3D shape cube construction system
+	\item 30 cubes all with side lengths equal and between 10mm and 15mm
+\end{compactitem}
+
+\paragraph{\textit{Experimental Parameters and Setup}}
+
+Complete the following steps to prepare for the qualification test:
+
+\begin{compactenum}
+	\item Navigate to the 3D shape selection screen for pre-defined shapes in the system control GUI.
+	\item Verify the test shapes are available for selection as pre-defined shapes in the system control software.
+\end{compactenum}
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Clear the robitc manipulator's workspace and insert the 30 cubes into the system loading mechanism.
+	\item Select a pre-defined test shape in the system control GUI.
+	\item Start the construction process in the system control GUI and wait for the robotic subsystem to construct the shape.
+	\item Compare the constructed shape to the selected pre-defined test shape in the GUI.
+	\item Repeat all the steps 1 to 4 of the experimental protocol with a different pre-defined test shape selected in step 2. 
+	\item Repeat step 5 until all the pre-defined test shapes have been built.
+\end{compactenum}
+
+\subsubsection{Qualification Test 2: Test of system's capability to facilitate the definition of 3D shapes}
+
+\paragraph{\textit{Test Objectives}} 
+
+The aim of this test is to determine if the system is capable of capturing and representing a user-specified 3D shape where the position of each constituent cube is specified along each Cartesian axis as well as the orientation about the z-axis.
+
+\paragraph{\textit{Equipment}} 
+
+Only the final 3D shape cube construction system is required for this test.
+
+\paragraph{\textit{Experimental Parameters and Setup}}
+
+Prepare for the qualification test by navigating to the 3D shape definition screen in the system control GUI.
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Select one of the test shapes defined above to input into the system.
+	\item Input the Cartesian position and orientation of each cube into system control software.
+	\item Once all of the cubes have been defined in the software, compare the captured Cartesian position and orientation with the desired values.
+	\item Verify the 3D render of the test shape shown in the GUI correctly represents the test shape.
+	\item Repeat all the steps 1 to 4 of the experimental protocol with a different test shape selected in step 1.
+	\item Repeat step 5 until all the test shape definitions have been captured by the system.
+\end{compactenum}
+
+\subsubsection{Qualification Test 3: Test of end-effector's capability to manipulate cubes}
+
+\paragraph{\textit{Test Objectives}}
+
+The aim of this test is to determine if the end-effector is capable of maintaining a cube in its grip under motion when the robotic manipulator is at maximum acceleration. The test also aims to determine if the end-effector is able to maintain the cube in its grip for at least 20 seconds continuously and if it is able to grip and ungrip the cube.
+
+\paragraph{\textit{Equipment}}
+
+The following items are required for this qualification test:
+
+\begin{compactitem}
+	\item Final 3D shape cube construction system
+	\item 1 cube with a side length between 10mm and 15mm
+\end{compactitem}
+
+\paragraph{\textit{Experimental Parameters and Setup}} 
+
+Complete the following steps to prepare for the qualification test:
+
+\begin{compactenum}
+	\item Navigate to the system test screen in the GUI.
+	\item Place the cube flat at an arbitraty location on the base plane in the robotic manipulator's workspace.
+\end{compactenum}
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Initiate the routine for qualification test 3 in the GUI.
+	\item Verify the robotic subsystem proceeds to locate and grip the cube placed during the test setup.
+	\item Verify the robotic subsystem continously moves the cube between the extremes on all axes for a period of 20 seconds as indicated by the timer in the GUI.
+	\item Verify the robotic subsystem places the cube back on the base plane and releases the cube.
+\end{compactenum}
+
+\subsubsection{Qualification Test 4: Measurement of robotic manipulator accuracy}
+
+\paragraph{\textit{Test Objectives}}
+
+The aim of this test is to determine the linear repeatability of the robotic manipulator's positioning along each Cartesian axis as well as its rotational repeatability about the z-axis.
+
+\paragraph{\textit{Equipment}}
+
+The following items are required for this qualification test:
+
+\begin{compactitem}
+	\item Final 3D shape cube construction system
+	\item Digital depth gauge caliper
+	\item Digital height gauge caliper
+	\item Digital protractor
+	\item Piece of paper
+	\item Thin plastic disc with an 10mm diameter custom designed to attach to the end-effector. This purpose of this disc is to increase the measurement resolution of the end-effector's rotation.
+\end{compactitem}
+
+\paragraph{\textit{Experimental Parameters and Setup}}
+
+Prepare for the qualification test by navigating to the system test screen in the GUI.
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Initiate the routine for qualification test 4 for the x an y axes in the GUI.
+	\item The robotic manipulator will move the end-effector to an arbitrary location on the base plane. Measure the perpendicular distance from the nearest edge of the workspace to the nearest point on the end-effector in both the x and y directions using the digital depth gauge caliper.
+	\item Instruct the system to continue with the test in the GUI. The robotic manipulator will return to the origin of the x and y axes before returning to approximately the same point as in the step above.
+	\item Take another measurement as in step 2.
+	\item Repeat steps 3 and 4 until 5 measurements have been taken for both the x and y axes.
+	\item Initiate the routine for qualification test 4 for the z axis in the GUI.
+	\item The robotic manipulator will move the end-effector to an arbitrary location in 3D space. Measure the perpendicular distance from the base plane of the workspace to the nearest point on the end-effector in the z direction using the digital height gauge caliper.
+	\item Instruct the system to continue with the test in the GUI. The robotic manipulator will return to the origin of the z axis before returning to approximately the same point as in the step above.
+	\item Take another measurement as in step 7.
+	\item Repeat steps 7 and 8 until 5 measurements have been taken.
+	\item Attach the plastic disc to the end-effector and place the paper on the base plane.
+	\item Initiate the routine for qualification test 4 for rotation about the z axis in the GUI.
+	\item The robotic manipulator will move the end effector to an arbitrary location on the paper with the end-effector aligned with the rotational origin. Mark the rotational position of the disc on the paper.
+	\item Instruct the system to continue with the test in the GUI. The robotic manipulator will rotate the end-effector an arbitrary amount.
+	\item Mark the rotational position of the disc on the paper and measure the rotational angle using the digital protractor.
+	\item Instruct the system to continue with the test in the GUI. The robotic manipulator will rotate back to the rotational origin and return to approximately the same rotational orientation.
+	\item Repeat steps 15 and 16 until 5 measurements have been taken.
+\end{compactenum}
+
+\subsubsection{Qualification Test 5: Measurement of computer vison cube detection accuracy}
+
+\paragraph{\textit{Test Objectives}}
+
+The aim of this test is to determine the accuracy of the computer vision system in detecting and localising cubes whose faces are visible from a vertical perspective. Specifically, the test aims to determine the accuracy of the linear localisation along the x-axis and y-axis as well as the rotational pose estimation about the z-axis.
+
+\paragraph{\textit{Equipment}}
+
+The following items are required for this qualification test:
+
+\begin{compactitem}
+	\item Final 3D shape cube construction system
+	\item 1 cube with a side length between 10mm and 15mm
+	\item Digital depth gauge caliper
+	\item Digital protractor
+\end{compactitem}
+
+\paragraph{\textit{Experimental Parameters and Setup}}
+
+Prepare for the qualification test by navigating to the system test screen in the GUI.
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Use the digital protractor and depth gauge caliper to place the cube at a arbitrary known location and orientation on the base plane with respect to the localisation markings on the base plane.
+	\item Initiate the routine for qualification test 5 in the GUI. The computer vision subsystem will proceed to detect and localise the cube and display the detected Cartesian position and z-axis rotational orientation.
+	\item Compare the detected Cartesian position and z-axis rotational orientation to the actual measured values.
+\end{compactenum}
+
+\subsubsection{Qualification Test 6: Test of system's capability to detect a dropped cube}
+
+\paragraph{\textit{Test Objectives}}
+
+The aim of this test is to determine if the system is capable of detecting when a cube has been dropped by the end-effector.
+
+\paragraph{\textit{Equipment}}
+
+The following items are required for this qualification test:
+
+\begin{compactitem}
+	\item Final 3D shape cube construction system
+	\item 1 cube with a side length between 10mm and 15mm
+\end{compactitem}
+
+\paragraph{\textit{Experimental Parameters and Setup}}
+
+Prepare for the qualification test by placing the cube at an arbitrary location on base plane in the robotic manipulator's workspace.
+
+\paragraph{\textit{Experimental Protocol}}
+
+Complete the following steps to execute the qualification test:
+
+\begin{compactenum}
+	\item Initiate the routine for qualification test 6 in the GUI. The robotic subsystem will locate and grip the cube before proceeding to move arbitrarily throughout the 3D workspace.
+	\item Instruct the end-effector to release the cube using the GUI. This action will not inform the system that a cube has been dropped.
+	\item Wait for the system to detect that a cube has been dropped.
+	\item Verify that the system shows a notification on the GUI indicating a dropped cube has been detected.
+\end{compactenum}
 
 \newpage
 
