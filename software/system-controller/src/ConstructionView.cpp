@@ -312,36 +312,21 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(pressureTimer, &QTimer::timeout, this, &ConstructionView::requestPressureUpdate);
 
     // Initialize source cubes in the world space model
-    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(446, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(383, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(320, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(256, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(193, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(130, 32, 16, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(446, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(383, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(320, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(256, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(193, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(130, 32, 79, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(825, 32, 143, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(762, 32, 143, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(699, 32, 143, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(635, 32, 143, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(572, 32, 143, 0));
-    sourceCubes.append(cubeWorldModel->insertCube(509, 32, 143, 0));
+    int numCubes = 15;
+    int xStart = 134;
+    int xStop = 1015;
+    float xStep = ((float) (xStop - xStart)) / (numCubes - 1);
+    for (int i = 0; i < numCubes; i++)
+    {
+        int xPos = std::round(xStart + xStep * i);
+        sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 0, 0));
+    }
+
+    for (int i = 0; i < numCubes; i++)
+    {
+        int xPos = std::round(xStart + xStep * i);
+        sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 63, 0));
+    }
 }
 
 void ConstructionView::showView()

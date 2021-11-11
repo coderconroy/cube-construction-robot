@@ -1,0 +1,91 @@
+{
+    "cubeMargin": 10,
+    "cubeSideLength": 64,
+    "cubes": [
+        {
+            "cubeID": 1,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                32,
+                0
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 2,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                96,
+                0
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 3,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                160,
+                0
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 4,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                224,
+                0
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 5,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                288,
+                0
+            ],
+            "sideLength": 64
+        },
+        {
+            "cubeID": 6,
+            "orientation": [
+                0,
+                0,
+                0
+            ],
+            "position": [
+                0,
+                352,
+                0
+            ],
+            "sideLength": 64
+        }
+    ],
+    "lastCubeID": 6
+}

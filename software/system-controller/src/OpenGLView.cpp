@@ -28,6 +28,7 @@ void OpenGLView::initializeGL()
     // Initialize shaders and shader program
     shaderProgram = new ShaderProgram(VERT_SHADER_PATH, FRAG_SHADER_PATH, context(), this);
 
+
     // Initialize cube vertex data
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,

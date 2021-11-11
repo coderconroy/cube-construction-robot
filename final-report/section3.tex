@@ -872,36 +872,54 @@ The following features were completed regarding the OpenGL 3D shape definition c
 
 \subsection{Computer Vision System}
 
-\subsubsection{Cube Detection}
+The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure drop.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition.
 
-Colour Segmentation with Overhead Lighting
+\subsubsection{Cube Feature Investigation}
 
-Although the cube was successfully segmented as shown in Figure X the following points must be made:
+Detection of an object in a single-view image generally involves the identification of features in the image which can be compared to a template set of features for the desired object to determine its presence and location in the image. Furthermore, certain features may be used in to generate further information about the object beyond feature matching. For example, edges and corners may be used to identify planes which are combined to identify the presence of a cuboid. The OpenCV C++ library was utilised as the source of various pre-written image processing and machine vision functions required to create a prototype of the feature detection process. Specifically, a set of cube images were captured and the Canny edge detector, Harris corner detector and SIFT feature descriptor implementations were utilised to detect edges, corners and features in the cube images respectively. 
 
-\begin{compactitem}
-	\item The cube had relatively even lighting from several angles. This caused all the faces to have a similar grey intensity which facilitated intensity segmentation but introduced difficulties with reliable face segmentation.
-	\item By using a plain black background, colour information does not play a role in the segmentation process.
-	\item The image of the cube is relatively high resolution which may not be possible in the final project configuration.
-	\item The camera is likely to be located relatively high above the cubes in which case such low angle images of the cube are unlikely to be processed.
-\end{compactitem}
+The primary challenge encountered in cube detection process was the extraction of useful feature information from individual cubes. The aluminium cubes used in this project are a singular shade of grey with an almost textureless surfaces which offers little unique information to detect the cubes. As a result, the prototype feature detection algorithms discussed above performed poorly and did not extract a sufficient number of features to uniquely detect the cubes. Specifically, in even lighting conditions, the Canny edge detector failed to identify internal edges within the outer bounding contour. Similarly, the Harris corner detector failed to consistently identify the corners of the cube while the SIFT algorithm failed to identify a sufficient number of features on the cube itself. The Hough transform parameterised for lines was also explored with limited success.  
 
-To explore the possibilities for cube recognition further, the above points were investigated. Figure X shows the image of the cube captured from a high angle with a plain blue paper background and diffuse overhead lighting. The first interesting point noted from this image is the intensity of the pixels corresponding to the top face of the cube. This high intensity was present even when the position of the cube and camera were varied provided the angle was sufficiently high. The following points are made considering this observation:
+The process of image segmentation was also explored to isolate the cubes from the background. Histogram plots showing pixel intensity distributions for each of the RGB colour channels were generated from images containing cubes with various monochrome background colours. Each of he colour channels exhibited nearly identical distributions which indicated the primary information in these images was grey-scale intensity information. The grey-scale histogram information from the images with a matte black background exhibited a peak at greater pixel intensity values corresponding with the cube pixels. Based on this, the cubes were successfully segmented in the image through through application of a binary threshold. 
 
-\begin{compactitem}
-	\item Given the constrained nature of cube recognition problem, knowledge of the top face of the cube should be sufficient to identify both the location and the pose of the cube.
-	\item Due to the light dispersion that occurs from the sand-blasted cube surface, a significant mirror effect does not occur on the cube surface despite the intensity of light reflection. This is beneficial as mirror-like surfaces introduce complications in machine vision problems.
-	\item If the lighting conditions are well-controlled, the top-face of the cube can be potentially be reliably segmented from the image. It is much simpler to extract geometric information from a segmented square face than from a given segmented view of a cube.
-\end{compactitem}
+In even lighting conditions, the cube faces could not be distinguished from each other with a significant degree of reliability. This presents a problem as face segmentation is necessary for cube pose estimation. However, when the dominant lighting source was placed directly above the cubes, a peak in the pixel intensity histogram was observed which corresponded to the top face of the cube. This allowed the segmentation of the top face with a great degree of reliability. If the scene is constrained such that cubes are the only objects present and the assumption is made that a cube face is always parallel to the base plane, then the segmented top cube face is sufficient information to detect a cube and uniquely determine its orientation about the z-axis. Therefore, this approach was selected as the basis of the computer vision cube detection component.
 
-Centroid Detection for Multiple Cubes
+%Colour Segmentation with Overhead Lighting
+%
+%Although the cube was successfully segmented as shown in Figure X the following points must be made:
+%
+%\begin{compactitem}
+%	\item The cube had relatively even lighting from several angles. This caused all the faces to have a similar grey intensity which facilitated intensity segmentation but introduced difficulties with reliable face segmentation.
+%	\item By using a plain black background, colour information does not play a role in the segmentation process.
+%	\item The image of the cube is relatively high resolution which may not be possible in the final project configuration.
+%	\item The camera is likely to be located relatively high above the cubes in which case such low angle images of the cube are unlikely to be processed.
+%\end{compactitem}
+%
+%To explore the possibilities for cube recognition further, the above points were investigated. Figure X shows the image of the cube captured from a high angle with a plain blue paper background and diffuse overhead lighting. The first interesting point noted from this image is the intensity of the pixels corresponding to the top face of the cube. This high intensity was present even when the position of the cube and camera were varied provided the angle was sufficiently high. The following points are made considering this observation:
+%
+%\begin{compactitem}
+%	\item Given the constrained nature of cube recognition problem, knowledge of the top face of the cube should be sufficient to identify both the location and the pose of the cube.
+%	\item Due to the light dispersion that occurs from the sand-blasted cube surface, a significant mirror effect does not occur on the cube surface despite the intensity of light reflection. This is beneficial as mirror-like surfaces introduce complications in machine vision problems.
+%	\item If the lighting conditions are well-controlled, the top-face of the cube can be potentially be reliably segmented from the image. It is much simpler to extract geometric information from a segmented square face than from a given segmented view of a cube.
+%\end{compactitem}
+%
+%Centroid Detection for Multiple Cubes
+%
+%Previous results have shown that segmentation of the top face of the cube based on light intensity offers the most promising avenue to robustly detect and localise the cube. In order to develop this concept further, several adjustments were made to the previous image processing test setups. Firstly, it was previously demonstrated that the introduction of colour information into the image through the addition of a coloured background offers no better performance than pure light intensity information. Therefore, in order to maximise the light intensity differential between the reflective top face of the cube, a plain matte black paper background was introduced. Secondly, it was observed that when the angle between the light incident on the top face of the cube and the light reflected into the camera is minimised, the light intensity on the top face of the cube as observed by the camera is maximised. To make the most of this effect, the camera was placed parallel to the base plane at a height of approximately 500 mm with two bright LED lights on either side angled toward the centre of the base plane. Lastly, to test that the ability of the image processing algorithm to detect multiple cubes in the same image with variying top face light intensities, multiple cubes were placed randomly on the base plane.
+%
+%Figure X shows the image that was captured with the above setup. Note the light intensity on the top face of each cube. The first step in extracting the contours from the image is to apply binary thresholding to the image to segment the top faces of the cubes. In preparation for this, the image was first converted to grayscale and blurred. The binary threshold in which only pixels with intensities greater than 140 out of 255 were retained. This resulted in a well segmented collection of cube top faces. The OpenCV contour detection algorithm was then applied to this binary images which resulted in the red contours shown in Figure X. Finally, the moment of each contour was calculated and used to find the centroid of each face. These centroids are indicated as blue dots in Figure X. All the cube centroids were successfully detected in terms of the image coordinate system which is sufficient output from the object detection phase. Methods to attain the vertices of the upper face will still be explored with the intent of use in pose estimation. The next process to be investigated needs to be capable of mapping these image coordinates to the world coordinate system.
 
-Previous results have shown that segmentation of the top face of the cube based on light intensity offers the most promising avenue to robustly detect and localise the cube. In order to develop this concept further, several adjustments were made to the previous image processing test setups. Firstly, it was previously demonstrated that the introduction of colour information into the image through the addition of a coloured background offers no better performance than pure light intensity information. Therefore, in order to maximise the light intensity differential between the reflective top face of the cube, a plain matte black paper background was introduced. Secondly, it was observed that when the angle between the light incident on the top face of the cube and the light reflected into the camera is minimised, the light intensity on the top face of the cube as observed by the camera is maximised. To make the most of this effect, the camera was placed parallel to the base plane at a height of approximately 500 mm with two bright LED lights on either side angled toward the centre of the base plane. Lastly, to test that the ability of the image processing algorithm to detect multiple cubes in the same image with variying top face light intensities, multiple cubes were placed randomly on the base plane.
+\subsubsection{Cube Detection Algorithm Design}
 
-Figure X shows the image that was captured with the above setup. Note the light intensity on the top face of each cube. The first step in extracting the contours from the image is to apply binary thresholding to the image to segment the top faces of the cubes. In preparation for this, the image was first converted to grayscale and blurred. The binary threshold in which only pixels with intensities greater than 140 out of 255 were retained. This resulted in a well segmented collection of cube top faces. The OpenCV contour detection algorithm was then applied to this binary images which resulted in the red contours shown in Figure X. Finally, the moment of each contour was calculated and used to find the centroid of each face. These centroids are indicated as blue dots in Figure X. All the cube centroids were successfully detected in terms of the image coordinate system which is sufficient output from the object detection phase. Methods to attain the vertices of the upper face will still be explored with the intent of use in pose estimation. The next process to be investigated needs to be capable of mapping these image coordinates to the world coordinate system.
+\ldots
 
-Camera Calibration
+\subsubsection{Cube Localisation}
 
-The next step in the development of the computer vision subsystem is the mapping of the points in the image coordinate system to coordinates in the world coordinate system. In order to perform this, several parameters about the camera and its orientation need to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ and the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinates of the scene and include the rotation and translation transformations that need to be performed to map a point in the world coordinate system to image coordinate system. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$. Camera calibration is used to estimate the intrinsic characteristics of the camera while camera localisation is used to estimate the extrinsic parameters of the camera. This description is based on the pinhole camera model which is shown in Equation \ref{fig:pinhole-camera-model}.
+The output of the cube detection stage in the computer vision system is the location of the centroid of the top face of the cube in the 2D image coordinate system. In order for the system controller to make decisions based on the location of the cube and for the robot to interact with the cube, the location of the cube with respect to the robot needs to be determined from the location of the cube in the image. For the purposes of this project, the robot coordinate system was defined to be equivalent to the world coordinate system. This problem is referred to as object localisation and requires a solution to map an arbitrary point in image coordinate system, denoted by $\boldsymbol{p}^i$, to a corresponding point in the world coordinate system, denoted by $\boldsymbol{p}^w$. The 3D camera coordinate system is useful as an intermediate frame to relate the world frame to the image frame. Let a point in the camera coordinate system be denoted by $\boldsymbol{p}^c$.
+
+% TODO: Include image of robot coordinate system, image coordinate system and camera coordinate
+
+In order to perform the cube localisation mapping, the pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} is used. This model requires that several parameters about the camera and its orientation be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that to be performed to map arbitrary point $\boldsymbol{p}^w$ to $\boldsymbol{p}^c$. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$.
 
 \begin{figure}[!ht]
 	\centering
@@ -910,7 +928,7 @@ The next step in the development of the computer vision subsystem is the mapping
 	\label{fig:pinhole-camera-model}
 \end{figure}
 
-The intrinsic parameters of the camera can be expressed as a calibration matrix $\textbf{K}$ as shown in Equation \ref{eqn:calibration-matrix} below.
+The intrinsic parameters of the camera can be expressed as a calibration matrix $\textbf{K}$ defined as
 
 \begin{equation}
 	\textbf{K}=
@@ -922,14 +940,14 @@ The intrinsic parameters of the camera can be expressed as a calibration matrix 
 	\label{eqn:calibration-matrix}
 \end{equation}
 
-The parameter $s$ captures the skew of the sensor axes that occurs as a result of the optical axis not being exactly perpendicular to the sensor plane. However, for practical purposes $s$ can be set to 0. Since the extrinsic parameters are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$, both the intrinsic and extrinsic parameters are captured by the product of this matrix and the calibration matrix $K$. This 3 x 4 product matrix is referred to the camera matrix $P$ and is defined in Equation \ref{eqn:camera-matrix} below.
+The parameter $s$ in Equation \ref{eqn:calibration-matrix} captures the skew of the sensor axes that occurs as a result of the optical axis not being exactly perpendicular to the sensor plane. However, for practical purposes $s$ can be set to 0. Since the extrinsic parameters are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$, both the intrinsic and extrinsic parameters are captured by the product of this matrix and the calibration matrix $\textbf{K}$. This 3 x 4 matrix product is referred to the camera matrix $\textbf{P}$ and expressed mathematically as
 
 \begin{equation}
-	\textbf{P}=\textbf{K}[\textbf{R}|\textbf{t}]
+	\textbf{P}=\textbf{K}[\textbf{R}|\textbf{t}].
 	\label{eqn:camera-matrix}
 \end{equation}
 
-The camera matrix is sufficient to map the world coordinates to the coordinates on the image plane provided that the pinhole camera model is used and no lens distortion effects are present. This mapping is captured by Equation \ref{eqn:pinhole-camera-mapping} below where $(u,v)$ represent the pixel coordinates on the image plane, $(X,Y,Z)$ represents a point in the world coordinate system and $s$ is simply a scaling factor.
+The camera matrix is sufficient to map the world coordinates to the coordinates on the image plane provided that the pinhole camera model is used and no lens distortion effects are present. This mapping is defined as
 
 \begin{equation}
 	s
@@ -949,15 +967,107 @@ The camera matrix is sufficient to map the world coordinates to the coordinates 
 	\label{eqn:pinhole-camera-mapping}
 \end{equation}
 
-Therefore, in order to map the centroids of the cubes from the image coordinate space to the world coordinate space, the intrinsic and extrinsic parameters of the camera need to be determined. Furthermore, real world cameras have lens distortion effects that need to be adjusted for. The OpenCV library was used to perform this camera calibration process to produce the intrinsic parameters of the camera. Furthermore, in order to account for the lens distortion, an improved intrinsic matrix was computed. It must be noted that most literature identifies the camera matrix $P$ as a product of the intrinsic and extrinsic matrices. However, OpenCV refers to the intrinsic matrix $K$ as the camera matrix. 
+where $(X,Y,Z)$ are the coordinates of a given point in the world coordinate system $\boldsymbol{p}^w$, $(u,v)$ are the coordinates of the corresponding point in the image coordinate system $\boldsymbol{p}^i$ and $s$ is simply a scaling factor. It is noted there is a loss of depth information when mapping from the world frame to the image frame. This is observed mathematically in Equation \ref{eqn:pinhole-camera-mapping} since $\textbf{P}$ is not a square matrix and not invertible as a result. Therefore it is not possible to map from the image frame to the world frame without an additional piece of information. It was postulated that this piece of information could be obtained given that the length of the cube edge is known in the world frame. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. Instead it was decided to use the z coordinate of $\boldsymbol{p}^w$ based on the horizontal plane layer a cube was expected to be detected in. This is reasonable given that a dropped cube will almost always be found on the base plane.
 
-In order to perform the camera calibration process and account for the lens distortion, 35 images were taken of a 8x6 checkerboard at various positions and orientations within the camera's FOV such as shown in Figure X. Various known points were subsequently identified on the checkerboard as shown in X to facilitate computation of the camera matrix. The improved camera matrix as well as the distortion coefficients describing the tangential and radial lens distortion are used to remap a distorted image as shown in Figure X as to remove the distortion. The undistorted image is shown in Figure X. Note how the checkerboard lines are perfectly aligned with the red ground truth lines while they are compressed inwards in the distorted image in Figure X.
+In order to solve for the the world coordinates given the image coordinates, camera matrix $\textbf{K}$ and world coordinate plane $Z$ using the pinhole camera model, Equation \ref{eqn:pinhole-camera-mapping} is expanded as
 
-\subsubsection{Cube Localisation}
+\begin{equation}
+	s
+	\begin{bmatrix}
+		u \\ 
+		v \\ 
+		1
+	\end{bmatrix}
+	=
+	\textbf{K}\left(\textbf{R}
+	\begin{bmatrix}
+		X \\ 
+		Y \\ 
+		Z
+	\end{bmatrix}
+	+ \textbf{t}\right),
+	\label{eqn:expanded-pinhole-camera-mapping1}
+\end{equation}
 
-The computer vision component of the project was one of the first components explored in depth. As such, the most recent work performed regarding this component took place on Thursday, 16 June 2021. The reader is referred back to this section as the theoretical point of reference on which further development of this component is based. As such, concepts such as the intrinsic and extrinsic matrices are not repeated. The most recent work provided a theoretical avenue to localize the cubes in 3D space without providing an implementation. Therefore, this was the focus at this stage of the project.
+\begin{equation}
+	\textbf{R}^{-1}\textbf{M}^{-1}
+	s
+	\begin{bmatrix}
+		u \\ 
+		v \\ 
+		1
+	\end{bmatrix}
+	=
+	\begin{bmatrix}
+		X \\ 
+		Y \\ 
+		Z
+	\end{bmatrix}
+	+ \textbf{R}^{-1}\textbf{t}.
+	\label{eqn:expanded-pinhole-camera-mapping2}
+\end{equation}
 
-The extrinsic matrix requires an additional piece of information when mapping points from the image frame to the world frame as a piece of information is lost during the inverse operation. It was postulated that this information could be obtained from the cube edge. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. As such, it was decided to make use of the computer vision component looking for a cube in an expected layer where the z-axis world coordinate of the cube can be provided. This is sufficient information to use the extrinsic and camera matrices in conjunction with the image points to locate the x and y coordinates of the cube in the world frame.
+In order to solve for the unknown scaling factor $s$, the intermediate vectors $\textbf{x}$ and $\textbf{y}$ are defined as
+
+\begin{equation}
+	\textbf{x}=
+	\begin{bmatrix}
+		x_1 \\ 
+		x_2 \\ 
+		x_3
+	\end{bmatrix}
+=
+	\textbf{R}^{-1}\textbf{M}^{-1}
+	\begin{bmatrix}
+		u \\ 
+		v \\ 
+		1
+	\end{bmatrix},
+	\label{eqn:expanded-pinhole-camera-mapping-left-matrix}
+\end{equation}
+
+\begin{equation}
+	\textbf{y}
+	=
+	\begin{bmatrix}
+		y_1 \\ 
+		y_2 \\ 
+		y_3
+	\end{bmatrix}
+	=
+	\textbf{R}^{-1}\textbf{t},
+	\label{eqn:expanded-pinhole-camera-mapping-right-matrix}
+\end{equation}
+
+such that Equation \ref{eqn:expanded-pinhole-camera-mapping2} can be rewritten as
+
+\begin{equation}
+	s\,\textbf{x}=
+	\begin{bmatrix}
+		X \\ 
+		Y \\ 
+		Z
+	\end{bmatrix}
+	+\textbf{y}.
+	\label{eqn:expanded-pinhole-camera-mapping-simplified}
+\end{equation}
+
+Since the camera matrix $\textbf{P}$ is given, the rotation matrix $\textbf{R}$, translation matrix $\textbf{t}$ and intrinsic matrix $\textbf{M}$ in Equations \ref{eqn:expanded-pinhole-camera-mapping-left-matrix} and \ref{eqn:expanded-pinhole-camera-mapping-right-matrix} are known. Consequently, $s$ can be computed as
+
+\begin{equation}
+	s=\frac{Z+y_3}{x_3}.
+	\label{eqn:expanded-pinhole-camera-mapping-scaling-factor}
+\end{equation}
+
+Finally, with $s$ known, it is trivial to make use of Equation \ref{eqn:expanded-pinhole-camera-mapping-simplified} to obtain the world coordinates.
+
+% TODO: Insert C++ implementation of the project image point function
+
+%Therefore, in order to map the centroids of the cubes from the image coordinate space to the world coordinate space, the intrinsic and extrinsic parameters of the camera need to be determined. Furthermore, real world cameras have lens distortion effects that need to be adjusted for. The OpenCV library was used to perform this camera calibration process to produce the intrinsic parameters of the camera. Furthermore, in order to account for the lens distortion, an improved intrinsic matrix was computed. It must be noted that most literature identifies the camera matrix $P$ as a product of the intrinsic and extrinsic matrices. However, OpenCV refers to the intrinsic matrix $K$ as the camera matrix. 
+%
+%In order to perform the camera calibration process and account for the lens distortion, 35 images were taken of a 8x6 checkerboard at various positions and orientations within the camera's FOV such as shown in Figure X. Various known points were subsequently identified on the checkerboard as shown in X to facilitate computation of the camera matrix. The improved camera matrix as well as the distortion coefficients describing the tangential and radial lens distortion are used to remap a distorted image as shown in Figure X as to remove the distortion. The undistorted image is shown in Figure X. Note how the checkerboard lines are perfectly aligned with the red ground truth lines while they are compressed inwards in the distorted image in Figure X.
+
+
 
 The camera matrix had already been formed during the checkerboard calibration process. However, the extrinsic translation and rotation matrices still needed to be created. These matrices were attained using the $\textit{solvePnP}$ function from the OpenCV library. This functions relies on points whose location in both the image frame as well as the world frame are known. Given at least four of these points, it is possible to estimate the rotation and translation matrices. However, in practice, it was found that at least five points are required for these matrices to be successfully be determined. 
 
