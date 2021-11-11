@@ -316,17 +316,20 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     int xStart = 134;
     int xStop = 1015;
     float xStep = ((float) (xStop - xStart)) / (numCubes - 1);
-    for (int i = 0; i < numCubes; i++)
+
+    for (int i = numCubes - 1; i >= 0; i--)
+    {
+        int xPos = std::round(xStart + xStep * i);
+        sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 63, 0));
+    }
+
+    for (int i = numCubes - 1; i >= 0; i--)
     {
         int xPos = std::round(xStart + xStep * i);
         sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 0, 0));
     }
 
-    for (int i = 0; i < numCubes; i++)
-    {
-        int xPos = std::round(xStart + xStep * i);
-        sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 63, 0));
-    }
+
 }
 
 void ConstructionView::showView()

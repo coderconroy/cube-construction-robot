@@ -8,11 +8,66 @@
 
 \subsection{Summary of results achieved}
 
-\ldots
+\begin{table}[h]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{6.5cm}|>{\raggedright}m{5cm}|>{\raggedright\arraybackslash}m{3cm}|}
+		\hline
+		\textbf{Intended outcome} & \textbf{Actual outcome} & \textbf{Location in report} \\
+		\hline
+		\multicolumn{3}{|l|}{\textbf{Core mission requirements and specifications}} \\
+		\hline
+		The system should construct novel and moderately complex 3D shapes using small cubes. The system should handle shapes up to at least 4 cubes in height containing up to at least 30 cubes where each cube has a face parallel to the base plane. The system should handle equal size cubes with a side length between 10mm and 15mm. & & \\
+		\hline
+		The GUI should allow the user to define a wide range of 3D shapes to be constructed. For each constituent cube in the shape, the GUI should allow the position of each cube to be specified along each Cartesian axis with at least 1mm resolution as well as the rotation of each cube about the z-axis with at least 1 degree resolution. & & \\
+		\hline
+		The end-effector should be able to grip a cube, maintain its grip during motion and release the cube. The end-effector should maintain the cube in its grip when the robotic manipulator is at maximum acceleration. The end-effector should be able to maintain the cube in its grip for at least 20 seconds continuously. &  & \\
+		\hline
+	\end{tabular}
+	\caption{\label{tab:results_summary_p1}Summary of results achieved.}
+\end{table}
+
+\begin{table}[h]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{6.5cm}|>{\raggedright}m{5cm}|>{\raggedright\arraybackslash}m{3cm}|}
+		\hline
+		\textbf{Intended outcome} & \textbf{Actual outcome} & \textbf{Location in report} \\
+		\hline
+		\multicolumn{3}{|l|}{\textbf{Core mission requirements and specifications}} \\
+		\hline
+		The robotic manipulator should accurately translate the end-effector in 3D space and rotate it about its vertical axis. The robotic manipulator should have a repeatability of at least 2mm for each Cartesian axis and a repeatability of at least 5 degrees for the rotation about the z-axis. & & \\
+		\hline
+		The computer vision component should detect and localise the construction cubes in the workspace to facilitate re-gripping dropped cubes and identifying damage to the 3D shape under construction to signal a construction halt condition. Only the cubes whose faces are visible from a vertical perspective need to be detected and localised. Cubes that need to be gripped should be localised with a positional accuracy of 2mm and a rotational accuracy of 5 degrees about the z-axis. & & \\
+		\hline
+		The system should detect when a cube is unintentionally dropped by the end-effector. The system should detect a cube has been dropped before the end-effector grips the next cube to be placed. & & \\
+		\hline
+	\end{tabular}
+	\caption{\label{tab:results_summary_p2}Summary of results achieved.}
+\end{table}
+
+\begin{table}[h]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{6.5cm}|>{\raggedright}m{5cm}|>{\raggedright\arraybackslash}m{3cm}|}
+		\hline
+		\textbf{Intended outcome} & \textbf{Actual outcome} & \textbf{Location in report} \\
+		\hline
+		\multicolumn{3}{|l|}{\textbf{Field condition requirements and specifications}} \\
+		\hline
+		The system should work under laboratory conditions. The ambient lighting level should be approximately 500 lux. & & \\
+		\hline
+		The image background should be controlled. The immediate background of the construction cubes in the captured images should be non-reflective and of a single hue.& & \\
+		\hline
+	\end{tabular}
+	\caption{\label{tab:results_summary_p3}Summary of results achieved.}
+\end{table}
 
 \subsection{Qualification tests}
 
-\ldots
+%\ldots
+
+
 
 \newpage
 

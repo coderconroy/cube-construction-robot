@@ -95,7 +95,19 @@ private:
 	// TODO: Review perform step implementation
 	int step = 0;
 	bool taskComplete = false;
-	int xOffset = 600;
-	int yOffset = 800;
+	//int xOffset = 0;
+	//int yOffset = 140;
+
+	//int xOffset = 1015;
+	//int yOffset = 140;
+
+	//int xOffset = 0;
+	//int yOffset = 1125;
+
+	//int xOffset = 1015;
+	//int yOffset = 1125;
+
+	int xOffset = 507;
+	int yOffset = 562;
 };
 
