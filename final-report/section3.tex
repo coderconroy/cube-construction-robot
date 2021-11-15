@@ -872,7 +872,7 @@ The following features were completed regarding the OpenGL 3D shape definition c
 
 \subsection{Computer Vision System}
 
-The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure drop.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition.
+The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure decrease.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition. This section begins with an overview of the cube detection approaches investigated. A description of the method used to map points detected in the image frame to the world frame follows in Section \ref{sec:3D Localisation}. These sections lay the foundation for the integrated computer vision algorithm discussed from Section \ref{sec:Top-Level Design}
 
 \subsubsection{Cube Feature Investigation}
 
@@ -909,17 +909,13 @@ In even lighting conditions, the cube faces could not be distinguished from each
 %
 %Figure X shows the image that was captured with the above setup. Note the light intensity on the top face of each cube. The first step in extracting the contours from the image is to apply binary thresholding to the image to segment the top faces of the cubes. In preparation for this, the image was first converted to grayscale and blurred. The binary threshold in which only pixels with intensities greater than 140 out of 255 were retained. This resulted in a well segmented collection of cube top faces. The OpenCV contour detection algorithm was then applied to this binary images which resulted in the red contours shown in Figure X. Finally, the moment of each contour was calculated and used to find the centroid of each face. These centroids are indicated as blue dots in Figure X. All the cube centroids were successfully detected in terms of the image coordinate system which is sufficient output from the object detection phase. Methods to attain the vertices of the upper face will still be explored with the intent of use in pose estimation. The next process to be investigated needs to be capable of mapping these image coordinates to the world coordinate system.
 
-\subsubsection{Cube Detection Algorithm Design}
+\subsubsection{3D Localisation} \label{sec:3D Localisation}
 
-\ldots
-
-\subsubsection{Cube Localisation}
-
-The output of the cube detection stage in the computer vision system is the location of the centroid of the top face of the cube in the 2D image coordinate system. In order for the system controller to make decisions based on the location of the cube and for the robot to interact with the cube, the location of the cube with respect to the robot needs to be determined from the location of the cube in the image. For the purposes of this project, the robot coordinate system was defined to be equivalent to the world coordinate system. This problem is referred to as object localisation and requires a solution to map an arbitrary point in image coordinate system, denoted by $\boldsymbol{p}^i$, to a corresponding point in the world coordinate system, denoted by $\boldsymbol{p}^w$. The 3D camera coordinate system is useful as an intermediate frame to relate the world frame to the image frame. Let a point in the camera coordinate system be denoted by $\boldsymbol{p}^c$.
+The location of the cube with respect to the robot needs to be determined from the location of the cube in the image for the system controller to make decisions based on the location of the cube and for the robot to interact with the cube. For the purposes of this project, the robot coordinate system was defined to be equivalent to the world coordinate system. This problem is referred to as object localisation and requires a solution to map an arbitrary point in image coordinate system, denoted by $\boldsymbol{p}^i\in\mathbb{R}^2$, to a corresponding point in the world coordinate system, denoted by $\boldsymbol{p}^w\in\mathbb{R}^3$. The 3D camera coordinate system is useful as an intermediate frame to relate the world frame to the image frame. Let a point in the camera coordinate system be denoted by $\boldsymbol{p}^c\in\mathbb{R}^3$.
 
 % TODO: Include image of robot coordinate system, image coordinate system and camera coordinate
 
-In order to perform the cube localisation mapping, the pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} is used. This model requires that several parameters about the camera and its orientation be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that to be performed to map arbitrary point $\boldsymbol{p}^w$ to $\boldsymbol{p}^c$. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$.
+The pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} was used as the foundation for the mapping methods discussed here. This model requires that several parameters about the camera and its orientation to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that are required to be performed to map arbitrary point $\boldsymbol{p}^w$ to $\boldsymbol{p}^c$. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$.
 
 \begin{figure}[!ht]
 	\centering
@@ -947,7 +943,7 @@ The parameter $s$ in Equation \ref{eqn:calibration-matrix} captures the skew of 
 	\label{eqn:camera-matrix}
 \end{equation}
 
-The camera matrix is sufficient to map the world coordinates to the coordinates on the image plane provided that the pinhole camera model is used and no lens distortion effects are present. This mapping is defined as
+The camera matrix is sufficient to map the world coordinate system to the the image coordinate plane provided that the pinhole camera model is used and no lens distortion effects are present. This mapping is defined as
 
 \begin{equation}
 	s
@@ -967,9 +963,9 @@ The camera matrix is sufficient to map the world coordinates to the coordinates 
 	\label{eqn:pinhole-camera-mapping}
 \end{equation}
 
-where $(X,Y,Z)$ are the coordinates of a given point in the world coordinate system $\boldsymbol{p}^w$, $(u,v)$ are the coordinates of the corresponding point in the image coordinate system $\boldsymbol{p}^i$ and $s$ is simply a scaling factor. It is noted there is a loss of depth information when mapping from the world frame to the image frame. This is observed mathematically in Equation \ref{eqn:pinhole-camera-mapping} since $\textbf{P}$ is not a square matrix and not invertible as a result. Therefore it is not possible to map from the image frame to the world frame without an additional piece of information. It was postulated that this piece of information could be obtained given that the length of the cube edge is known in the world frame. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. Instead it was decided to use the z coordinate of $\boldsymbol{p}^w$ based on the horizontal plane layer a cube was expected to be detected in. This is reasonable given that a dropped cube will almost always be found on the base plane.
+where $(X,Y,Z)$ are the coordinates of a given point in the world coordinate system $\boldsymbol{p}^w$, $(u,v)$ are the coordinates of the corresponding point in the image coordinate system $\boldsymbol{p}^i$ and $s$ is simply a scaling factor. It is noted there is a loss of depth information when mapping from the world frame to the image frame. This is observed mathematically in Equation \ref{eqn:pinhole-camera-mapping} since $\textbf{P}$ is not a square matrix and not invertible as a result. Therefore it is not possible to map from the image frame to the world frame without an additional piece of information. It was postulated that this piece of information could be obtained given that the length of the cube edge is known in the world frame. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. Instead it was decided to provide the z coordinate of $\boldsymbol{p}^w$ based on the horizontal plane layer a cube was expected to be detected in. This is reasonable given that a cube dropped away from the source and structural cubes will always be found on the base plane.
 
-In order to solve for the the world coordinates given the image coordinates, camera matrix $\textbf{K}$ and world coordinate plane $Z$ using the pinhole camera model, Equation \ref{eqn:pinhole-camera-mapping} is expanded as
+In order to solve for the the world coordinates given the image coordinates, camera matrix $\textbf{K}$ and world coordinate plane $Z$ using the pinhole camera model, Equation \ref{eqn:pinhole-camera-mapping} is expanded and rearranged as
 
 \begin{equation}
 	s
@@ -1059,7 +1055,17 @@ Since the camera matrix $\textbf{P}$ is given, the rotation matrix $\textbf{R}$,
 	\label{eqn:expanded-pinhole-camera-mapping-scaling-factor}
 \end{equation}
 
-Finally, with $s$ known, it is trivial to make use of Equation \ref{eqn:expanded-pinhole-camera-mapping-simplified} to obtain the world coordinates.
+Finally, with $s$ known, it is trivial to make use of Equation \ref{eqn:expanded-pinhole-camera-mapping-simplified} to obtain the world coordinates. For completeness, this is expressed as
+
+\begin{equation}
+	\begin{bmatrix}
+		X \\ 
+		Y \\ 
+		Z
+	\end{bmatrix}=
+	s\,\textbf{x}-\textbf{y}.
+	\label{eqn:expanded-pinhole-camera-mapping-simplified}
+\end{equation}
 
 % TODO: Insert C++ implementation of the project image point function
 
@@ -1067,13 +1073,65 @@ Finally, with $s$ known, it is trivial to make use of Equation \ref{eqn:expanded
 %
 %In order to perform the camera calibration process and account for the lens distortion, 35 images were taken of a 8x6 checkerboard at various positions and orientations within the camera's FOV such as shown in Figure X. Various known points were subsequently identified on the checkerboard as shown in X to facilitate computation of the camera matrix. The improved camera matrix as well as the distortion coefficients describing the tangential and radial lens distortion are used to remap a distorted image as shown in Figure X as to remove the distortion. The undistorted image is shown in Figure X. Note how the checkerboard lines are perfectly aligned with the red ground truth lines while they are compressed inwards in the distorted image in Figure X.
 
+In order to make use of the mathematical tools discussed above, the intrinsic parameters and extrinsic parameters of the camera needed to be determined. The intrinsic parameters were determined using a checkerboard calibration. A number of images of the checkerboard were captured at various poses in the robotic subsystem's workspace. The \textit{findChessboardCorners}, \textit{calibrateCamera} and \textit{getOptimalNewCameraMatrix} OpenCV library functions were used in the camera calibration process. The camera's extrinsic parameters were obtained using the \textit{solvePnP} function from the OpenCV library which serves as a solution to the P\textit{n}P problem. This requires point correspondences which refers to points that have a known location in both the image frame and the world frame. Given at least four of these points, it is possible to estimate the rotation and translation matrices.
 
+% TODO: Possibly insert calibration images
 
-The camera matrix had already been formed during the checkerboard calibration process. However, the extrinsic translation and rotation matrices still needed to be created. These matrices were attained using the $\textit{solvePnP}$ function from the OpenCV library. This functions relies on points whose location in both the image frame as well as the world frame are known. Given at least four of these points, it is possible to estimate the rotation and translation matrices. However, in practice, it was found that at least five points are required for these matrices to be successfully be determined. 
+\subsubsection{Top-Level Design} \label{sec:Top-Level Design}
 
-In order to provide these point correspondences, fiducials were used to mark the known points in the world location. The location of these fiducials in the camera image provided the corresponding image frame coordinates. In order to ensure the rotation and translation matrices were successfully determined, six fiducials were placed at known locations in the image frame. The fiducials were structured as a square with a white border with an imaginary internal grid of 3x3 squares such that black squares correspond with a binary 0 and white squares correspond with a binary 0. In order to uniquely determine the orientation of the fiducial, the squares at coordinates $(0, 0)$, $(2, 0)$ and $(2,2)$ were assigned binary values of 0, 0 and 1 respectively. This left 6 squares which could represent $2^6=64$ unique identifiers. The fiducials themselves were detected by applying a binary and contour detection in a similar manner to the top cube faces discussed in the previous computer vision work.
+The \textit{System Controller} maintains a non-probabilistic belief state for the location and orientation of each cube with respect to the robot's coordinate system. Furthermore, four mutually exclusive states are used to distinguish between cubes. A \textit{source cube} is a cube that is believed to be in its known initial position while a \textit{structure cube} is believed to have been successfully placed in its designated position within the 3D shape under construction. If no unexpected events occur during the construction process, each cube will only exist in either of one these two states. The two unexpected events the system is expected to deal with are the dropped cube case and the structural damage case. If the vacuum system pressure sensor detects that a cube is dropped during manipulation by the robot, the cube is classified as a \textit{missing cube}. A cube that is detected by the \textit{Vision System} that is not in an expected \textit{source cube} or \textit{structure cube} location is classified as an \textit{independent cube}. The \textit{System Controller} is able to deal with both the dropped cube case and the structural damage case when the position and orientation of all \textit{independent cubes} with respect to the robot's coordinate system are provided. This is discussed in greater detail in Section <INSERT>. As such, the purpose of the \textit{Vision System} is to detect and localise all \textit{independent cubes} with respect to the robot given the image input data of the robot's workspace. The expected location of the \textit{source cubes} and the \textit{structure cubes} with respect to the robot are also required as input to distinguish these cubes from the \textit{independent cubes} for a given time instance.
 
-The detection of both the cubes and the fiducials were extended through the addition of corner detection algorithm. The algorithm was developed from first principles and required the use of the centroid of the contour. The first corner was selected as the contour point with the greatest Euclidean distance from the centroid. Following this the contour was divided into four quadrants with the first detected corner centred in a quadrant. The furthest points from the centroid were identified in the remaining quadrants and taken as the remaining corners. Using these corners it was possible to determine the orientation of the cube top face as well as determine the homography matrix that could be used to map the fiducial to a 2D image which could be analysed further. The binary array data of the fiducial was extracted by sampling the centre pixel in each fiducial block and using this to calculate the unique fiducial identifier. The corresponding world point location is drawn from a lookup table and used in conjunction with the fiducial centroid image location to compute the rotation and translation matrices. With these matrices formed, it is possible to calculate the world point location of a detected cube given the expected Z plane. Finally in order to visualise the 3D information the computer vision system has of the scene, a bounding box of the workspace was defined in the world space and mapped to the image frame. These components, namely the fiducial detection, cube pose detection and bounding box visualisation were all integrated with the desktop software component and are shown in Figure \ref{fig:computer-vision-overview} below.
+% TODO: Possibly insert cube state diagram
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.8\linewidth]{figures/high-level-computer-vision-design.pdf}
+	\caption{Flow diagram showing the steps in the integrated computer vision process.}
+	\label{fig:high-level-computer-vision-design}
+\end{figure}
+
+Figure \ref{fig:high-level-computer-vision-design} shows the high level steps
+
+\subsubsection{Fiducial Identification}
+The location of these fiducials within the image input data provided the corresponding image frame coordinates. It has been found that a greater number of point correspondences generally leads to an improved solution to the P\textit{n}P problem. As such, eight fiducial markers were placed at eight known locations on the robot's base plane. Each fiducial is structured as a square with a white border with an imaginary internal grid of 3x3 squares each having a side length of 5mm. The black squares were defined to represent a binary zero and the white squares a binary one. In order to ensure the rotation of the fiducial can be uniquely determined, the squares at coordinates $(0, 0)$, $(2, 0)$ and $(2,2)$ were assigned the binary values of 0, 0 and 1 respectively. The six remaining binary squares facilitated the representation of $2^6=64$ unique identifiers. 
+
+Figure \ref{fig:fiducial-step1} shows an example of a fiducial marker located on the robot's base plane. Since the top-level structure of the fiducial is a white square, the outer fiducial contours are detected as part of the square detection step presented in Section \ref{Cube Detection}. The square contour and four square corners are obtained as part of the output from this step. To distinguish between fiducial contours and cube contours, a fiducial identification step was implemented. The various stages within this step are shown in Figure \ref{fig:fiducial-stages}. It was first noted that the fiducial in the image captured by the system camera has a degree of perspective warping compared to the reference digital fiducial image. In order to correct for this perspective warp, a 3x3 homography matrix \textbf{H} is computed using the \textit{findHomography} OpenCV library function. Four point correspondences are required to compute \textbf{H}. These correspondences are obtained by arbitrarily pairing each of the fiducial candidate's corner coordinates in the original image to the corner coordinates of a 128 x 128 pixel destination image. The fiducial candidate region in the original image is warped to the destination image such that the fiducial pattern is isolated as shown in Figure \ref{fig:fiducial-step2}.
+
+% TODO: Possibly fiducial detection pseudo code
+
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}{.24\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/fiducial-step1}
+		\caption{Original}
+		\label{fig:fiducial-step1}
+	\end{subfigure}%
+	\begin{subfigure}{.24\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/fiducial-step2}
+		\caption{Isolated}
+		\label{fig:fiducial-step2}
+	\end{subfigure}
+	\begin{subfigure}{.24\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/fiducial-step3}
+		\caption{Processed}
+		\label{fig:fiducial-step3}
+	\end{subfigure}
+	\begin{subfigure}{.24\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/fiducial-step4}
+		\caption{Annotated}
+		\label{fig:fiducial-step4}
+	\end{subfigure}
+	\caption{Various stages of fiducial detection and identification in the computer vision subsystem.}
+	\label{fig:fiducial-stages}
+\end{figure}
+
+The internal region of the isolated fiducial candidate image is divided into a pre-placed 3x3 grid of squares corresponding to the expected positions of the fiducial squares. This grid is shown in Figure \ref{fig:fiducial-step3}.
+
+%The corresponding world point location is drawn from a lookup table and used in conjunction with the fiducial centroid image location to compute the rotation and translation matrices. With these matrices formed, it is possible to calculate the world point location of a detected cube given the expected Z plane. Finally in order to visualise the 3D information the computer vision system has of the scene, a bounding box of the workspace was defined in the world space and mapped to the image frame. These components, namely the fiducial detection, cube pose detection and bounding box visualisation were all integrated with the desktop software component and are shown in Figure \ref{fig:computer-vision-overview} below.
 
 \begin{figure}[H]
 	\centering
@@ -1082,7 +1140,11 @@ The detection of both the cubes and the fiducials were extended through the addi
 	\label{fig:computer-vision-overview}
 \end{figure}
 
-\subsection{System Control Software}
+\subsubsection{Cube Detection} \label{Cube Detection}
+
+The detection of both the cubes and the fiducials were extended through the addition of corner detection algorithm. The algorithm was developed from first principles and required the use of the centroid of the contour. The first corner was selected as the contour point with the greatest Euclidean distance from the centroid. Following this the contour was divided into four quadrants with the first detected corner centred in a quadrant. The furthest points from the centroid were identified in the remaining quadrants and taken as the remaining corners. Using these corners it was possible to determine the orientation of the cube top face as well as determine the homography matrix that could be used to map the fiducial to a 2D image which could be analysed further. The binary array data of the fiducial was extracted by sampling the centre pixel in each fiducial block and using this to calculate the unique fiducial identifier. 
+
+\subsection{System Controller}
 
 Software Requirements
 

@@ -1,5 +1,6 @@
 #include "Vision.h"
 #include <iostream>
+#include <string>
 
 // Threshold parameters
 int thresh = 80;
@@ -11,9 +12,6 @@ int maxBlurSize = 20;
 float fiducialThresh = 0.7f;
 int fiducialWidth = 128;
 int fiducialHeight = 128;
-
-// Fiducial sample points
-std::vector<cv::Point> fiducialSamplePoints;
 
 // Bounding box parameters
 bool showCoords = true;
@@ -39,17 +37,6 @@ Vision::Vision(QObject* parent) : QObject(parent)
     fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
     fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
     fiducialWorldPoints.insert(37, cv::Point3i(953, 1322, 0));
-
-    // Initialize fiducial sample points
-    fiducialSamplePoints.push_back(cv::Point(31, 31));
-    fiducialSamplePoints.push_back(cv::Point(63, 31));
-    fiducialSamplePoints.push_back(cv::Point(95, 31));
-    fiducialSamplePoints.push_back(cv::Point(31, 63));
-    fiducialSamplePoints.push_back(cv::Point(63, 63));
-    fiducialSamplePoints.push_back(cv::Point(95, 63));
-    fiducialSamplePoints.push_back(cv::Point(31, 95));
-    fiducialSamplePoints.push_back(cv::Point(63, 95));
-    fiducialSamplePoints.push_back(cv::Point(95, 95));
 
     // Initialize camera matrix and distortion coefficients
     cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
@@ -77,6 +64,7 @@ void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::
 
     // Reset fiducial stage images
     fiducialImages.clear();
+    annotatedFiducialImages.clear();
 
     // Process image
     cv::Mat processImage;
@@ -116,12 +104,13 @@ void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::
 
             // Isolate rectangle
             cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
+            cv::Mat annotatedFiducialImage(fiducialWidth, fiducialHeight, CV_8UC1);
             cv::Mat homographyMatrix;
             isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
             cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
 
             // Process fiducial
-            int fiducialId = processFiducial(isolatedImage, isolatedImage);
+            int fiducialId = identifyFiducial(isolatedImage, isolatedImage, annotatedFiducialImage);
 
             // Add to fiducial contour list if fiducial
             // TODO: Add further checks to confirm fiducial nature
@@ -136,6 +125,7 @@ void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::
                 fiducialContours.push_back(fiducial);
 
                 fiducialImages.push_back(isolatedImage);
+                annotatedFiducialImages.push_back(annotatedFiducialImage);
             }
             // Assume contour is cube and add to cube contour list
             // TODO: Add further checks to confirm cube nature
@@ -492,7 +482,7 @@ void Vision::isolateRectangle(const std::vector<cv::Point>& corners, const cv::M
     warpPerspective(sourceImage, isolatedImage, homographyMatrix, isolatedImage.size());
 }
 
-int Vision::processFiducial(const cv::Mat& inputImage, cv::Mat& outputImage) const
+int Vision::identifyFiducial(const cv::Mat& inputImage, cv::Mat& outputImage, cv::Mat& annotatedFiducial) const
 {
     // Check if image conforms to isolated fiducial specification
     if (inputImage.rows != fiducialWidth || inputImage.cols != fiducialHeight)
@@ -511,12 +501,15 @@ int Vision::processFiducial(const cv::Mat& inputImage, cv::Mat& outputImage) con
     // Initialize output image
     inputImage.copyTo(outputImage);
 
+    //cv::imshow("Fiducial", outputImage);
+    //cv::waitKey();
+
     // Rotate image until correct orientation is found by alignment with 3 orientation reference blocks
     int rotationCount = 0;
-    int refBlock1 = outputImage.at<uchar>(fiducialSamplePoints[0]);
-    int refBlock2 = outputImage.at<uchar>(fiducialSamplePoints[6]);
-    int refBlock3 = outputImage.at<uchar>(fiducialSamplePoints[8]);
-    while (refBlock1 != 0 || refBlock2 != 0 || refBlock3 != 255)
+    int refBlock1 = classifyFiducialSquare(outputImage, 0, 0);
+    int refBlock2 = classifyFiducialSquare(outputImage, 2, 0);
+    int refBlock3 = classifyFiducialSquare(outputImage, 2, 2);
+    while (refBlock1 != 0 || refBlock2 != 0 || refBlock3 != 1)
     {
         // Check if all orientations have been tested
         rotationCount++;
@@ -527,29 +520,85 @@ int Vision::processFiducial(const cv::Mat& inputImage, cv::Mat& outputImage) con
         cv::rotate(outputImage, outputImage, cv::ROTATE_90_CLOCKWISE);
 
         // Sample orientation reference blocks
-        refBlock1 = outputImage.at<uchar>(fiducialSamplePoints[0]);
-        refBlock2 = outputImage.at<uchar>(fiducialSamplePoints[6]);
-        refBlock3 = outputImage.at<uchar>(fiducialSamplePoints[8]);
+        refBlock1 = classifyFiducialSquare(outputImage, 0, 0);
+        refBlock2 = classifyFiducialSquare(outputImage, 2, 0);
+        refBlock3 = classifyFiducialSquare(outputImage, 2, 2);
     }
 
     // Get fiducial identifier by mapping fiducial blocks to binary bits
     int bits[6];
-    bits[0] = outputImage.at<uchar>(fiducialSamplePoints[1]) ? 1 : 0;
-    bits[1] = outputImage.at<uchar>(fiducialSamplePoints[2]) ? 1 : 0;
-    bits[2] = outputImage.at<uchar>(fiducialSamplePoints[3]) ? 1 : 0;
-    bits[3] = outputImage.at<uchar>(fiducialSamplePoints[4]) ? 1 : 0;
-    bits[4] = outputImage.at<uchar>(fiducialSamplePoints[5]) ? 1 : 0;
-    bits[5] = outputImage.at<uchar>(fiducialSamplePoints[7]) ? 1 : 0;
+    bits[0] = classifyFiducialSquare(outputImage, 0, 1);
+    bits[1] = classifyFiducialSquare(outputImage, 0, 2);
+    bits[2] = classifyFiducialSquare(outputImage, 1, 0);
+    bits[3] = classifyFiducialSquare(outputImage, 1, 1);
+    bits[4] = classifyFiducialSquare(outputImage, 1, 2);
+    bits[5] = classifyFiducialSquare(outputImage, 2, 1);
 
     int identifier = 0;
     for (int i = 0; i < 6; ++i)
+    {
+        // Check if bit was successfully classified
+        if (bits[i] == -1)
+            return -1;
+
+        // Add bit to identifier
         identifier |= bits[i] << i;
+    }
 
+    // Annotate fiducial image with grid and binary values
+    outputImage.copyTo(annotatedFiducial);
+    cv::cvtColor(annotatedFiducial, annotatedFiducial, cv::COLOR_GRAY2RGB);
+    int gridLinePos[4] = { 13, 47, 80, 114 };
+    for (int i = 0; i < 4; i++)
+    {
+        cv::line(annotatedFiducial, cv::Point(gridLinePos[i], gridLinePos[0]), cv::Point(gridLinePos[i], gridLinePos[3]), cv::Scalar(255, 0, 0), 2, cv::LINE_8);
+        cv::line(annotatedFiducial, cv::Point(gridLinePos[0], gridLinePos[i]), cv::Point(gridLinePos[3], gridLinePos[i]), cv::Scalar(255, 0, 0), 2, cv::LINE_8);
+    }
 
-    //cv::imshow("Display Name", outputImage);
-    //cv::waitKey(0);
+    int xOffset = 10;
+    int yOffset = 25;
+    cv::putText(annotatedFiducial, "X", cv::Point(13 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[2]), cv::Point(13 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, "X", cv::Point(13 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[0]), cv::Point(47 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[3]), cv::Point(47 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[5]), cv::Point(47 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[1]), cv::Point(81 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[4]), cv::Point(81 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, "X", cv::Point(81 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
 
     return identifier;
+}
+
+int Vision::classifyFiducialSquare(const cv::Mat& fiducialImage, int row, int col) const
+{
+    int squareLength = 34; // Side length of gird square in pixels
+    int startPixel = 13; // Location of first pixel in first square
+    float threshold = 0.7; // Minimum proportion of square of one type required for classification (0.5, 1]
+
+
+    // Count number of zero and one pixels in fiducial square
+    int zeroSum = 0;
+    int oneSum = 0;
+    for (int i = startPixel + row * squareLength; i < startPixel + (row + 1) * squareLength; i++)
+    {
+        for (int j = startPixel + col * squareLength; j < startPixel + (col + 1) * squareLength; j++)
+        {
+            if (fiducialImage.at<uchar>(cv::Point(j, i)) == 0)
+                zeroSum++;
+            else if (fiducialImage.at<uchar>(cv::Point(j, i)) == 255)
+                oneSum++;
+        }
+    }
+
+    // Classify pixel
+    int totalPixels = squareLength * squareLength;
+    if ((float)zeroSum / totalPixels > threshold)
+        return 0;
+    else if ((float)oneSum / totalPixels > threshold)
+        return 1;
+    else
+        return -1;
 }
 
 float Vision::mapAngle(float angle) const
@@ -587,7 +636,7 @@ float Vision::computeCubeZRotation(const std::vector<cv::Point>& corners, const 
         worldCorners[i] = projectImagePoint(corners[i], z);
 
         // Compute angle formed by the line from the top cube face centroid to each corner with the x-axis in radians
-        // Rotate 90i degrees clockwise to align with the line formed by the first corner and centroid and map to range(- PI, PI]
+        // Rotate 90 degrees clockwise to align with the line formed by the first corner and centroid and map to range(- PI, PI]
         // This assumes the corners are specified in an anti-clockwise direction
         angles[i] = atan2(worldCorners[i].y - worldCentroid.y, worldCorners[i].x - worldCentroid.x) - (M_PI * i / 2);
 
@@ -646,6 +695,39 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 	return imagePoint;
 }
 
+Eigen::Matrix<double, 3, 3> get_homography(Eigen::Matrix<double, 4, 2> video_pts, Eigen::Matrix<double, 4, 2> logo_pts)
+{
+    Eigen::Matrix<double, 8, 9> A;
+
+    for (int i = 0; i < 4; i++)
+    {
+        Eigen::Matrix<double, 9, 1> ax;
+        Eigen::Matrix<double, 9, 1> ay;
+
+        ax << video_pts(i, 0), video_pts(i, 1), 1., 0., 0., 0., -1 * video_pts(i, 0) * logo_pts(i, 0), -1 * video_pts(i, 1) * logo_pts(i, 0), -1 * logo_pts(i, 0);
+        ay << 0., 0., 0., -1 * video_pts(i, 0), -1 * video_pts(i, 1), -1, video_pts(i, 0)* logo_pts(i, 1), video_pts(i, 1)* logo_pts(i, 1), logo_pts(i, 1);
+
+        A.row(2 * i) = ax;
+        A.row(2 * i + 1) = ay;
+
+    }
+
+
+
+    Eigen::JacobiSVD<Eigen::Matrix<double, 8, 9>> svd(A, Eigen::ComputeFullU | Eigen::ComputeFullV);
+
+    Eigen::Matrix<double, 9, 9> V = svd.matrixV();
+    Eigen::Matrix<double, 9, 1> h = V.col(8);
+
+    Eigen::Matrix<double, 3, 3> homography;
+    homography << h(0, 0), h(1, 0), h(2, 0),
+        h(3, 0), h(4, 0), h(5, 0),
+        h(6, 0), h(7, 0), h(8, 0);
+
+    return homography;
+
+}
+
 double Vision::computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB) const
 {
     return sqrt(pow(pointA.x - pointB.x, 2) + pow(pointA.y - pointB.y, 2) + pow(pointA.z - pointB.z, 2));
@@ -669,6 +751,11 @@ cv::Mat Vision::getContourImage() const
 std::vector<cv::Mat> Vision::getFiducialImages() const
 {
     return fiducialImages;
+}
+
+std::vector<cv::Mat> Vision::getAnnotatedFiducialImages() const
+{
+    return annotatedFiducialImages;
 }
 
 std::vector<cv::Point3i> Vision::getCubeCentroids(const int z) const

@@ -367,7 +367,7 @@
 
 %% Caption setup
 \RequirePackage[hang]{caption}
-\DeclareCaptionFormat{capformat}{#1#2\\#3}
+\DeclareCaptionFormat{capformat}{#1#2#3}
 \DeclareCaptionStyle{capstyle}{labelfont=bf,justification=raggedright,labelsep=period,textfont=bf}
 \captionsetup{style=capstyle,format=capformat}
 

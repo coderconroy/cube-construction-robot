@@ -426,6 +426,13 @@ void ConstructionView::updateCameraFeed()
 
             for (int i = 1; i < vision.getFiducialImages().size(); ++i)
                 cv::hconcat(output, vision.getFiducialImages()[i], output);
+
+            cv:cvtColor(output, output, cv::COLOR_GRAY2RGB);
+            cv::Mat annotatedFiducials = vision.getAnnotatedFiducialImages()[0];
+            for (int i = 1; i < vision.getAnnotatedFiducialImages().size(); ++i)
+                cv::hconcat(annotatedFiducials, vision.getAnnotatedFiducialImages()[i], annotatedFiducials);
+
+           cv::vconcat(output, annotatedFiducials, output);
         }
     }
 

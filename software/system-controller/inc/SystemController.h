@@ -42,7 +42,7 @@ private:
 
     const double CAMERA_WIDTH = 1280; /*! Robot vision camera input image width in pixels */
     const double CAMERA_HEIGHT = 720; /*! Robot vision camera input image height in pixels */
-    const double CAMERA_EXPOSURE = -9; /*! Robot vision camera exposure level */
+    const double CAMERA_EXPOSURE = -7; /*! Robot vision camera exposure level */
     const double CAMERA_FOCUS = 5; /*! Robot vision camera focus distance (must be a multiple of 5) */
 
     /*!

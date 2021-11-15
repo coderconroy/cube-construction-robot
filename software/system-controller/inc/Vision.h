@@ -120,6 +120,13 @@ public:
 	std::vector<cv::Mat> getFiducialImages() const;
 
 	/*!
+	* Getter for the annotated fiducial images.
+	*
+	* \return List of annotated fiducial images.
+	*/
+	std::vector<cv::Mat> getAnnotatedFiducialImages() const;
+
+	/*!
 	* Getter for the independent cube contour centroids.
 	*
 	* \param [in] z Z world coordinate of the xy plane the centroids are projeced to.
@@ -186,6 +193,7 @@ private:
 	cv::Mat thresholdImage; /*! Image after the thresholding stage of processing */
 	cv::Mat contourImage; /*! Image after the contour detection stage of processing */
 	std::vector<cv::Mat> fiducialImages; /*! Isolated fiducial images */
+	std::vector<cv::Mat> annotatedFiducialImages; /*! Annotated fiducial images */
 
 	// Robot constant parameters
 	const int ROBOT_X_MIN = 0; /*! Minimum step position of robot end-effector along x-axis */
@@ -224,9 +232,20 @@ private:
 	* 
 	* \param inputImage Input fiducial image.
 	* \param outputImage Correctly oriented fiducial image.
+	* \param outputImage Correctly oriented fiducial image with annotations.
 	* \return Fiducial identifer. Returns -1 if not a valid fiducial.
 	*/
-	int processFiducial(const cv::Mat& inputImage, cv::Mat& outputImage) const;
+	int identifyFiducial(const cv::Mat& inputImage, cv::Mat& outputImage, cv::Mat& annotatedFiducial) const;
+
+	/*!
+	* Identify the binary value of a fiducial square.
+	* 
+	* \param [in] fiducialImage Fiducial image to be processed.
+	* \param [in] row Row number of the square to be classified.
+	* \param [in] col Column number of the square to be classified.
+	* \return Binary value of the square. Returns -1 if the square was not predominantly a single binary value.
+	*/
+	int classifyFiducialSquare(const cv::Mat& fiducialImage, int row, int col) const;
 
 	/*!
 	* Map angle to the range (-PI, PI] randians.
@@ -260,4 +279,5 @@ private:
 	* \param [in] pointB Coordinates of the second coordinate.
 	*/
 	double computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB) const;
+
 };
