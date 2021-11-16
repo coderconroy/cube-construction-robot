@@ -376,7 +376,7 @@ void ConstructionView::updateCameraFeed()
     else if (baseLayout->currentWidget() == visionWidget)
     {
         display = visionImage;
-        scaleFactor = 0.8;
+        scaleFactor = 0.6;
     }
     else
     {

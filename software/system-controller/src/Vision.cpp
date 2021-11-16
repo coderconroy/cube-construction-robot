@@ -29,10 +29,19 @@ Vision::Vision(QObject* parent) : QObject(parent)
     //fiducialWorldPoints.insert(37, cv::Point3i(951, 1320, 0));
 
     // Initialize world point of each fiducial
-    fiducialWorldPoints.insert(10, cv::Point3i(-32, -387, 0));
-    fiducialWorldPoints.insert(0, cv::Point3i(944, -377, 0));
-    fiducialWorldPoints.insert(50, cv::Point3i(-277, -53, 0));
-    fiducialWorldPoints.insert(11, cv::Point3i(1188, -52, 0));
+    //fiducialWorldPoints.insert(10, cv::Point3i(-32, -387, 0));
+    //fiducialWorldPoints.insert(0, cv::Point3i(944, -377, 0));
+    //fiducialWorldPoints.insert(50, cv::Point3i(-277, -53, 0));
+    //fiducialWorldPoints.insert(11, cv::Point3i(1188, -52, 0));
+    //fiducialWorldPoints.insert(3, cv::Point3i(-278, 986, 0));
+    //fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
+    //fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
+    //fiducialWorldPoints.insert(37, cv::Point3i(953, 1322, 0));
+
+    fiducialWorldPoints.insert(10, cv::Point3i(-27, -370, 0));
+    fiducialWorldPoints.insert(0, cv::Point3i(946, -379, 0));
+    fiducialWorldPoints.insert(50, cv::Point3i(-268, -57, 0));
+    fiducialWorldPoints.insert(11, cv::Point3i(1188, -54, 0));
     fiducialWorldPoints.insert(3, cv::Point3i(-278, 986, 0));
     fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
     fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
@@ -548,7 +557,7 @@ int Vision::identifyFiducial(const cv::Mat& inputImage, cv::Mat& outputImage, cv
     // Annotate fiducial image with grid and binary values
     outputImage.copyTo(annotatedFiducial);
     cv::cvtColor(annotatedFiducial, annotatedFiducial, cv::COLOR_GRAY2RGB);
-    int gridLinePos[4] = { 13, 47, 80, 114 };
+    int gridLinePos[4] = { 16, 48, 79, 111 };
     for (int i = 0; i < 4; i++)
     {
         cv::line(annotatedFiducial, cv::Point(gridLinePos[i], gridLinePos[0]), cv::Point(gridLinePos[i], gridLinePos[3]), cv::Scalar(255, 0, 0), 2, cv::LINE_8);
@@ -557,32 +566,33 @@ int Vision::identifyFiducial(const cv::Mat& inputImage, cv::Mat& outputImage, cv
 
     int xOffset = 10;
     int yOffset = 25;
-    cv::putText(annotatedFiducial, "X", cv::Point(13 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[2]), cv::Point(13 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, "X", cv::Point(13 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[0]), cv::Point(47 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[3]), cv::Point(47 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[5]), cv::Point(47 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[1]), cv::Point(81 + xOffset, 13 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, std::to_string(bits[4]), cv::Point(81 + xOffset, 47 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
-    cv::putText(annotatedFiducial, "X", cv::Point(81 + xOffset, 81 + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+    cv::putText(annotatedFiducial, "X", cv::Point(gridLinePos[0] + xOffset, gridLinePos[0] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[2]), cv::Point(gridLinePos[0] + xOffset, gridLinePos[1] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, "X", cv::Point(gridLinePos[0] + xOffset, gridLinePos[2] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[0]), cv::Point(gridLinePos[1] + xOffset, gridLinePos[0] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[3]), cv::Point(gridLinePos[1] + xOffset, gridLinePos[1] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[5]), cv::Point(gridLinePos[1] + xOffset, gridLinePos[2] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[1]), cv::Point(gridLinePos[2] + xOffset, gridLinePos[0] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, std::to_string(bits[4]), cv::Point(gridLinePos[2] + xOffset, gridLinePos[1] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 0, 255), 2);
+    cv::putText(annotatedFiducial, "X", cv::Point(gridLinePos[2] + xOffset, gridLinePos[2] + yOffset), cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(0, 255, 0), 2);
 
     return identifier;
 }
 
 int Vision::classifyFiducialSquare(const cv::Mat& fiducialImage, int row, int col) const
 {
-    int squareLength = 34; // Side length of gird square in pixels
-    int startPixel = 13; // Location of first pixel in first square
+    int squareLength = 32; // Side length of gird square in pixels
+    int startPixel = 16; // Location of first pixel in first square
     float threshold = 0.7; // Minimum proportion of square of one type required for classification (0.5, 1]
+    int padding = 3; // Number of pixels of padding that are not included in square sum
 
 
     // Count number of zero and one pixels in fiducial square
     int zeroSum = 0;
     int oneSum = 0;
-    for (int i = startPixel + row * squareLength; i < startPixel + (row + 1) * squareLength; i++)
+    for (int i = startPixel + row * squareLength + padding; i < startPixel + (row + 1) * squareLength - padding; i++)
     {
-        for (int j = startPixel + col * squareLength; j < startPixel + (col + 1) * squareLength; j++)
+        for (int j = startPixel + col * squareLength + padding; j < startPixel + (col + 1) * squareLength - padding; j++)
         {
             if (fiducialImage.at<uchar>(cv::Point(j, i)) == 0)
                 zeroSum++;
@@ -592,7 +602,7 @@ int Vision::classifyFiducialSquare(const cv::Mat& fiducialImage, int row, int co
     }
 
     // Classify pixel
-    int totalPixels = squareLength * squareLength;
+    int totalPixels = pow(squareLength - 2 * padding, 2);
     if ((float)zeroSum / totalPixels > threshold)
         return 0;
     else if ((float)oneSum / totalPixels > threshold)
@@ -693,39 +703,6 @@ cv::Point Vision::projectWorldPoint(const cv::Point3d& worldPoint) const
 	cv::Point2d imagePoint = cv::Point2d(imagePointMat.at<double>(0) / s, imagePointMat.at<double>(1) / s);
 
 	return imagePoint;
-}
-
-Eigen::Matrix<double, 3, 3> get_homography(Eigen::Matrix<double, 4, 2> video_pts, Eigen::Matrix<double, 4, 2> logo_pts)
-{
-    Eigen::Matrix<double, 8, 9> A;
-
-    for (int i = 0; i < 4; i++)
-    {
-        Eigen::Matrix<double, 9, 1> ax;
-        Eigen::Matrix<double, 9, 1> ay;
-
-        ax << video_pts(i, 0), video_pts(i, 1), 1., 0., 0., 0., -1 * video_pts(i, 0) * logo_pts(i, 0), -1 * video_pts(i, 1) * logo_pts(i, 0), -1 * logo_pts(i, 0);
-        ay << 0., 0., 0., -1 * video_pts(i, 0), -1 * video_pts(i, 1), -1, video_pts(i, 0)* logo_pts(i, 1), video_pts(i, 1)* logo_pts(i, 1), logo_pts(i, 1);
-
-        A.row(2 * i) = ax;
-        A.row(2 * i + 1) = ay;
-
-    }
-
-
-
-    Eigen::JacobiSVD<Eigen::Matrix<double, 8, 9>> svd(A, Eigen::ComputeFullU | Eigen::ComputeFullV);
-
-    Eigen::Matrix<double, 9, 9> V = svd.matrixV();
-    Eigen::Matrix<double, 9, 1> h = V.col(8);
-
-    Eigen::Matrix<double, 3, 3> homography;
-    homography << h(0, 0), h(1, 0), h(2, 0),
-        h(3, 0), h(4, 0), h(5, 0),
-        h(6, 0), h(7, 0), h(8, 0);
-
-    return homography;
-
 }
 
 double Vision::computeEuclidDist(const cv::Point3i& pointA, const cv::Point3i& pointB) const
