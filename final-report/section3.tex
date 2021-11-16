@@ -62,18 +62,10 @@ This section presents a summary of the project design tasks as well as the imple
 
 \subsubsection{End-Effector Mechanism}
 
-Since the design of the rest of the robot relies on the design of the end-effector mechanism, this mechanism is investigated first.
-
-End-Effector Mechanism Design
-
-For the purposes of this project, the end-effector subsystem refers to the components responsible for enabling the direct manipulation of the cube. These components include the vacuum pad, tubing and vacuum generation system. The end-effector subsystem is attached to the gantry robot by means of an end-effector mechanism. In order to design this component, the machine design procedure was followed. The first step of this procedure involves understanding the requirements of the machine.
-
-Requirements
-
-The end-effector mechanism requirements are listed below. The end-effector mechanism should:
+For the purposes of this project, the end-effector subsystem refers to the components responsible for enabling the direct manipulation of the cube. These components include the vacuum pad, tubing and vacuum generation system. The end-effector subsystem is attached to the gantry robot by means of an end-effector mechanism. In order to design this component, the machine design procedure was followed. The first step of this procedure involves understanding the requirements of the machine. The end-effector mechanism requirements are listed below. The end-effector mechanism should:
 
 \begin{compactitem}
-	\item Attach the end effector the the gantry robot.
+	\item Attach the end-effector to the gantry robot.
 	\item Maintain the suction-pad component in a vertical orientation.
 	\item Allow limited linear buffered motion of the vertical suction-pad component along the z-axis w.r.t the gantry robot.
 	\item The linear buffer should facilitate at least a 5mm range of linear motion.
@@ -89,11 +81,11 @@ An issue with this simple design is that the vacuum tube needs to be routed to t
 
 The second design consideration is how the rod will be rotated to rotate the vacuum pad given that the rod has linear motion of 5mm. The design solution to this investigated in the proof of concept design is the use of a gear attached to the rod which can be driven by a motor gear. The use of gears with their axes aligned with the rod axis allows the linear motion to be absorbed by the linear freedom of movement between the gear teeth. In order to absorb this motion, the height of the gear attached to the rod needs to be at least 5mm greater than the height of the motor gear is the maximum overlap is to be always maintained assuming the position of the motor is fixed with respect to the component supporting the rod. An alternative design that could be explored in the future, is fixing the linear position of the motor with respect to the spring to reduce the gear height and using the weight of the motor to act in a similar manner to the spring force.
 
-Rotary Motor Selection Considerations
+%Rotary Motor Selection Considerations
 
 The rod designed to facilitate the rotation and linear buffer motion of the vacuum pad was further developed. Intuitively, the rod requires a relatively low amount of torque to initiate and maintain rotary motion. Therefore, the smallest class of NEMA stepper motors, namely NEMA 8 motors, were considered as a guide for the motor footprint in the mechanical design. A preliminary decision to use a stepper motor over a servo was made based on the fact that rotary stability is essential once the vacuum pad has reached its required orientation. Servos may pulsate at standstill which is undesirable as the gripped cube may displace adjacent cubes. Furthermore, the rotation speed required is low and stepper motors exhibit the best torque characteristics at low speed. Lastly, in full step mode, NEMA 8 stepper motors typically exhibit a full step resolution of $1.8 ^\circ / \text{step}$ which falls within the rotary accuracy specifications of $5 ^\circ$.
 
-Transmission Gear Design
+%Transmission Gear Design
 
 The width and breadth of the front face of the NEMA 8 stepper motor is 20 mm and 20 mm. The diameter of the designed rotary rod is 13 mm. In order to facilitate a sufficient space between the motor and the rotary rod for spring and rotary rod gear, the centres of rotation of the rotary rod and the NEMA 8 stepper motor were placed 20 mm apart. Since the step accuracy of the motor is sufficient, no gearing ratio is required. Therefore, the most space efficient manner of connecting these two rotary centres is with two gears with a pitch diameter of 20mm each. Since this is not a specialised application of these gears, relatively standard parameters were selected for their design. The gear parameters as designed in Fusion 360 and used for both gears are as follows:
 
@@ -108,7 +100,7 @@ The width and breadth of the front face of the NEMA 8 stepper motor is 20 mm and
 
 A relatively large backlash of 0.3 mm was selected due to the high tolerance required by 3D printed parts. A pressure angle of $20 ^\circ$ and $25 ^\circ$ are the most commonly used angles in gear design. A smaller pressure angle has weaker teeth but runs quieter. Due to the low torque nature of this gear application, a $20 ^\circ$ pressure angle was selected to take advantage of the qualitative low noise benefit.
 
-Torque Calculations
+%Torque Calculations
 
 The point of entry for calculating the various mass elements that need to be translated and rotated is the aluminium cube that needs to be manipulated. The density of aluminum is $2.7 g/cm^3$. Since the cube has a maximum side length of $1.3 cm$, the cube has a maximum mass of $5.94 g$. Using the updated design of the end-effector rod, the 3D model was converted to a triangle mesh and exported to the 3D printing slicer Cura. Using PLA 1.75mm filament, Cura estimated the weight of the part to be 7g when printed at 50\% infill. The following is a summary of the masses of the components that comprise the rotating mass in the end-effector as well as the mass of the cube gripped by the end-effector:
 
@@ -790,15 +782,15 @@ A communication protocol needs to be developed between the robotic controller an
 
 \subsection{Shape Definition Interface}
 
-\subsubsection{Shape Rendering}
+\subsubsection{Background}
 
-OpenGL
+The second system specification for this project requires the development of a PC-based GUI software component that allows the user to define 3D shapes to be constructed by the robot using the small construction cubes. Furthermore, this specification also indicates that this software component must make use of graphical primitives to generate a 3D render of the shape as part of this process. To this extent, the OpenGL specification was selected as the basis for the 3D rendering component. DirectX was considered as an alternative to OpenGL. However, DirectX is only supported for the Windows operating system and XBox while OpenGL is cross-platform. The C++ QT framework used as the basis for the PC-based software component is inherently cross-platform and also offers better support for OpenGL integration which justified its selection for use in this project. It is noted that OpenGL is only a specification for a graphics API and not an implementation in itself. This API is usually implemented by the graphics card manufacturers. Furthermore, it is noted that OpenGL can be considered to be a state machine which is referred to as the graphical context. The behaviour of various OpenGL instructions depends on the state of the OpenGL context.
 
-One of the specifications for this project requires the development of a PC-based GUI software component that allows the user to define 3D shapes to be constructed by the robot. Furthermore, the project proposal indicates that this software component must make use of graphical primitives to generate a 3D render of the shape as part of this process. To this extent, the OpenGL specification was selected as the basis for the 3D rendering component. It is noted that OpenGL is only a specification for a graphics API and not an implementation in itself. This API is usually implemented by the graphics card manufacturers. Furthermore it is noted that can be considered to be a state machine which is described as the graphical context. The behaviour of various OpenGL instructions depends on the state of the OpenGL context.
+The approach to developing the \textit{Shape Definition} component was split into two phases. The first phase involved the prototype development of the component in an environment isolated from the QT environment. The Graphics Library Framework (GLFW) was used to provide a simple window to render and manage the OpenGL context in as well as to provide basic mechanisms of interaction with this window through computer peripherals. Secondly, as OpenGL is just a specification, there are a number of versions of drivers that implement this specification. However, the location of these drivers is usually unknown at the point of compilation and, as a result, their locations need to be fetched upon execution of the OpenGL dependent program. In order to overcome this issue, the OpenGL loading library, GLAD, was used to fetch the location of such drivers and makes them available for use in the OpenGL prototype. The second phase of the \textit{Shape Definition} component development process involved the integration of the OpenGL prototype with the QT-based PC software component. Specifically, the \textit{QOpenGLWidget} QT class was used to facilitate this, which is essentially an OpenGL wrapper class that allows native OpenGL API calls and offers functionality similar to both GLFW and GLAD.
 
-In order to make use of and learn OpenGL, some supporting software components were required. Firstly, GLFW was used to provide a basic window to render OpenGL content in as well as to provide basic mechanisms of interaction with this window through computer peripherals. Secondly, as OpenGL is just a specification, there are a number of versions of drivers that implement this specification. However, the location of these drivers is usually unknown at the point of compilation ad as a result their locations need to be fetched upon execution of the OpenGL dependent program. In order to overcome this issue, GLAD was used since it fetches the location of such drivers and makes them available for use in the OpenGL dependent program.
+The foundation of rendering using OpenGL is centred around the use of vertices. Specifically, a number of vertices are defined as the starting point for various objects to be rendered in 3D. These vertices are assembled into primitive shapes such as lines, triangles, quadrilaterals and other polygons depending on the OpenGL context. Triangles were used as the primitive shape created from vertices in this project since it is straightforward to define cubes through the use of triangles and most OpenGL hardware supports render acceleration for triangles. Surfaces are created by generating a number of these shapes adjacent to each other with varying sizes and orientations. These vertices and shapes encounter a number of processes and transformations when being converted from a description in 3D space to a collection of pixels on a 2D computer screen. There are approximately six such steps in this process which are known as the six stages of the graphics pipeline which is shown in Figure \ref{fig:graphics-pipeline}.
 
-The foundation of rendering using OpenGL rests on the use of vertices. Specifically, a number of vertices are defined as the starting point for various objects to be rendered in 3D. These vertices are assembled into shapes such as triangles depending on the OpenGL context. Triangles were used as the primitive shape created from vertices in this project. Surfaces can be created by generating a number of these shapes adjacent to each other with varying sizes and orientations. These vertices and shapes encounter a number of processes and transformations when being converted from a description in 3D space to a collection of pixels on a 2D computer screen. There are approximately six such steps in this process which are known as the six stages of the graphics pipeline which is shown in Figure \ref{fig:graphics-pipeline} below.
+% TODO: Replace graphics pipeline image
 
 \begin{figure}[H]
 	\centering
@@ -807,18 +799,90 @@ The foundation of rendering using OpenGL rests on the use of vertices. Specifica
 	\label{fig:graphics-pipeline}
 \end{figure}
 
-Two of the stages shown in Figure \ref{fig:graphics-pipeline} require an implementation to be defined when using OpenGL, namely the vertex shader and the fragment shader. These shaders are written using GLSL which is a language similar to C that is used to write shader programs that execute on the graphics card. In order to define the positions and orientations of the various objects to be rendered as well as how they are transformed to 2D space on the screen, a number of coordinate systems and transformation matrices are required. These are shown in Figure \ref{fig:transformation-matrices} below.
+Two of the stages shown in Figure \ref{fig:graphics-pipeline} require an implementation to be defined when using OpenGL, namely the vertex shader and the fragment shader. These shaders were written using the  OpenGL Shading Language (GLSL)\footnote{GLSL is a high-level language with C-style syntax that executes on graphics hardware and allows modification of the graphics pipeline.}. In order to define the positions and orientations of the various objects to be rendered as well as how they are transformed to 2D space on the screen, a number of coordinate systems and transformation matrices are required. These are shown in Figure \ref{fig:transformation-matrices} below.
 
-\begin{figure}[H]
+% TODO: Replace transformation matrix image with custom renders of cube in each of these states
+
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=1\linewidth]{figures/transformation-matrices.PNG}
 	\caption{Transformation matrices involved in mapping the vertices from local space to screen space.}
 	\label{fig:transformation-matrices}
 \end{figure}
 
-The object is described in the local coordinate frame with the origin of the frame of reference usually located somewhere on or within the object. World space is the frame of reference that relates the position, orientation and scale of all the objects to be rendered together. The matrix that maps the local frame to the world frame is known as the model matrix. Similarly, the view of the world, usually thought of as a camera, has its own coordinate system. The world space is mapped to this view space by means of a view matrix. This defines the angle the world is seen from. Lastly, it is noted that the coordinates that are mapped to the screen need to be NDC where all vertex values of the coordinate axes are between 0 and 1. Any vertex outside of this space will not be projected onto the screen. As such, this space is called clip space and the projection matrix is used to map from view space to clip space. However, the projection matrix can be used to define the nature of this clip space and as such can be used to control the projection perspective. 
+The object is described in the local frame \textit{l} with the origin of the frame of reference usually located somewhere on or within the object. The world frame \textit{w} is the space  that relates the position, orientation and scale of all the objects to be rendered together. The matrix that maps the local frame to the world frame is known as the model matrix, denoted here by $\matr{M}^{wl}$. Similarly, the view of the world, usually thought of as a camera, has its own coordinate system called view space \textit{v}. The world space is mapped to this view space by means of the view matrix $\matr{M}^{vw}$. This defines the perspective the world is seen from. Lastly, it is noted that the coordinates that are mapped to the screen need to be normalized device coordinates (NDC) where all vertex values of the coordinate axes are between 0 and 1. Any vertex outside of this space will not be projected onto the screen. As such, this space is called clip space \textit{c} and the projection matrix $\matr{M}^{cw}$ is used to map from view space to clip space. The projection matrix can be used to define the nature of this clip space and as such can be used to control the projection perspective. 
 
-Lastly, the viewport transform is performed to convert the 3D coordinates to 2D coordinates. The former three transforms, namely the model, view and projection matrices, are the transforms that will be manipulated to transform the vertices accordingly. Each of these matrices consist of a translation, rotation and scale sub-component of which the order of operations is important to ensure the correct transform result. By defining cubes using vertex arrays and manipulating these vertices as described above, a pyramid 3D shape that the robot could build was rendered as shown in Figure \ref{fig:initial-opengl} below.
+Lastly, the viewport transform is performed to convert the 3D coordinates to 2D coordinates. The former three transforms, namely the model, view and projection matrices, are the transforms that were be manipulated to transform the vertices accordingly. Each of these matrices consist of a translation, rotation and scale sub-component of which the order of operations is important to ensure the correct transform result.
+
+% TODO: Possibly add description of OpenGL coordinate system
+
+\subsubsection{3D Shape Render}
+
+The 3D shape to be rendered was approached by first considering how each individual constituent cube within the shape should be rendered. Since triangles were selected as the graphical shape primitive, the cube was formed by defining the six cube faces using two triangles per face. Each triangle was defined by specifying the location of each vertex in the local coordinate system for a total of 36 vertices to define the entire cube as shown in Figure \ref{fig:cube-triangles-render}. Furthermore, in order to map a texture to the cube face, each triangle vertex was associated with an NDC in the texture image file shown in Figure \ref{fig:cube-texture} such that the entire texture image was mapped to each cube face. Let $\vect{p}^l_i\in\mathbb{R}^3$ denote the position of the \textit{i}th vertex in the local coordinate system and let $\vect{t}_i\in\mathbb{R}^2$ denote the NDC in the texture image associated with $\vect{p}^l_i$. In order to capture the structure and texture of the cube to be rendered, a vertex information array was defined as
+
+\begin{equation}
+	\textit{vertices}=[\vect{p}^l_0, \vect{t}_0, \vect{p}^l_1, \vect{t}_1,...,\vect{p}^l_{35}, \vect{t}_{35}].
+	\label{eqn:vertex-array}
+\end{equation}
+
+Vertex attribute pointers were created to indicate the location of the position and texture coordinates within the \textit{vertices} array in Equation \ref{eqn:vertex-array} for the OpenGL context. To render the cube using this vertex information the \textit{vertices} array was bound to the current OpenGL context using various calls to the OpenGL API. However, this resulted in only the front 2D cube face being rendered on the screen. In order for multiple cubes to be rendered from different perspectives, the model, view and projection matrices need to be derived and utilised. The model matrix is constructed by noting that a given cube is mapped from local space to world space through scaling, rotation and translation operations. Let the matrices $\matr{S}\in\mathbb{R}^{4\times4}$, $\matr{R}\in\mathbb{R}^{4\times4}$ and $\matr{T}\in\mathbb{R}^{4\times4}$ represent these operations respectively in homogeneous coordinates. Furthermore, let $\vect{v}^l_i\in\mathbb{R}^4$ denote the position of the \textit{i}th vertex in homogeneous coordinates in the local frame. Since each cube only needed to be rotated about the y-axis, $\matr{R}$ can be simplified for only this rotation as $\matr{R}_y$. Additionally, Euler angles were chosen to parameterise the cube's orientation since Gimbal lock is not possible with the rotation restricted as such. Based on this, the model matrix is calculated as
+
+\begin{align}
+	\matr{M}^{wl}&=\matr{T}\matr{R_y}\matr{S},\\
+	&=
+	\begin{bmatrix}
+		1 & 0 & 0 & T_x\\
+		0 & 1 & 0 & T_y\\
+		0 & 0 & 1 & T_z\\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+	\begin{bmatrix}
+		\cos\theta & 0 & \sin\theta & 0\\
+		0 & 1 & 0 & 0\\
+		-\sin\theta & 0 & \cos\theta & 0\\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+	\begin{bmatrix}
+		S_x & 0 & 0 & 0\\
+		0 & S_y & 0 & 0\\
+		0 & 0 & S_z & 0\\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+\end{align}
+
+where $(T_x, T_y, T_z)$ is the translation vector, $(S_x, S_y, S_z)$ is the scaling vector and $\theta$ is the angle of rotation of the cube about the y-axis. The \textit{vertices} vector was defined in such a manner that the cube has a side length of 1 unit in the local coordinate system. Since the end-effector in the \textit{Robotic System} can only be positioned at a number of discrete \textit{step} positions, it was chosen to use \textit{steps} as the measurement unit for the world space coordinate system in the \textit{Shape Definition} component. A physical construction cube has a side length of 64 \textit{steps}. Therefore, a scaling factor of 64 \textit{steps} was used for all axes to form $\matr{M}^{wl}$. The translation vector values were obtained from the position state of the centre of a given cube in \textit{steps}. Furthermore, the translation vector element $T_y$ was offset by 32 \textit{steps} to ensure no part of the cube exists below the plane $z=0$ in the world frame.
+
+
+
+
+
+%TODO: Possibly add image showing how cube was defined using triangles as well as the original texture
+
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}{.32\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/cube-texture.jpg}
+		\caption{Cube face texture}
+		\label{fig:cube-texture}
+	\end{subfigure}%
+	\begin{subfigure}{.32\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/cube-triangles-render.PNG}
+		\caption{Triangle components}
+		\label{fig:cube-triangles-render}
+	\end{subfigure}%
+	\begin{subfigure}{.32\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/cube-render.PNG}
+		\caption{Textured cube}
+		\label{fig:cube-render}
+	\end{subfigure}%
+	\caption{Stages of the process to render a construction cube using OpenGL.}
+	\label{fig:opengl}
+\end{figure}
+
+By defining cubes using vertex arrays and manipulating these vertices as described above, a pyramid 3D shape that the robot could build was rendered as shown in Figure \ref{fig:initial-opengl} below.
 
 \begin{figure}[H]
 	\centering
@@ -827,14 +891,13 @@ Lastly, the viewport transform is performed to convert the 3D coordinates to 2D 
 	\label{fig:initial-opengl}
 \end{figure}
 
-\subsubsection{Camera System}
 
-OpenGL Camera
+\subsubsection{User Control}
 
-The next OpenGL component that needed to be implemented after the basic 3D rendering is the camera control. The view matrix is used to map the world space to the camera space. A convenient approach to constructing the view matrix is by using a so-called LookAt matrix $\boldsymbol{V}$. The look at matrix is defined as
+The next OpenGL component that needed to be implemented after the 3D render of the shape was the camera control component to allow the user to change the view perspective of the designed shape. The was achieved through manipulation of the view matrix based on user input. The view matrix is used to map the world space to the camera space. A convenient approach to constructing the view matrix is by using a so-called \textit{LookAt} matrix $\matr{V}$. The look at matrix is defined as
 
 \begin{align}
-	\boldsymbol{V}=
+	\matr{V}=
 	\begin{bmatrix}
 		R_x & R_y & R_z & 0 \\
 		U_x & U_y & U_z & 0 \\
@@ -849,7 +912,7 @@ The next OpenGL component that needed to be implemented after the basic 3D rende
 	\end{bmatrix}
 \end{align}
 
-where $\boldsymbol{R}$ is the right vector, $\boldsymbol{U}$ is the up vector, $\boldsymbol{D}$ is the direction vector and $\boldsymbol{P}$ is the position vector for the camera in the world space. These vectors defining the $\boldsymbol{V}$ matrix can be obtained from 3 vectors which are much more intuitive to use for camera control. Specifically a position, target (i.e. the point in the world space the camera is pointed towards) and up vector are sufficient to derive a look up matrix. This was used as the basis to form the camera system for this project's implementation. The desired camera behaviour was defined as follows:
+where $\matr{R}$ is the right vector, $\matr{U}$ is the up vector, $\matr{D}$ is the direction vector and $\matr{P}$ is the position vector for the camera in the world space. These vectors defining the $\matr{V}$ matrix can be obtained from 3 vectors which are much more intuitive to use for camera control. Specifically a position, target (i.e. the point in the world space the camera is pointed towards) and up vector are sufficient to derive a look up matrix. This was used as the basis to form the camera system for this project's implementation. The desired camera behaviour was defined as follows:
 
 \begin{compactitem}
 	\item The camera frame x-axis should remain parallel to the world xz plane.
@@ -857,18 +920,14 @@ where $\boldsymbol{R}$ is the right vector, $\boldsymbol{U}$ is the up vector, $
 	\item As the camera rotates the camera should continue to look at the same focal point.
 \end{compactitem}
 
-This behaviour was successfully implemented for the camera.
+%\begin{compactitem}
+%	\item Camera control by means of computer peripherals was implemented. The right mouse button can be used to control the rotation of the camera about a given focal point. The middle mouse button can be used to translate the camera horizontally in the world scene.
+%	\item The OpenGL shape render view was integrated with the main software GUI component.
+%	\item The ability for the user to insert and remove shapes from the model as well as the ability for the user to specify the position and rotation of the cube within the 3D model space.
+%	\item The option to load and save model files.
+%\end{compactitem}
 
-Shape Definition
-
-The following features were completed regarding the OpenGL 3D shape definition component:
-
-\begin{compactitem}
-	\item Camera control by means of computer peripherals was implemented. The right mouse button can be used to control the rotation of the camera about a given focal point. The middle mouse button can be used to translate the camera horizontally in the world scene.
-	\item The OpenGL shape render view was integrated with the main software GUI component.
-	\item The ability for the user to insert and remove shapes from the model as well as the ability for the user to specify the position and rotation of the cube within the 3D model space.
-	\item The option to load and save model files.
-\end{compactitem}
+\subsubsection{Class Diagrams}
 
 \subsection{Computer Vision System}
 
@@ -911,11 +970,11 @@ In even lighting conditions, the cube faces could not be distinguished from each
 
 \subsubsection{3D Localisation} \label{sec:3D Localisation}
 
-The location of the cube with respect to the robot needs to be determined from the location of the cube in the image for the system controller to make decisions based on the location of the cube and for the robot to interact with the cube. For the purposes of this project, the robot coordinate system was defined to be equivalent to the world coordinate system. This problem is referred to as object localisation and requires a solution to map an arbitrary point in image coordinate system, denoted by $\boldsymbol{p}^i\in\mathbb{R}^2$, to a corresponding point in the world coordinate system, denoted by $\boldsymbol{p}^w\in\mathbb{R}^3$. The 3D camera coordinate system is useful as an intermediate frame to relate the world frame to the image frame. Let a point in the camera coordinate system be denoted by $\boldsymbol{p}^c\in\mathbb{R}^3$.
+The location of the cube with respect to the robot needs to be determined from the location of the cube in the image for the system controller to make decisions based on the location of the cube and for the robot to interact with the cube. For the purposes of this project, the robot coordinate system was defined to be equivalent to the world coordinate system. This problem is referred to as object localisation and requires a solution to map an arbitrary point in image coordinate system, denoted by $\vect{p}^i\in\mathbb{R}^2$, to a corresponding point in the world coordinate system, denoted by $\vect{p}^w\in\mathbb{R}^3$. The 3D camera coordinate system is useful as an intermediate frame to relate the world frame to the image frame. Let a point in the camera coordinate system be denoted by $\vect{p}^c\in\mathbb{R}^3$.
 
 % TODO: Include image of robot coordinate system, image coordinate system and camera coordinate
 
-The pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} was used as the foundation for the mapping methods discussed here. This model requires that several parameters about the camera and its orientation to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that are required to be performed to map arbitrary point $\boldsymbol{p}^w$ to $\boldsymbol{p}^c$. These transformations are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$.
+The pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} was used as the foundation for the mapping methods discussed here. This model requires that several parameters about the camera and its orientation to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that are required to be performed to map arbitrary point $\vect{p}^w$ to $\vect{p}^c$. These transformations are captured by the rotation-translation matrix $[\matr{R}|\vect{t}]$.
 
 \begin{figure}[!ht]
 	\centering
@@ -924,10 +983,10 @@ The pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} was used
 	\label{fig:pinhole-camera-model}
 \end{figure}
 
-The intrinsic parameters of the camera can be expressed as a calibration matrix $\textbf{K}$ defined as
+The intrinsic parameters of the camera can be expressed as a calibration matrix $\matr{K}$ defined as
 
 \begin{equation}
-	\textbf{K}=
+	\matr{K}=
 	\begin{bmatrix}
 		f_x & s & c_x \\ 
 		0 & f_y & c_y \\ 
@@ -936,10 +995,10 @@ The intrinsic parameters of the camera can be expressed as a calibration matrix 
 	\label{eqn:calibration-matrix}
 \end{equation}
 
-The parameter $s$ in Equation \ref{eqn:calibration-matrix} captures the skew of the sensor axes that occurs as a result of the optical axis not being exactly perpendicular to the sensor plane. However, for practical purposes $s$ can be set to 0. Since the extrinsic parameters are captured by the rotation-translation matrix $[\textbf{R}|\textbf{t}]$, both the intrinsic and extrinsic parameters are captured by the product of this matrix and the calibration matrix $\textbf{K}$. This 3 x 4 matrix product is referred to the camera matrix $\textbf{P}$ and expressed mathematically as
+The parameter $s$ in Equation \ref{eqn:calibration-matrix} captures the skew of the sensor axes that occurs as a result of the optical axis not being exactly perpendicular to the sensor plane. However, for practical purposes $s$ can be set to 0. Since the extrinsic parameters are captured by the rotation-translation matrix $[\matr{R}|\vect{t}]$, both the intrinsic and extrinsic parameters are captured by the product of this matrix and the calibration matrix $\matr{K}$. This 3 x 4 matrix product is referred to the camera matrix $\matr{P}$ and expressed mathematically as
 
 \begin{equation}
-	\textbf{P}=\textbf{K}[\textbf{R}|\textbf{t}].
+	\matr{P}=\matr{K}[\matr{R}|\vect{t}].
 	\label{eqn:camera-matrix}
 \end{equation}
 
@@ -953,7 +1012,7 @@ The camera matrix is sufficient to map the world coordinate system to the the im
 		1
 	\end{bmatrix}
 	=
-	\textbf{P}
+	\matr{P}
 	\begin{bmatrix}
 		X \\ 
 		Y \\ 
@@ -963,9 +1022,9 @@ The camera matrix is sufficient to map the world coordinate system to the the im
 	\label{eqn:pinhole-camera-mapping}
 \end{equation}
 
-where $(X,Y,Z)$ are the coordinates of a given point in the world coordinate system $\boldsymbol{p}^w$, $(u,v)$ are the coordinates of the corresponding point in the image coordinate system $\boldsymbol{p}^i$ and $s$ is simply a scaling factor. It is noted there is a loss of depth information when mapping from the world frame to the image frame. This is observed mathematically in Equation \ref{eqn:pinhole-camera-mapping} since $\textbf{P}$ is not a square matrix and not invertible as a result. Therefore it is not possible to map from the image frame to the world frame without an additional piece of information. It was postulated that this piece of information could be obtained given that the length of the cube edge is known in the world frame. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. Instead it was decided to provide the z coordinate of $\boldsymbol{p}^w$ based on the horizontal plane layer a cube was expected to be detected in. This is reasonable given that a cube dropped away from the source and structural cubes will always be found on the base plane.
+where $(X,Y,Z)$ are the coordinates of a given point in the world coordinate system $\vect{p}^w$, $(u,v)$ are the coordinates of the corresponding point in the image coordinate system $\vect{p}^i$ and $s$ is simply a scaling factor. It is noted there is a loss of depth information when mapping from the world frame to the image frame. This is observed mathematically in Equation \ref{eqn:pinhole-camera-mapping} since $\matr{P}$ is not a square matrix and not invertible as a result. Therefore it is not possible to map from the image frame to the world frame without an additional piece of information. It was postulated that this piece of information could be obtained given that the length of the cube edge is known in the world frame. However, the cube side length differential was not found to be sufficiently large between vertical layers to make this distinction. Instead it was decided to provide the z coordinate of $\vect{p}^w$ based on the horizontal plane layer a cube was expected to be detected in. This is reasonable given that a cube dropped away from the source and structural cubes will always be found on the base plane.
 
-In order to solve for the the world coordinates given the image coordinates, camera matrix $\textbf{K}$ and world coordinate plane $Z$ using the pinhole camera model, Equation \ref{eqn:pinhole-camera-mapping} is expanded and rearranged as
+In order to solve for the the world coordinates given the image coordinates, camera matrix $\matr{K}$ and world coordinate plane $Z$ using the pinhole camera model, Equation \ref{eqn:pinhole-camera-mapping} is expanded and rearranged as
 
 \begin{equation}
 	s
@@ -975,18 +1034,18 @@ In order to solve for the the world coordinates given the image coordinates, cam
 		1
 	\end{bmatrix}
 	=
-	\textbf{K}\left(\textbf{R}
+	\matr{K}\left(\matr{R}
 	\begin{bmatrix}
 		X \\ 
 		Y \\ 
 		Z
 	\end{bmatrix}
-	+ \textbf{t}\right),
+	+ \vect{t}\right),
 	\label{eqn:expanded-pinhole-camera-mapping1}
 \end{equation}
 
 \begin{equation}
-	\textbf{R}^{-1}\textbf{M}^{-1}
+	\matr{R}^{-1}\matr{M}^{-1}
 	s
 	\begin{bmatrix}
 		u \\ 
@@ -999,21 +1058,21 @@ In order to solve for the the world coordinates given the image coordinates, cam
 		Y \\ 
 		Z
 	\end{bmatrix}
-	+ \textbf{R}^{-1}\textbf{t}.
+	+ \matr{R}^{-1}\vect{t}.
 	\label{eqn:expanded-pinhole-camera-mapping2}
 \end{equation}
 
-In order to solve for the unknown scaling factor $s$, the intermediate vectors $\textbf{x}$ and $\textbf{y}$ are defined as
+In order to solve for the unknown scaling factor $s$, the intermediate vectors $\vect{x}$ and $\vect{y}$ are defined as
 
 \begin{equation}
-	\textbf{x}=
+	\vect{x}=
 	\begin{bmatrix}
 		x_1 \\ 
 		x_2 \\ 
 		x_3
 	\end{bmatrix}
 =
-	\textbf{R}^{-1}\textbf{M}^{-1}
+	\matr{R}^{-1}\matr{M}^{-1}
 	\begin{bmatrix}
 		u \\ 
 		v \\ 
@@ -1023,7 +1082,7 @@ In order to solve for the unknown scaling factor $s$, the intermediate vectors $
 \end{equation}
 
 \begin{equation}
-	\textbf{y}
+	\vect{y}
 	=
 	\begin{bmatrix}
 		y_1 \\ 
@@ -1031,24 +1090,24 @@ In order to solve for the unknown scaling factor $s$, the intermediate vectors $
 		y_3
 	\end{bmatrix}
 	=
-	\textbf{R}^{-1}\textbf{t},
+	\matr{R}^{-1}\matr{t},
 	\label{eqn:expanded-pinhole-camera-mapping-right-matrix}
 \end{equation}
 
 such that Equation \ref{eqn:expanded-pinhole-camera-mapping2} can be rewritten as
 
 \begin{equation}
-	s\,\textbf{x}=
+	s\,\vect{x}=
 	\begin{bmatrix}
 		X \\ 
 		Y \\ 
 		Z
 	\end{bmatrix}
-	+\textbf{y}.
+	+\vect{y}.
 	\label{eqn:expanded-pinhole-camera-mapping-simplified}
 \end{equation}
 
-Since the camera matrix $\textbf{P}$ is given, the rotation matrix $\textbf{R}$, translation matrix $\textbf{t}$ and intrinsic matrix $\textbf{M}$ in Equations \ref{eqn:expanded-pinhole-camera-mapping-left-matrix} and \ref{eqn:expanded-pinhole-camera-mapping-right-matrix} are known. Consequently, $s$ can be computed as
+Since the camera matrix $\matr{P}$ is given, the rotation matrix $\matr{R}$, translation matrix $\vect{t}$ and intrinsic matrix $\matr{M}$ in Equations \ref{eqn:expanded-pinhole-camera-mapping-left-matrix} and \ref{eqn:expanded-pinhole-camera-mapping-right-matrix} are known. Consequently, $s$ can be computed as
 
 \begin{equation}
 	s=\frac{Z+y_3}{x_3}.
@@ -1063,7 +1122,7 @@ Finally, with $s$ known, it is trivial to make use of Equation \ref{eqn:expanded
 		Y \\ 
 		Z
 	\end{bmatrix}=
-	s\,\textbf{x}-\textbf{y}.
+	s\,\vect{x}-\vect{y}.
 	\label{eqn:expanded-pinhole-camera-mapping-final}
 \end{equation}
 
@@ -1138,7 +1197,7 @@ The location of the fiducials within the image input data provide the correspond
 	\label{fig:fiducial-stages}
 \end{figure}
 
-The fiducial identification step takes place after the contour extraction phase shown in Figure \ref{fig:high-level-computer-vision-design}. The purpose of this step is to identify which of the detected contours are an artifacts of fiducials, to acquire the image coordinates of the fiducials and to extract the fiducial identifiers. An overview of the fiducial identification algorithm developed for this project is shown in Figure \ref{fig:fiducial-identification}. This algorithm follows the approach of initially assuming that each contour is a fiducial and discarding contours in latter steps if the contour does not fulfill certain fiducial requirements. Following this logic, the four corners of the fiducial candidate contour are extracted using the algorithm presented in later Section \ref{sec:Square Corner Detection} based on the assumption that the contour is a square. Using the detected corners, the internal angles and side lengths of this quadrilateral are computed. If the do not approximate the properties of a square, the contour is discarded.
+The fiducial identification step takes place after the contour extraction phase shown in Figure \ref{fig:high-level-computer-vision-design}. The purpose of this step is to identify which of the detected contours are an artifacts of fiducials, to acquire the image coordinates of the fiducials and to extract the fiducial identifiers. An overview of the fiducial identification algorithm developed for this project is shown in Figure \ref{fig:fiducial-identification}. This algorithm follows the approach of initially assuming that each contour is a fiducial and discarding contours in latter steps if the contour does not fulfill certain fiducial requirements. Following this logic, the four corners of the fiducial candidate contour are extracted using the algorithm presented in later Section \ref{sec:Square Corner Detection} based on the assumption that the contour is a square. Using the detected corners, the internal angles and side lengths of this quadrilateral are computed. If they do not approximate the properties of a square, the contour is discarded.
 
 \begin{figure}[!ht]
 	\centering
@@ -1147,7 +1206,7 @@ The fiducial identification step takes place after the contour extraction phase 
 	\label{fig:fiducial-identification}
 \end{figure}
 
-It was noted that the fiducial in the image captured by the camera has a degree of perspective warping compared to the reference digital fiducial image. In order to correct for this perspective warp, a 3x3 homography matrix \textbf{H} is computed using the \textit{findHomography} OpenCV library function. Four point correspondences are required to compute \textbf{H}. These correspondences are obtained by arbitrarily pairing each of the fiducial candidate's detected corner coordinates in the original image to the corner coordinates of a 128 x 128 pixel destination image. The fiducial candidate region in the original image is warped to the destination image such that the fiducial pattern is isolated as shown in Figure \ref{fig:fiducial-step2}. The internal region of the isolated fiducial candidate image is divided into a pre-placed 3x3 grid of squares corresponding to the expected positions of the fiducial squares. This grid is shown in Figure \ref{fig:fiducial-step3}. For the grid cell to be classified as a binary one or zero, at least 75\% of the inner 30 x 30 pixels of the square need to have a pixel intensity of 255 or 0 respectively. If the condition is not met for either value for any grid cell, the grid cell is considered unclassified and the contour is discarded.
+It was noted that the fiducial in the image captured by the camera has a degree of perspective warping compared to the reference digital fiducial image. In order to correct for this perspective warp, a 3x3 homography matrix $\matr{H}$ is computed using the \textit{findHomography} OpenCV library function. Four point correspondences are required to compute $\matr{H}$. These correspondences are obtained by arbitrarily pairing each of the fiducial candidate's detected corner coordinates in the original image to the corner coordinates of a 128 x 128 pixel destination image. The fiducial candidate region in the original image is warped to the destination image such that the fiducial pattern is isolated as shown in Figure \ref{fig:fiducial-step2}. The internal region of the isolated fiducial candidate image is divided into a pre-placed 3x3 grid of squares corresponding to the expected positions of the fiducial squares. This grid is shown in Figure \ref{fig:fiducial-step3}. For the grid cell to be classified as a binary one or zero, at least 75\% of the inner 30 x 30 pixels of the square need to have a pixel intensity of 255 or 0 respectively. If the condition is not met for either value for any grid cell, the grid cell is considered unclassified and the contour is discarded.
 
 Once all the grid cells have been classified, the orientation reference cells at $(0, 0)$, $(2, 0)$ and $(2,2)$ are compared with the expected binary values of 0, 0 and 1 respectively. If these match, the fiducial is considered to be correctly oriented. Otherwise, the isolated fiducial candidate is rotated 90$^{\circ}$ clockwise until the correct orientation is found. If the correct orientation is not found after three rotations have been performed, the contour is discarded. Finally the unique binary identifier encoded in the fiducial is extracted by reading the binary values of the cells from left to right and top to bottom excluding the orientation cells. The cells are ordered from the least significant bit (LSB) to the most significant bit (MSB). Figure \ref{fig:fiducial-step3} shows the result of applying the fiducial identification step to the isolated fiducial in Figure \ref{fig:fiducial-step3}. The orientation reference cells are indicated by green crosses while the fiducial has been rotated to align with these cells. The binary values detected in each cell are indicated in red. In this case the identifier is calculated as $100101_2=37$. The fiducial in the original image is annotated with the detected corners as well as the fiducial identifier as shown in Figure \ref{fig:fiducial-step4}.
 

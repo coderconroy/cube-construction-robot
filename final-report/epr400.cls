@@ -87,14 +87,11 @@
 \RequirePackage{pifont}
 
 %% Load AMS mathematics support, fonts and symbols.
-\RequirePackage[fleqn]{amsmath}
+\RequirePackage{amsmath}
 \RequirePackage{amsfonts}
 \RequirePackage{amstext}
 \RequirePackage{amssymb}
 \RequirePackage{mathtools}
-
-%% Set maths equation number to reset per section
-\numberwithin{equation}{section}
 
 %% Yet more mathematics font related modules...
 \RequirePackage{bm}

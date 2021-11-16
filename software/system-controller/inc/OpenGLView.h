@@ -115,4 +115,46 @@ private:
     const char* CUBE_TEXTURE_PATH = "res/cube-texture.jpg";
     const char* CUBE_TEXTURE_SELECTED_PATH = "res/cube-texture-selected.jpg";
     const char* CUBE_TEXTURE_INVALID_PATH = "res/cube-texture-invalid.jpg";
+
+    // Camera control parameters
+    int rho = 800;
+    float theta = 0;
+    float phi = 30;
+    float xFocal = 0;
+    float yFocal = 0;
+    float zFocal = 0;
+    int mouseX = 0;
+    int mouseY = 0;
+    int thetaSensitivity = 30;
+    int phiSensitivity = 30;
+    int xFocalSensitivity = 5;
+    int zFocalSensitivity = 5;
+
+    /*!
+    * Post-multiply 4x4 homogeneous matrix by 4x4 translation matrix.
+    * 
+    * \param [in] mat The matrix to be updated.
+    * \param [in] vec Vector containing the translation values for the x, y and z axes.
+    */
+    glm::mat4 translateMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const;
+
+    /*!
+    * Post-multiply 4x4 homogeneous matrix by 4x4 rotation matrix for rotation about the y-axis
+    *
+    * \param [in] mat The matrix to be updated.
+    * \param [in] theta Angle of rotation about y-axis (radians).
+    */
+    glm::mat4 rotateMatrixY(glm::mat4 const& mat, float const theta) const;
+
+    /*!
+    * Post-multiply 4x4 homogeneous matrix by 4x4 scaling matrix.
+    *
+    * \param [in] mat The matrix to be updated.
+    * \param [in] vec Vector containing the scaling factors for the x, y and z axes.
+    */
+    glm::mat4 scaleMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const;
+
+    glm::mat4 createViewMatrix(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up);
+
+    glm::mat4 createProjectionMatrix(float fovy, float aspect, float zNear, float zFar);
 };

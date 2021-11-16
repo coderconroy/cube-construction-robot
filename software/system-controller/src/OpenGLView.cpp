@@ -5,7 +5,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <stb-image/stb_image.h>
 
-
 OpenGLView::OpenGLView(QWidget* parent) : QOpenGLWidget(parent) 
 {
     // Set focus policy to ensure the widget receives keyboard events
@@ -28,8 +27,9 @@ void OpenGLView::initializeGL()
     // Initialize shaders and shader program
     shaderProgram = new ShaderProgram(VERT_SHADER_PATH, FRAG_SHADER_PATH, context(), this);
 
-
     // Initialize cube vertex data
+    // Each line corresponds to a triangle vertex and the attributes for each vertex are defined as
+    // [x position, y position, z position, x texture coordinate, y texture coordinate]
     float vertices[] = {
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -124,15 +124,8 @@ void OpenGLView::initializeGL()
     // Load selected cube texture source image
     stbi_set_flip_vertically_on_load(true);
     data = stbi_load(CUBE_TEXTURE_SELECTED_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
     // Initialize invalid cube texture
@@ -146,15 +139,8 @@ void OpenGLView::initializeGL()
     // Load selected cube texture source image
     stbi_set_flip_vertically_on_load(true);
     data = stbi_load(CUBE_TEXTURE_INVALID_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
     // Initialize the shader program's texture sampler's
@@ -171,13 +157,6 @@ void OpenGLView::resizeGL(int width, int height)
     screen_height = height;
 }
 
-int rho = 800;
-float theta = 0;
-float phi = 30;
-float xFocal = 0;
-float yFocal = 0;
-float zFocal = 0;
-
 void OpenGLView::paintGL()
 {
     // Reset the background color and depth buffer
@@ -191,17 +170,13 @@ void OpenGLView::paintGL()
     float frustumAngle = 45; // Perspective angle of frustum
     glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
-
     float xPos = rho * sin(glm::radians(theta)) * cos(glm::radians(phi)) + xFocal;
     float yPos = rho * sin(glm::radians(phi)) + yFocal;
     float zPos = rho * cos(glm::radians(theta)) * cos(glm::radians(phi)) + zFocal;
 
     // The view matrix transforms the world frame to the cameras frame
-    glm::mat4 view = glm::lookAt(glm::vec3(xPos, yPos, zPos),
-        glm::vec3(xFocal, yFocal, zFocal),
-        glm::vec3(0.0f, 1.0f, 0.0f));
-
-    projection = glm::perspective(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 10000.0f);
+    glm::mat4 view = createViewMatrix(glm::vec3(xPos, yPos, zPos), glm::vec3(xFocal, yFocal, zFocal), glm::vec3(0.0f, 1.0f, 0.0f));
+    projection = createProjectionMatrix(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 10000.0f);
 
     // Update the shader program's view and projection matrices
     shaderProgram->setUniformMat4("view", view);
@@ -213,7 +188,7 @@ void OpenGLView::paintGL()
         glBindVertexArray(vertArrayObj); // Bind to vertex array object containing the cube defintion
         for (unsigned int i = 0; i < cubes->size(); i++)
         {
-            // Get cube to render
+            // Get next cube to render
             Cube* cube = cubes->at(i);
 
             // Bind cube texture to texture unit based on cube state
@@ -227,10 +202,10 @@ void OpenGLView::paintGL()
 
             // Compute model matrix
             glm::mat4 model = glm::mat4(1.0f); // The model matrix is used to transform the local frame to the world frame
-            model = glm::translate(model, cube->getPosition());
-            model = glm::rotate(model, cube->getPitch(), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = translateMatrix(model, cube->getPosition());
+            model = rotateMatrixY(model, cube->getPitch());
             // Scale the cube from one step in size to its side length in steps
-            model = glm::scale(model, glm::vec3(cube->getSideLength(), cube->getSideLength(), cube->getSideLength()));
+            model = scaleMatrix(model, glm::vec3(cube->getSideLength(), cube->getSideLength(), cube->getSideLength()));
 
             // Update the shader program's model matrix
             shaderProgram->setUniformMat4("model", model);
@@ -240,13 +215,6 @@ void OpenGLView::paintGL()
         }
     }
 }
-
-int mouseX = 0;
-int mouseY = 0;
-int thetaSensitivity = 30;
-int phiSensitivity = 30;
-int xFocalSensitivity = 5;
-int zFocalSensitivity = 5;
 
 void OpenGLView::mousePressEvent(QMouseEvent* event)
 {
@@ -340,4 +308,80 @@ void OpenGLView::wheelEvent(QWheelEvent* event)
 
     if (rho <= 0)
         rho = 100;
+}
+
+glm::mat4 OpenGLView::translateMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const
+{
+    // Initialise output matrix
+    glm::mat4 output = glm::mat4(1.0f);
+
+    // Insert translations into matrix
+    output[3][0] = vec[0];
+    output[3][1] = vec[1];
+    output[3][2] = vec[2];
+
+    // Post-multiply with input matrix
+    return mat * output;
+}
+
+glm::mat4 OpenGLView::rotateMatrixY(glm::mat4 const& mat, float const theta) const
+{
+    // Initialise y axis rotation matrix
+    glm::mat4 yRot = glm::mat4(1.0f);
+
+    yRot[0][0] = cos(theta);
+    yRot[2][0] = sin(theta);
+    yRot[0][2] = -sin(theta);
+    yRot[2][2] = cos(theta);
+
+    // Post-multiply with input matrix
+    return mat * yRot;
+}
+
+glm::mat4 OpenGLView::scaleMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const
+{
+    // Initialise scale matrix
+    glm::mat4 scale = glm::mat4(1.0f);
+
+    scale[0][0] = vec[0];
+    scale[1][1] = vec[1];
+    scale[2][2] = vec[2];
+
+    // Post-multiply with input matrix
+    return mat * scale;
+}
+
+glm::mat4 OpenGLView::createViewMatrix(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up)
+{
+    glm::vec3 const f(normalize(center - eye));
+    glm::vec3 const s(normalize(glm::cross(f, up)));
+    glm::vec3 const u(glm::cross(s, f));
+
+    glm::mat4 Result(1);
+    Result[0][0] = s.x;
+    Result[1][0] = s.y;
+    Result[2][0] = s.z;
+    Result[0][1] = u.x;
+    Result[1][1] = u.y;
+    Result[2][1] = u.z;
+    Result[0][2] = -f.x;
+    Result[1][2] = -f.y;
+    Result[2][2] = -f.z;
+    Result[3][0] = -dot(s, eye);
+    Result[3][1] = -dot(u, eye);
+    Result[3][2] = dot(f, eye);
+    return Result;
+}
+
+glm::mat4 OpenGLView::createProjectionMatrix(float fovy, float aspect, float zNear, float zFar)
+{
+    float const tanHalfFovy = tan(fovy / static_cast<float>(2));
+
+    glm::mat4 Result(static_cast<float>(0));
+    Result[0][0] = static_cast<float>(1) / (aspect * tanHalfFovy);
+    Result[1][1] = static_cast<float>(1) / (tanHalfFovy);
+    Result[2][2] = -(zFar + zNear) / (zFar - zNear);
+    Result[2][3] = -static_cast<float>(1);
+    Result[3][2] = -(static_cast<float>(2) * zFar * zNear) / (zFar - zNear);
+    return Result;
 }
