@@ -144,7 +144,7 @@ private:
     * \param [in] mat The matrix to be updated.
     * \param [in] theta Angle of rotation about y-axis (radians).
     */
-    glm::mat4 rotateMatrixY(glm::mat4 const& mat, float const theta) const;
+    glm::mat4 rotateMatrixY(const glm::mat4& mat, const float theta) const;
 
     /*!
     * Post-multiply 4x4 homogeneous matrix by 4x4 scaling matrix.
@@ -152,9 +152,16 @@ private:
     * \param [in] mat The matrix to be updated.
     * \param [in] vec Vector containing the scaling factors for the x, y and z axes.
     */
-    glm::mat4 scaleMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const;
+    glm::mat4 scaleMatrix(const glm::mat4& mat, const glm::vec3& vec) const;
 
-    glm::mat4 createViewMatrix(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up);
+    /*!
+    * Create view matrix for mapping the world space to view space.
+    *
+    * \param [in] cameraPos Position of the camera in the world frame.
+    * \param [in] focalPoint Position of the focal point of the camera in the world frame.
+    * \param [in] upVector Direction vector for the up direction in the world frame.
+    */
+    glm::mat4 createViewMatrix(const glm::vec3& cameraPos, const glm::vec3& focalPoint, const glm::vec3& upVector) const;
 
-    glm::mat4 createProjectionMatrix(float fovy, float aspect, float zNear, float zFar);
+    glm::mat4 createProjectionMatrix(const float fovy, const float aspect, const float zNear, const float zFar) const;
 };

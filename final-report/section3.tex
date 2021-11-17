@@ -719,7 +719,16 @@ The components required to assemble the board were acquired prior to the deliver
 
 \subsubsection{Firmware}
 
-USART
+\subsubsection{Serial Communication}
+
+A communication protocol needs to be developed between the robotic controller and the PC running the GUI software. The PC needs to be able to issue the following commands to the robotic controller:
+
+\begin{compactitem}
+	\item Calibrate axes - The robot must home its motor to find the zero position on each axis as indicated when each limit switch is triggered. The robot must also place the rotational motor into sleep mode briefly to allow any rotational tension on the vacuum tube to be released. Following this the rotational motor must be removed from sleep mode and its current angular position reset as the zero angular position. 
+	\item Go to position - The robot must move to the specified position in 3D Cartesian space as well as the specified z-axis angular position.
+	\item Actuate vacuum mechanism - Set the actuation of the servo motor controlling the vacuum mechanism
+	\item Report pressure in vacuum system
+\end{compactitem}
 
 For the serial communication component, a word length of 8 bits was selected with no parity bit and 1 stop bit as this the most common structure used and there was no reason to choose an altered structure. A baud rate of 115200 bits/s was also selected with the maximum oversampling rate of 16 samples chosen to minimise the effective noise during data reception. The value of USARTDIV in the \textit{USART\_BRR} register of the STM32L072RZT6 is used to define the baud rate. Different equations are used to compute the baud rate based on the oversampling frequency used. For an oversampling rate of 16, the baud equation is
 
@@ -763,22 +772,29 @@ The first step in configuring PWM requires the configuration of the counter cloc
 	\label{pwm-counter-clock}
 \end{align}
 
-Using Equation \ref{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
+%Using Equation \ref{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
 
-\subsubsection{Communication Protocol}
-
-Communication Protocol
-
-% See https://en.wikibooks.org/wiki/Serial_Programming/Forming_Data_Packets
-
-A communication protocol needs to be developed between the robotic controller and the PC running the GUI software. The PC needs to be able to issue the following commands to the robotic controller:
-
-\begin{compactitem}
-	\item Calibrate axes - The robot must home its motor to find the zero position on each axis as indicated when each limit switch is triggered. The robot must also place the rotational motor into sleep mode briefly to allow any rotational tension on the vacuum tube to be released. Following this the rotational motor must be removed from sleep mode and its current angular position reset as the zero angular position. 
-	\item Go to position - The robot must move to the specified position in 3D Cartesian space as well as the specified z-axis angular position.
-	\item Actuate vacuum mechanism - Set the actuation of the servo motor controlling the vacuum mechanism
-	\item Report pressure in vacuum system
-\end{compactitem}
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{2cm}|>{\raggedright}m{2cm}|>{\raggedright\arraybackslash}m{9cm}|}
+		\hline
+		\textbf{ID} & \textbf{Type} & \textbf{Description} \\
+		\hline
+		0x0 & & \\
+		0x1 & & \\
+		0x2 & & \\
+		0x3 & & \\
+		0x4 & & \\
+		0x5 & & \\
+		0x6 & & \\
+		0x7 & & \\
+		0x8 & & \\
+		0x9 & & \\
+		\hline
+	\end{tabular}
+	\caption{\label{tab:serial-communication-protocol}Serial communication protocol utilised between the \textit{PC System} and the \textit{Robotic System}.}
+\end{table}
 
 \subsection{Shape Definition Interface}
 
@@ -810,9 +826,9 @@ Two of the stages shown in Figure \ref{fig:graphics-pipeline} require an impleme
 	\label{fig:transformation-matrices}
 \end{figure}
 
-The object is described in the local frame \textit{l} with the origin of the frame of reference usually located somewhere on or within the object. The world frame \textit{w} is the space  that relates the position, orientation and scale of all the objects to be rendered together. The matrix that maps the local frame to the world frame is known as the model matrix, denoted here by $\matr{M}^{wl}$. Similarly, the view of the world, usually thought of as a camera, has its own coordinate system called view space \textit{v}. The world space is mapped to this view space by means of the view matrix $\matr{M}^{vw}$. This defines the perspective the world is seen from. Lastly, it is noted that the coordinates that are mapped to the screen need to be normalized device coordinates (NDC) where all vertex values of the coordinate axes are between 0 and 1. Any vertex outside of this space will not be projected onto the screen. As such, this space is called clip space \textit{c} and the projection matrix $\matr{M}^{cw}$ is used to map from view space to clip space. The projection matrix can be used to define the nature of this clip space and as such can be used to control the projection perspective. 
+The object is described in the local frame \textit{l} with the origin of the frame of reference usually located somewhere on or within the object. The world frame \textit{w} is the space  that relates the position, orientation and scale of all the objects to be rendered together. The matrix that maps the local frame to the world frame is known as the model matrix, denoted here by $\matr{M}^{wl}$. Similarly, the view of the world, usually thought of as a camera, has its own coordinate system called view space \textit{v}. The world space is mapped to this view space by means of the view matrix $\matr{M}^{vw}$. This defines the point of view the world is seen from. Lastly, it is noted that the coordinates that are mapped to the screen need to be normalized device coordinates (NDC) where all vertex values of the coordinate axes are between 0 and 1. Any vertex outside of this space will not be projected onto the screen. As such, this space is called clip space \textit{c} and the projection matrix $\matr{M}^{cv}$ is used to map from view space to clip space. The projection matrix can be used to define the nature of this clip space and as such can be used to control the projection perspective. 
 
-Lastly, the viewport transform is performed to convert the 3D coordinates to 2D coordinates. The former three transforms, namely the model, view and projection matrices, are the transforms that were be manipulated to transform the vertices accordingly. Each of these matrices consist of a translation, rotation and scale sub-component of which the order of operations is important to ensure the correct transform result.
+Lastly, the viewport transform is performed to convert the 3D coordinates to 2D coordinates. The former three transforms, namely the model, view and projection matrices, are the transforms that were manipulated to transform the vertices accordingly. Each of these matrices consist of a translation, rotation and scale sub-component of which the order of operations is important to ensure the correct transform result.
 
 % TODO: Possibly add description of OpenGL coordinate system
 
@@ -852,11 +868,67 @@ Vertex attribute pointers were created to indicate the location of the position 
 
 where $(T_x, T_y, T_z)$ is the translation vector, $(S_x, S_y, S_z)$ is the scaling vector and $\theta$ is the angle of rotation of the cube about the y-axis. The \textit{vertices} vector was defined in such a manner that the cube has a side length of 1 unit in the local coordinate system. Since the end-effector in the \textit{Robotic System} can only be positioned at a number of discrete \textit{step} positions, it was chosen to use \textit{steps} as the measurement unit for the world space coordinate system in the \textit{Shape Definition} component. A physical construction cube has a side length of 64 \textit{steps}. Therefore, a scaling factor of 64 \textit{steps} was used for all axes to form $\matr{M}^{wl}$. The translation vector values were obtained from the position state of the centre of a given cube in \textit{steps}. Furthermore, the translation vector element $T_y$ was offset by 32 \textit{steps} to ensure no part of the cube exists below the plane $z=0$ in the world frame.
 
+The cubes in the world space are mapped to the view space next using the view matrix. The result of this transformation gives the impression that the world space is rendered from the perspective of a camera. This idea was used as the basis to form the view matrix\footnote{In this case, the view matrix is also frequently referred to as the \textit{LookAt} matrix.} using the camera's position $\vect{p}^w_c\in\mathbb{R}^3$, the camera's focal point $\vect{p}^w_f\in\mathbb{R}^3$ and the camera's up direction vector $\hat{\vect{u}}^w_u\in\mathbb{R}^3$, all with respect to the world frame. The camera direction\footnote{Unintuitively, the camera direction vector points in direction opposite to the direction the camera is facing.} vector $\hat{\vect{u}}^w_z\in\mathbb{R}^3$ (i.e. camera's positive z-axis) is calculated as
 
+\begin{align}
+	\vect{u}^w_z&=\vect{p}^w_c-\vect{p}^w_f,\\
+	\hat{\vect{u}}^w_z&=\frac{\vect{u}^w_z}{||\vect{u}^w_z||}.
+	\label{eqn:opengl-camera-z}
+\end{align}
 
+With the direction of the camera known, the camera's right vector $\hat{\vect{u}}^w_x\in\mathbb{R}^3$ (i.e. camera's positive x-axis) in the world frame is calculated as
 
+\begin{align}
+	\vect{u}^w_x&=\hat{\vect{u}}^w_u\times\hat{\vect{u}}^w_d,\\
+	\hat{\vect{u}}^w_x&=\frac{\vect{u}^w_x}{||\vect{u}^w_x||}.
+	\label{eqn:opengl-camera-x}
+\end{align}
 
-%TODO: Possibly add image showing how cube was defined using triangles as well as the original texture
+Finally, the direction of the camera's positive y-axis $\hat{\vect{u}}^w_y\in\mathbb{R}^3$ with respect to the world frame is calculated as
+
+\begin{equation}
+	\hat{\vect{u}}^w_y=\hat{\vect{u}}^w_z\times\hat{\vect{u}}^w_x.
+	\label{eqn:opengl-camera-y}
+\end{equation}
+
+The results of Equations \ref{eqn:opengl-camera-z}, \ref{eqn:opengl-camera-x} and \ref{eqn:opengl-camera-y} are used to calculate the view matrix as
+
+\begin{equation}
+	\renewcommand*{\arraystretch}{1.3}
+	\matr{T}^{vw}=
+	\begin{bmatrix}
+		\hat{u}^w_{x,0} & \hat{u}^w_{x,1} & \hat{u}^w_{x,2} & 0 \\
+		\hat{u}^w_{y,0} & \hat{u}^w_{y,1} & \hat{u}^w_{y,2} & 0 \\
+		\hat{u}^w_{z,0} & \hat{u}^w_{z,1} & \hat{u}^w_{z,2} & 0 \\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+	\begin{bmatrix}
+		1 & 0 & 0 & -p^w_{c,0} \\
+		0 & 1 & 0 & -p^w_{c,1} \\
+		0 & 0 & 1 & -p^w_{c,2} \\
+		0 & 0 & 0 & 1
+	\end{bmatrix}
+\end{equation}
+
+where $\hat{u}^w_{x,i}$, $\hat{u}^w_{y,i}$, $\hat{u}^w_{z,i}$ and $p^w_{c,i}$ are the \textit{i}th elements of $\hat{\vect{u}}^w_{x}$, $\hat{\vect{u}}^w_{y}$, $\hat{\vect{u}}^w_{z}$ and $\vect{p}^w_{c}$ respectively. The final transformation that was implemented is the mapping of view space to clip space using the projection matrix. The points that are clipped are selected based on their location with respect to a frustum defined in the view frame. Points that fall within this frustum are kept and converted to NDCs while points outside of this frustum are clipped. The shape of this frustum defines the nature of the projection. Specifically, if the frustum is a rectangular prism, the resulting projection is an orthographic projection. However, if the frustum is not a uniform prism, the resulting projection is a perspective projection. The perspective projection is how the world appears to the human eye and, therefore, was selected as the projection method for this project to ease the process of comparing the 3D shape model and the constructed shape. The projection matrix is defined as
+
+\begin{equation}
+	\matr{T}^{cv}=
+	\begin{bmatrix}
+		\frac{n}{r} & 0 & 0 & 0 \\
+		0 & \frac{n}{t} & 0 & 0 \\
+		0 & 0 & \frac{-(f+n)}{f-n} & \frac{-2fn}{f-n} \\
+		0 & 0 & -1 & 0
+	\end{bmatrix}
+\label{eqn:projection-matrix}
+\end{equation}
+
+where $n$ and $f$ are the near and far z-planes of the projection frustum respectively in the view frame. Furthermore, $r$ and $t$ are the right and top bounding x- and y-planes respectively for the near frustum z-plane. Equation \ref{eqn:projection-matrix} assumes that the frustum exhibits x and y symmetry such that the left and bottom bounding planes need not be specified. It was found to be more intuitive to parameterise the projection in terms of the frustum angle $\alpha$ and aspect ratio $\beta$ of the frustum z-planes alongside $f$ and $n$. To this end, $n/r$ and $n/t$ in Equation \ref{eqn:projection-matrix} are computed as
+
+\begin{align}
+	\frac{n}{r}&=\frac{1}{\alpha\tan(\beta/2)}\\
+	\frac{n}{r}&=\frac{1}{\tan(\beta/2)}
+\end{align} 
 
 \begin{figure}[!ht]
 	\centering
@@ -884,7 +956,7 @@ where $(T_x, T_y, T_z)$ is the translation vector, $(S_x, S_y, S_z)$ is the scal
 
 By defining cubes using vertex arrays and manipulating these vertices as described above, a pyramid 3D shape that the robot could build was rendered as shown in Figure \ref{fig:initial-opengl} below.
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{figures/initial-opengl-shape.PNG}
 	\caption{3D render of pyramid shape generated using OpenGL within QT framework.}
@@ -894,25 +966,7 @@ By defining cubes using vertex arrays and manipulating these vertices as describ
 
 \subsubsection{User Control}
 
-The next OpenGL component that needed to be implemented after the 3D render of the shape was the camera control component to allow the user to change the view perspective of the designed shape. The was achieved through manipulation of the view matrix based on user input. The view matrix is used to map the world space to the camera space. A convenient approach to constructing the view matrix is by using a so-called \textit{LookAt} matrix $\matr{V}$. The look at matrix is defined as
-
-\begin{align}
-	\matr{V}=
-	\begin{bmatrix}
-		R_x & R_y & R_z & 0 \\
-		U_x & U_y & U_z & 0 \\
-		D_x & D_y & D_z & 0 \\
-		0 & 0 & 0 & 1 \\
-	\end{bmatrix}
-	\begin{bmatrix}
-		1 & 0 & 0 & -P_x \\
-		0 & 1 & 0 & -P_y \\
-		0 & 0 & 1 & -P_z \\
-		0 & 0 & 0 & 1 \\
-	\end{bmatrix}
-\end{align}
-
-where $\matr{R}$ is the right vector, $\matr{U}$ is the up vector, $\matr{D}$ is the direction vector and $\matr{P}$ is the position vector for the camera in the world space. These vectors defining the $\matr{V}$ matrix can be obtained from 3 vectors which are much more intuitive to use for camera control. Specifically a position, target (i.e. the point in the world space the camera is pointed towards) and up vector are sufficient to derive a look up matrix. This was used as the basis to form the camera system for this project's implementation. The desired camera behaviour was defined as follows:
+The desired camera behaviour was defined as follows:
 
 \begin{compactitem}
 	\item The camera frame x-axis should remain parallel to the world xz plane.
@@ -927,11 +981,9 @@ where $\matr{R}$ is the right vector, $\matr{U}$ is the up vector, $\matr{D}$ is
 %	\item The option to load and save model files.
 %\end{compactitem}
 
-\subsubsection{Class Diagrams}
-
 \subsection{Computer Vision System}
 
-The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure decrease.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition. This section begins with an overview of the cube detection approaches investigated. A description of the method used to map points detected in the image frame to the world frame follows in Section \ref{sec:3D Localisation}. These sections lay the foundation for the integrated computer vision algorithm discussed from Section \ref{sec:Top-Level Design}
+The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure decrease.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition. This section begins with an overview of the cube detection approaches investigated. A description of the method used to map points detected in the image frame to the world frame follows in Section \ref{sec:3D Localisation}. These sections lay the foundation for the integrated computer vision algorithm and supporting functions discussed from Section \ref{sec:Top-Level Design} onward.
 
 \subsubsection{Cube Feature Investigation} \label{sec:Cube Feature Investigation}
 

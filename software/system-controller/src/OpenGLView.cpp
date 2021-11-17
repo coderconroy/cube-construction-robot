@@ -102,15 +102,8 @@ void OpenGLView::initializeGL()
     int imgWidth, imgHeight, imgChannels;
     stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(CUBE_TEXTURE_PATH, &imgWidth, &imgHeight, &imgChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, imgWidth, imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
     stbi_image_free(data);
 
     // Initialize selected cube texture
@@ -166,7 +159,7 @@ void OpenGLView::paintGL()
     // Set the active shader program for the current context
     shaderProgram->useProgram();
 
-    // Comput the view and projection matrices
+    // Compute the view and projection matrices
     float frustumAngle = 45; // Perspective angle of frustum
     glm::mat4 projection = glm::mat4(1.0f); // The projection matrix maps the cameras frame to clipping space
 
@@ -176,6 +169,8 @@ void OpenGLView::paintGL()
 
     // The view matrix transforms the world frame to the cameras frame
     glm::mat4 view = createViewMatrix(glm::vec3(xPos, yPos, zPos), glm::vec3(xFocal, yFocal, zFocal), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // The projection matrix transforms the camera frame to clip coordinates and computes the NDC from this
     projection = createProjectionMatrix(glm::radians(frustumAngle), (float) screen_width / (float) screen_height, 0.1f, 10000.0f);
 
     // Update the shader program's view and projection matrices
@@ -324,7 +319,7 @@ glm::mat4 OpenGLView::translateMatrix(glm::mat4 const& mat, glm::vec3 const& vec
     return mat * output;
 }
 
-glm::mat4 OpenGLView::rotateMatrixY(glm::mat4 const& mat, float const theta) const
+glm::mat4 OpenGLView::rotateMatrixY(const glm::mat4& mat, const float theta) const
 {
     // Initialise y axis rotation matrix
     glm::mat4 yRot = glm::mat4(1.0f);
@@ -338,7 +333,7 @@ glm::mat4 OpenGLView::rotateMatrixY(glm::mat4 const& mat, float const theta) con
     return mat * yRot;
 }
 
-glm::mat4 OpenGLView::scaleMatrix(glm::mat4 const& mat, glm::vec3 const& vec) const
+glm::mat4 OpenGLView::scaleMatrix(const glm::mat4& mat, const glm::vec3& vec) const
 {
     // Initialise scale matrix
     glm::mat4 scale = glm::mat4(1.0f);
@@ -351,37 +346,44 @@ glm::mat4 OpenGLView::scaleMatrix(glm::mat4 const& mat, glm::vec3 const& vec) co
     return mat * scale;
 }
 
-glm::mat4 OpenGLView::createViewMatrix(glm::vec3 const& eye, glm::vec3 const& center, glm::vec3 const& up)
+glm::mat4 OpenGLView::createViewMatrix(const glm::vec3& cameraPos, const glm::vec3& focalPoint, const glm::vec3& upVector) const
 {
-    glm::vec3 const f(normalize(center - eye));
-    glm::vec3 const s(normalize(glm::cross(f, up)));
-    glm::vec3 const u(glm::cross(s, f));
+    // Compute view space coordinate axes
+    const glm::vec3 zDirection(glm::normalize(cameraPos - focalPoint));
+    const glm::vec3 xDirection(glm::normalize(glm::cross(upVector, zDirection)));
+    const glm::vec3 yDirection(glm::cross(zDirection, xDirection));
 
-    glm::mat4 Result(1);
-    Result[0][0] = s.x;
-    Result[1][0] = s.y;
-    Result[2][0] = s.z;
-    Result[0][1] = u.x;
-    Result[1][1] = u.y;
-    Result[2][1] = u.z;
-    Result[0][2] = -f.x;
-    Result[1][2] = -f.y;
-    Result[2][2] = -f.z;
-    Result[3][0] = -dot(s, eye);
-    Result[3][1] = -dot(u, eye);
-    Result[3][2] = dot(f, eye);
-    return Result;
+    // Compute left matrix
+    glm::mat4 output1(1.0f);
+    output1[0][0] = xDirection.x;
+    output1[1][0] = xDirection.y;
+    output1[2][0] = xDirection.z;
+    output1[0][1] = yDirection.x;
+    output1[1][1] = yDirection.y;
+    output1[2][1] = yDirection.z;
+    output1[0][2] = zDirection.x;
+    output1[1][2] = zDirection.y;
+    output1[2][2] = zDirection.z;
+
+    // Compute right matrix
+    glm::mat4 output2(1.0f);
+    output2[3][0] = -cameraPos.x;
+    output2[3][1] = -cameraPos.y;
+    output2[3][2] = -cameraPos.z;
+
+    // Compute view matrix
+    return output1 * output2;
 }
 
-glm::mat4 OpenGLView::createProjectionMatrix(float fovy, float aspect, float zNear, float zFar)
+glm::mat4 OpenGLView::createProjectionMatrix(const float fovy, const float aspect, const float zPlaneClose, const float zPlaneFar) const
 {
-    float const tanHalfFovy = tan(fovy / static_cast<float>(2));
+    const float tanHalfFovy = tan(fovy * 0.5f);
 
-    glm::mat4 Result(static_cast<float>(0));
-    Result[0][0] = static_cast<float>(1) / (aspect * tanHalfFovy);
-    Result[1][1] = static_cast<float>(1) / (tanHalfFovy);
-    Result[2][2] = -(zFar + zNear) / (zFar - zNear);
-    Result[2][3] = -static_cast<float>(1);
-    Result[3][2] = -(static_cast<float>(2) * zFar * zNear) / (zFar - zNear);
-    return Result;
+    glm::mat4 output(0.0f);
+    output[0][0] = 1.0f / (aspect * tanHalfFovy);
+    output[1][1] = 1.0f / (tanHalfFovy);
+    output[2][2] = -(zPlaneFar + zPlaneClose) / (zPlaneFar - zPlaneClose);
+    output[2][3] = -1.0f;
+    output[3][2] = -(2.0f * zPlaneFar * zPlaneClose) / (zPlaneFar - zPlaneClose);
+    return output;
 }
