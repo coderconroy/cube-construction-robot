@@ -375,15 +375,15 @@ glm::mat4 OpenGLView::createViewMatrix(const glm::vec3& cameraPos, const glm::ve
     return output1 * output2;
 }
 
-glm::mat4 OpenGLView::createProjectionMatrix(const float fovy, const float aspect, const float zPlaneClose, const float zPlaneFar) const
+glm::mat4 OpenGLView::createProjectionMatrix(const float fovAngle, const float aspectRatio, const float zPlaneNear, const float zPlaneFar) const
 {
-    const float tanHalfFovy = tan(fovy * 0.5f);
+    const float tanFovAngle = tan(fovAngle * 0.5f);
 
     glm::mat4 output(0.0f);
-    output[0][0] = 1.0f / (aspect * tanHalfFovy);
-    output[1][1] = 1.0f / (tanHalfFovy);
-    output[2][2] = -(zPlaneFar + zPlaneClose) / (zPlaneFar - zPlaneClose);
+    output[0][0] = 1.0f / (aspectRatio * tanFovAngle);
+    output[1][1] = 1.0f / (tanFovAngle);
+    output[2][2] = -(zPlaneFar + zPlaneNear) / (zPlaneFar - zPlaneNear);
     output[2][3] = -1.0f;
-    output[3][2] = -(2.0f * zPlaneFar * zPlaneClose) / (zPlaneFar - zPlaneClose);
+    output[3][2] = -(2.0f * zPlaneFar * zPlaneNear) / (zPlaneFar - zPlaneNear);
     return output;
 }

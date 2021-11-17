@@ -615,10 +615,6 @@ The pin connections for the STM32L072RZT6 are as follows:
 
 \subsubsection{PCB Design}
 
-PCB Design
-
-Prototype
-
 The robotic controller prototype was created by soldering the STM32L072RZT6 microcontroller to a TQFP breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which was removed using solder wick. Finally the solder flux residue was cleaned using IPA. The final prototype is shown in Figure \ref{fig:robotic-controller-prototype}.
 
 \begin{figure}[H]
@@ -719,6 +715,23 @@ The components required to assemble the board were acquired prior to the deliver
 
 \subsubsection{Firmware}
 
+\ldots
+
+\subsubsection{Servo Motor Control}
+
+The first step in configuring PWM requires the configuration of the counter clock speed. A counter clock speed of $1\;MHz$ is desired given that the system clock frequency is $f_{CK}=32\;MHz$. These two quantities are related by the timer prescalar PSC[15:0] as
+
+\begin{align}
+	\text{CK\_CNT}=\frac{f_{CK}}{\text{PSC[15:0]}}.
+	\label{pwm-counter-clock}
+\end{align}
+
+%Using Equation \ref{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
+
+\subsubsection{Stepper Motor Control}
+
+\ldots
+
 \subsubsection{Serial Communication}
 
 A communication protocol needs to be developed between the robotic controller and the PC running the GUI software. The PC needs to be able to issue the following commands to the robotic controller:
@@ -763,34 +776,47 @@ The baud rate error can then be calculated as
 
 The datasheet specifies an error tolerance of $3\%$ for the USART receiver with the given configuration. Therefore, the error is acceptable and has sufficient margin to account for other error sources such as transmitter clock deviation, local oscillator deviation and errors introduced by the transmission line.
 
-PWM
-
-The first step in configuring PWM requires the configuration of the counter clock speed. A counter clock speed of $1\;MHz$ is desired given that the system clock frequency is $f_{CK}=32\;MHz$. These two quantities are related by the timer prescalar PSC[15:0] as
-
-\begin{align}
-	\text{CK\_CNT}=\frac{f_{CK}}{\text{PSC[15:0]}}.
-	\label{pwm-counter-clock}
-\end{align}
-
-%Using Equation \ref{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10.5cm}|}
+		\hline
+		\textbf{} & \textbf{} & \textbf{} \\
+		\hline
+		\multicolumn{3}{|l|}{\textbf{}} \\
+		\hline
+		 & & \\
+		\hline
+	\end{tabular}
+	\caption{\label{tab:packet-format}Packet format.}
+\end{table}
 
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{2cm}|>{\raggedright}m{2cm}|>{\raggedright\arraybackslash}m{9cm}|}
+	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10.5cm}|}
 		\hline
-		\textbf{ID} & \textbf{Type} & \textbf{Description} \\
+		\textbf{Control Byte} & \textbf{Command} & \textbf{Description} \\
 		\hline
-		0x0 & & \\
-		0x1 & & \\
-		0x2 & & \\
-		0x3 & & \\
-		0x4 & & \\
-		0x5 & & \\
-		0x6 & & \\
-		0x7 & & \\
-		0x8 & & \\
-		0x9 & & \\
+		\multicolumn{3}{|l|}{\textbf{\textit{PC System} to \textit{Robotic System}}} \\
+		\hline
+		0x1 & Wake & \\
+		\hline
+		0x2 & Calibrate & \\
+		\hline
+		0x3 & Set target position & \\
+		\hline
+		0x4 & Actuate vacuum mechanism & \\
+		\hline
+		0x5 & Delay & \\
+		\hline
+		0x6 & Request pressure update & \\
+		\hline
+		\multicolumn{3}{|l|}{\textbf{\textit{Robotic System} to \textit{PC System}}} \\
+		\hline
+		0x1 & Command complete & \\
+		\hline
+		0x6 & Pressure update & \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:serial-communication-protocol}Serial communication protocol utilised between the \textit{PC System} and the \textit{Robotic System}.}
