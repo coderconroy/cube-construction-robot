@@ -312,7 +312,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(pressureTimer, &QTimer::timeout, this, &ConstructionView::requestPressureUpdate);
 
     // Initialize source cubes in the world space model
-    int numCubes = 15;
+    //int numCubes = 15;
+    int numCubes = 0;
     int xStart = 134;
     int xStop = 1015;
     float xStep = ((float) (xStop - xStart)) / (numCubes - 1);

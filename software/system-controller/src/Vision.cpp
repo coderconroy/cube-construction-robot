@@ -3,7 +3,7 @@
 #include <string>
 
 // Threshold parameters
-int thresh = 80;
+int thresh = 100;
 int maxThresh = 255;
 int blurSize = 1;
 int maxBlurSize = 20;
@@ -19,37 +19,25 @@ double areaThreshold = 1300;
 
 Vision::Vision(QObject* parent) : QObject(parent)
 {
-    //fiducialWorldPoints.insert(10, cv::Point3i(-32, -397, 0));
-    //fiducialWorldPoints.insert(0, cv::Point3i(944, -383, 0));
-    //fiducialWorldPoints.insert(50, cv::Point3i(-277, -63, 0));
-    //fiducialWorldPoints.insert(11, cv::Point3i(1188, -58, 0));
-    //fiducialWorldPoints.insert(3, cv::Point3i(-278, 984, 0));
-    //fiducialWorldPoints.insert(41, cv::Point3i(1186, 979, 0));
-    //fiducialWorldPoints.insert(6, cv::Point3i(-36, 1316, 0));
-    //fiducialWorldPoints.insert(37, cv::Point3i(951, 1320, 0));
 
-    // Initialize world point of each fiducial
-    //fiducialWorldPoints.insert(10, cv::Point3i(-32, -387, 0));
-    //fiducialWorldPoints.insert(0, cv::Point3i(944, -377, 0));
-    //fiducialWorldPoints.insert(50, cv::Point3i(-277, -53, 0));
-    //fiducialWorldPoints.insert(11, cv::Point3i(1188, -52, 0));
-    //fiducialWorldPoints.insert(3, cv::Point3i(-278, 986, 0));
-    //fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
-    //fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
-    //fiducialWorldPoints.insert(37, cv::Point3i(953, 1322, 0));
-
-    fiducialWorldPoints.insert(10, cv::Point3i(-27, -370, 0));
-    fiducialWorldPoints.insert(0, cv::Point3i(946, -379, 0));
-    fiducialWorldPoints.insert(50, cv::Point3i(-268, -57, 0));
-    fiducialWorldPoints.insert(11, cv::Point3i(1188, -54, 0));
-    fiducialWorldPoints.insert(3, cv::Point3i(-278, 986, 0));
-    fiducialWorldPoints.insert(41, cv::Point3i(1188, 981, 0));
-    fiducialWorldPoints.insert(6, cv::Point3i(-36, 1318, 0));
-    fiducialWorldPoints.insert(37, cv::Point3i(953, 1322, 0));
+    fiducialWorldPoints.insert(10, cv::Point3i(-29, -377, 0));
+    fiducialWorldPoints.insert(0, cv::Point3i(940, -383, 0));
+    fiducialWorldPoints.insert(50, cv::Point3i(-270, -64, 0));
+    fiducialWorldPoints.insert(11, cv::Point3i(1189, -59, 0));
+    fiducialWorldPoints.insert(3, cv::Point3i(-272, 976, 0));
+    fiducialWorldPoints.insert(41, cv::Point3i(1184, 971, 0));
+    fiducialWorldPoints.insert(6, cv::Point3i(-32, 1304, 0));
+    fiducialWorldPoints.insert(37, cv::Point3i(947, 1310, 0));
 
     // Initialize camera matrix and distortion coefficients
     cameraMatrix = (cv::Mat_<double>(3, 3) << fx, 0, cx, 0, fy, cy, 0, 0, 1);
     distCoeffs = cv::Mat::zeros(4, 1, cv::DataType<double>::type);
+    //distCoeffs = cv::Mat::zeros(5, 1, cv::DataType<double>::type);
+    //distCoeffs.at<double>(0, 0) = 0.09892315624807735;
+    //distCoeffs.at<double>(1, 0) = -0.1682965898621485;
+    //distCoeffs.at<double>(2, 0) = 0.001369242773772446;
+    //distCoeffs.at<double>(3, 0) = -0.0005313360380761699;
+    //distCoeffs.at<double>(4, 0) = -0.01936020510633366;
 
     // Initialize coordinates of bounding box for computer vision region of interest in world coordinates
     visionBoundBox[0] = ROBOT_X_MIN - 340;
@@ -325,7 +313,7 @@ void Vision::plotCubeInfo(cv::Mat& image)
 
         // Plot orientation text
         float angle = computeCubeZRotation(c.corners, c.centroid, -64);
-        QString angleText = QString::number(round(angle / M_PI * 180)) + " deg";
+        QString angleText = QString::number(round(angle / M_PI * 180 *100) / 100) + " deg";
         cv::Point angleTextPoint(c.centroid.x - 50, c.centroid.y + 70);
         cv::putText(image, angleText.toStdString(), angleTextPoint, cv::FONT_HERSHEY_DUPLEX, 0.7, cv::Scalar(255, 255, 255), 2);
 

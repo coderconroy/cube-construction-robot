@@ -58,7 +58,7 @@ This section presents a summary of the project design tasks as well as the imple
 	\caption{\label{tab:design_summary_p2}Design summary continued.}
 \end{table}
 
-\subsection{Mechanical Robotic Component}
+\subsection{Mechanical Robotic Component} \label{sec:Mechancial Robotic Component}
 
 \subsubsection{End-Effector Mechanism}
 
@@ -241,7 +241,7 @@ The general motor-driven gantry robotic system design is currently the leading o
 	\item The frame of the gantry has the potential to include an integrated mount for the computer vision camera/s. This would allow the camera to always operate from a similar point relative to the workspace and reduce the inaccuracies that are introduced from positional shifts of the camera each time the system is used.
 \end{compactitem}
 
-End-Effector Assembly
+\subsubsection{End-Effector Assembly}
 
 The end-effector mount was designed to fulfil to following requirements:
 
@@ -269,7 +269,7 @@ Figure \ref{fig:end-effector-disassembled} shows the end-effector mount and supp
 	\label{fig:end-effector-assembled}
 \end{figure}
 
-Z-Axis Assembly
+\subsubsection{Z-Axis Assembly}
 
 For the purposes of this project, the z-axis assembly is defined as the collection of mechanical components that move linearly along the z-axis when the z-axis drive mechanism is activated. In the case of this project, the z-axis drive mechanism is included in the z-axis assembly. There are many different approaches to the z-axis mechanism. One of the most common approaches which is often used in CNC applications involves the use of a linear guide which is fixed with respect to the motion of the z-axis assembly. The z-axis drive mechanism is also fixed with regards to the z-axis assembly. In other words, when the z-axis drive is activated, the z-axis assembly moves relative to the linear guides and the linear drive. The advantage of this approach is that the moving mass of the z-axis assembly is minimised as the linear guides and the z-axis drive mechanism are fixed relative to the motion. The linear bearings form part of the z-axis assembly in this case. The disadvantage of this approach is that a connecting component is required to connect the end-effector to the point at which the linear bearings connect to the linear guides. As such, the greater the range of motion along the z-axis that is required, the longer this connecting element has to be. This introduces a potential area of play as the connecting component is prone to a greater degree of flex the greater its length is. Therefore, this approach is only suited to tasks in which the range of motion along the z-axis is minimal.
 
@@ -362,7 +362,7 @@ Figure \ref{fig:z-axis-mount-assembled} shows the z-axis mount assembled with al
 	\label{fig:z-axis-mount-assembled}
 \end{figure}
 
-X-Axis Assembly
+\subsubsection{X-Axis Assembly}
 
 For the purposes of this project, the x-axis assembly is defined in a similar manner to the z-axis assembly. Specifically, the x-axis assembly is the collection of components that move linearly along the x-axis when the x-axis drive motor is activated. Similar to the z-axis assembly, a decision needs to be made regarding whether to position the x-axis drive motor as part of the x-axis assembly or not. There is no significant benefit to including the x-axis motor as part of the x-axis assembly either than it potentially reduces the complexity of the x-axis mount which no longer needs to support the motor as well. However, this is offset by the complexity increase in the z-axis mount which would need to include a mounting point for the x-axis motor. Furthermore, mounting the motor in this manner would increase the mass of the x-axis assembly which would require a larger motor with more torque to drive. For these reasons, it was selected to not include the x-axis motor in the x-axis assembly. Note, the x-axis assembly does not include the x-axis linear guide in the form of the 2040 aluminium v-slot extrusion as it does not move when the x-axis drive is activated.
 
@@ -375,7 +375,7 @@ The second design consideration is the selection of the drive mechanism. Again, 
 	\label{fig:x-axis-assembly}
 \end{figure}
 
-Y-Axis Assembly
+\subsubsection{Y-Axis Assembly}
 
 For the purposes of this project, the y-axis assembly is defined in a similar manner to the z-axis and x-axis assemblies. Specifically, the y-axis assembly is the collection of components that moves linearly along the y-axis when the y-axis drive is activated. At this point in the design, the x-axis assembly is the highest level component of the robotic subsystem. The x-axis assembly runs along the x-axis aluminium v-slot extrusion. In order to introduce linear motion along the y-axis, both of these components need to be translated and therefore will both form part of the y-axis assembly.
 
@@ -433,7 +433,7 @@ The components that comprise the y-axis assembly are as follows:
 	\item Idler pulley for 6mm belt
 \end{compactitem}
 
-Final Assembly
+\subsubsection{Final Assembly}
 
 The highest level component of the robotic subsystem at this point in the design is the y-axis assembly. In order to complete the design, several components still need to be developed, namely the belt tensioners to be used on both the left and right y-axis timing belts as well as the y-axis drive mechanism. The y-axis belt tensioners have identical functions with the only difference being their operation on opposite sides of the robotic subsystem. Therefore, the left and right y-axis timing belt tensioners are mirror images of each other and essentially share the same design. The y-axis belt tensioner component needs to meet the following requirements.
 
@@ -469,92 +469,127 @@ The second design that needs to be completed in order to complete the robotic su
 	\label{fig:final-assembly}
 \end{figure}
 
-Component Manufacturing
-
-I have a personal 3D printer available and therefore it was decided to manufacture the custom components designed for the robotic subsystem using this 3D printer. One of the most commonly used filaments for 3D printing is PLA primarily due to the fact that it is easier to print. However, PLA has a low glass transition temperature of $50^{\circ}C$. This means that it is possible for the plastic to soften if left in direct sunlight. For this and other reasons, PLA is usually used for art prints as opposed to engineering prints. A filament more suited to engineering applications is PETG. PETG has a higher glass transition temperature of $80^{\circ}C$ which is much better suited to everyday conditions. Furthermore, PETG has mechanical properties that make it less likely to mechanically fail than PLA. Therefore, it was chosen to use PETG to manufacture the custom components using FDM 3D printing techniques. PETG has the drawback that it is more challenging to print than PLA. In order to achieve successful prints, all of the custom components were printed using a build plate temperature of $85^{\circ}C$ and a nozzle temperature of $240^{\circ}C$. Furthermore, blue painters tape was first placed on the glass build plate to improve build plate adhesion along with rafts. However, the rafts needed to be manually cut away after the print had completed while the blue painter's tape had to be softened by soaking in IPA alcohol before being removed. Figure \ref{fig:3d-printed-components} shows all of the custom components printed using the method described over the course of approximately one week. The majority of the components were printed using 0.12 mm layer height to best capture the intricate part details.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/3d-printed-components.JPG}
-	\caption{All the robotic components that were manufactured by means of FDM 3D printing methods.}
-	\label{fig:3d-printed-components}
-\end{figure}
-
-Metal Component Machining
-
-A number of metal components including aluminium v-slot extrusions, chromed steel linear rods, linear rails and a stainless steel leadscrew were required in order to construct the robotic subsystem. These components could only be purchased in set lengths and therefore needed to be cut to the correct length for the project. Since the length of components such as the y-axis rail spacer extrusions and the leg extrusions affected the accuracy of the robotic subsystem (in terms of consistency of height and distance between the linear rails), the components needed very close to their design length. Therefore, a tolerance of 0.1 mm for the component lengths was specified. Furthermore, in order to facilitate the joining of aluminium extrusions in the design, M5 threads of 20mm depth needed to be tapped into the ends of some of the aluminium extrusions. M5 clearance holes also needed to be drilled through the extrusions along with the corresponding counterbores. Again the tolerance specified for this was 0.1 mm. The high accuracy required for these tasks required specialised machinery. In order to acquire access to such machinery, I approached the Heavy Machinery Lab at the University of Pretoria and was able to acquire access to use the machinery.
-
-The following list summarises the structural components as procured as well as the lengths each of the original components needed to be cut into:
-
-\begin{compactitem}
-	\item 1m 2040 aluminium v-slot extrusion: Cut into 3 x 80mm and 2 x 370mm lengths
-	\item 1m 2040 aluminium v-slot extrusion: Cut into 1 x 80mm, 1 x 280mm and 1 x 320mm lengths
-	\item 1m 2020 aluminium v-slot extrusion: Cut into 2 x 250mm and 1 x 370mm lengths
-	\item 1m 2020 aluminium v-slot extrusion: Cut to length 280mm
-	\item 1m 8mm diameter chromed steel rod: Cut into 2 x 195mm and 1 x 213mm lengths
-	\item 1m, 12mm x 8mm, stainless steel linear rail: Cut into 2 x 320mm lengths
-	\item 300mm 8mm diameter stainless steel lead screw: Cut to length 168mm
-\end{compactitem}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/hg2-001-drawing.png}
-	\caption{Technical drawing showing the M5 clearance holes to be cut into the left y-axis 2040 aluminium v-slot extrusion.}
-	\label{fig:hg2-001-drawing}
-\end{figure}
-
-In order to cut the components to the correct length, a bandsaw to cut the component with approximately 1 mm excess. The bandsaw does not produce a perfectly straight or square cut and the tolerance is relatively high. In order to attain the 0.1 mm tolerance specification, the milling machine was used to shave the excess material of the face of the component to an accuracy of approximately 10 microns. Figure\ ref{fig:hg2-001-drawing} and Figure \ref{fig:hg2-002-drawing} show the technical drawings for the M5 clearance holes that needed to be cut into the y-axis extrusions to facilitate joining of the components to the frame. The drawings were created to be sent in for review during the application process to access the Heavy Machinery Lab. Across the course of three days in the Heavy Machinery Lab, all the required tasks were completed barring the length milling of 6 of the extrusions. It is estimated this will take another day to complete subject to the demand of the milling machine. Figure \ref{fig:machined-components} shows the current state of the machined components.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/hg2-002-drawing.png}
-	\caption{Technical drawing showing the M5 clearance holes to be cut into the right y-axis 2040 aluminium v-slot extrusion.}
-	\label{fig:hg2-002-drawing}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.5\linewidth]{figures/machined-components.JPG}
-	\caption{Metal components after the machining process.}
-	\label{fig:machined-components}
-\end{figure}
+%Component Manufacturing
+%
+%I have a personal 3D printer available and therefore it was decided to manufacture the custom components designed for the robotic subsystem using this 3D printer. One of the most commonly used filaments for 3D printing is PLA primarily due to the fact that it is easier to print. However, PLA has a low glass transition temperature of $50^{\circ}C$. This means that it is possible for the plastic to soften if left in direct sunlight. For this and other reasons, PLA is usually used for art prints as opposed to engineering prints. A filament more suited to engineering applications is PETG. PETG has a higher glass transition temperature of $80^{\circ}C$ which is much better suited to everyday conditions. Furthermore, PETG has mechanical properties that make it less likely to mechanically fail than PLA. Therefore, it was chosen to use PETG to manufacture the custom components using FDM 3D printing techniques. PETG has the drawback that it is more challenging to print than PLA. In order to achieve successful prints, all of the custom components were printed using a build plate temperature of $85^{\circ}C$ and a nozzle temperature of $240^{\circ}C$. Furthermore, blue painters tape was first placed on the glass build plate to improve build plate adhesion along with rafts. However, the rafts needed to be manually cut away after the print had completed while the blue painter's tape had to be softened by soaking in IPA alcohol before being removed. Figure \ref{fig:3d-printed-components} shows all of the custom components printed using the method described over the course of approximately one week. The majority of the components were printed using 0.12 mm layer height to best capture the intricate part details.
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.7\linewidth]{figures/3d-printed-components.JPG}
+%	\caption{All the robotic components that were manufactured by means of FDM 3D printing methods.}
+%	\label{fig:3d-printed-components}
+%\end{figure}
+%
+%Metal Component Machining
+%
+%A number of metal components including aluminium v-slot extrusions, chromed steel linear rods, linear rails and a stainless steel leadscrew were required in order to construct the robotic subsystem. These components could only be purchased in set lengths and therefore needed to be cut to the correct length for the project. Since the length of components such as the y-axis rail spacer extrusions and the leg extrusions affected the accuracy of the robotic subsystem (in terms of consistency of height and distance between the linear rails), the components needed very close to their design length. Therefore, a tolerance of 0.1 mm for the component lengths was specified. Furthermore, in order to facilitate the joining of aluminium extrusions in the design, M5 threads of 20mm depth needed to be tapped into the ends of some of the aluminium extrusions. M5 clearance holes also needed to be drilled through the extrusions along with the corresponding counterbores. Again the tolerance specified for this was 0.1 mm. The high accuracy required for these tasks required specialised machinery. In order to acquire access to such machinery, I approached the Heavy Machinery Lab at the University of Pretoria and was able to acquire access to use the machinery.
+%
+%The following list summarises the structural components as procured as well as the lengths each of the original components needed to be cut into:
+%
+%\begin{compactitem}
+%	\item 1m 2040 aluminium v-slot extrusion: Cut into 3 x 80mm and 2 x 370mm lengths
+%	\item 1m 2040 aluminium v-slot extrusion: Cut into 1 x 80mm, 1 x 280mm and 1 x 320mm lengths
+%	\item 1m 2020 aluminium v-slot extrusion: Cut into 2 x 250mm and 1 x 370mm lengths
+%	\item 1m 2020 aluminium v-slot extrusion: Cut to length 280mm
+%	\item 1m 8mm diameter chromed steel rod: Cut into 2 x 195mm and 1 x 213mm lengths
+%	\item 1m, 12mm x 8mm, stainless steel linear rail: Cut into 2 x 320mm lengths
+%	\item 300mm 8mm diameter stainless steel lead screw: Cut to length 168mm
+%\end{compactitem}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.7\linewidth]{figures/hg2-001-drawing.png}
+%	\caption{Technical drawing showing the M5 clearance holes to be cut into the left y-axis 2040 aluminium v-slot extrusion.}
+%	\label{fig:hg2-001-drawing}
+%\end{figure}
+%
+%In order to cut the components to the correct length, a bandsaw to cut the component with approximately 1 mm excess. The bandsaw does not produce a perfectly straight or square cut and the tolerance is relatively high. In order to attain the 0.1 mm tolerance specification, the milling machine was used to shave the excess material of the face of the component to an accuracy of approximately 10 microns. Figure\ ref{fig:hg2-001-drawing} and Figure \ref{fig:hg2-002-drawing} show the technical drawings for the M5 clearance holes that needed to be cut into the y-axis extrusions to facilitate joining of the components to the frame. The drawings were created to be sent in for review during the application process to access the Heavy Machinery Lab. Across the course of three days in the Heavy Machinery Lab, all the required tasks were completed barring the length milling of 6 of the extrusions. It is estimated this will take another day to complete subject to the demand of the milling machine. Figure \ref{fig:machined-components} shows the current state of the machined components.
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.7\linewidth]{figures/hg2-002-drawing.png}
+%	\caption{Technical drawing showing the M5 clearance holes to be cut into the right y-axis 2040 aluminium v-slot extrusion.}
+%	\label{fig:hg2-002-drawing}
+%\end{figure}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.5\linewidth]{figures/machined-components.JPG}
+%	\caption{Metal components after the machining process.}
+%	\label{fig:machined-components}
+%\end{figure}
 
 \subsection{Embedded Robot Controller}
 
-\subsubsection{Circuit Design}
-
-Microcontroller Selection
-
-The project requires an embedded platform to control the robotic subsystem and communicate with the PC. A microcontroller needs to be selected to control the robotic subsystem stepper motors by means of the DRV8825 stepper motor drivers as well as the servo that controls the vacuum subsystem. Furthermore, the microcontroller needs to be capable of monitoring the pressure sensor reading of the vacuum subsystem as well as the mechanical limit switches for the three Cartesian axes. The specific microcontroller pin requirements to control and monitor each individual stepper motor DRV8825 board are shown below:
+The \textit{Robotic System} required an embedded controller to drive the end-effector mechanism and the robotic manipulator developed as part of the mechanical robotic component in Section \ref{sec:Mechancial Robotic Component} as well as to facilitate communication with the \textit{PC System}. Specifically, in service of these requirements, the embedded controller needed to fulfill the following functions:
 
 \begin{compactitem}
-	\item 2 x digital output pins to control the DRV8825 STEP and DIR (direction)  input pins.
-	\item 1 x digital input pin to monitor the DRV8825 FAULT output pin.
+	\item The controller should provide control signals to control the four robotic manipulator stepper motors as well as the vacuum mechanism servo motor.
+	\item The controller should capture the pressure sensor reading in the vacuum system.
+	\item The controller should facilitate bi-directional communication with the \textit{PC System} such that the \textit{PC System} can send control commands to and receive status information from the \textit{Robotic Subsystem}.
+	\item The controller should distribute energy from a power supply to the components in the \item Robotic System including the stepper motors, servo motor, cooling fan (for the embedded controller) and robot workspace lights.
+	\item The controller should monitor the robotic manipulator limit switches on each Cartesian axis.
 \end{compactitem}
 
-Since 4 DRV8825 stepper motor drivers are to be used, this requires 8 digital output pins and 4 digital input pins. In Furthermore, the following pins will be used to control all the stepper motor drivers with a single signal:
+The hardware considerations of the circuit designed to fulfill these requirements are outlined in Section \ref{sec:Circuit Design} while the development of the physical realisation of this circuit in the form of a printed circuit board (PCB) is presented in Section \ref{sec:PCB Design}. Following this, the firmware implementations developed to fulfill various facets of the embedded controller's functional requirements are discussed.
 
-\begin{compactitem}
-	\item 6 x digital output pins to control the DRV8825 EN (enable), RST (reset), SLEEP and M[0:2] (microstepping) input pins with a shared signal for all drivers.
-\end{compactitem}
+\subsubsection{Circuit Design} \label{sec:Circuit Design}
 
-A single digital output pin is also required to control the vacuum system servo motor. The microcontroller needs to have sufficient computational power to simultaneously control the 4 stepper motors according to various acceleration profiles, control the vacuum subsystem servo motor, monitor the vacuum subsystem pressure and communicate with the PC. The stepper motor control and acceleration computations are expected to use the most computation time. Furthermore, the use of microstepping to achieve smooth stepper motor motion also increases the computational load as more step pulses need to be sent to the stepper motor drivers per unit time. An 8-bit microcontroller could possibly achieve this performance with highly optimised code. However, the rules of EPR 402 forbids the use of an 8-bit microcontroller. 32-bit microcontrollers offer greater computational power which facilitate greater leeway in the stepper motor control computations. Furthermore, the current trend in industry, especially in the 3D printing space, is towards 32-bit controller boards. For these reasons, it was decided to use a 32-bit microcontroller as the basis for the embedded platform.
+As noted in the project proposal, the motor drivers for the robotic manipulator stepper motors were taken off-the-shelf. The DRV8825 stepper motor driver was selected for this purpose since the driver is capable of supplying up to 1.5 A to the motor which is sufficient for the selected robotic manipulator motors. Specifically, the DRV8825 driver breakout board was selected for use in this project. Each DRV8825 driver exposes four output drive pins to control the current in both coils in the connected stepper motor. Furthermore, the DRV8825 driver exposes a number of input pins to control the operation of the motor and the driver.
 
-The general design of 3D printers is similar to the design of the robotic subsystem required in this project in terms of the size of the robotic subsystem, the Cartesian nature of the robot and the number of stepper motors that require control. Therefore, the control board required to be developed for this project will bear resemblance to many existing 3D printer control boards. For this reason, the common microcontrollers used on these control boards were researched and listed below as a starting point for selection:
+The DRV8825 driver control inputs and status outputs of interest for this project are shown in Table \ref{tab:drv8825-input-pins} and their use in this project is detailed in Section \ref{sec:Motor Control}. Therefore, the microcontroller around which the embedded controller is based needs to provide seven digital output pins and one digital input pin is per stepper motor. Furthermore, the STEP pin needs to be controlled with time-sensitive signals and as such one timer peripheral is required for each stepper motor. Since the robotic manipulator makes use of four stepper motors, a total of 28 digital output pins, four digital input pins and four timer peripherals are required in the microcontroller to control the motors.
 
-\begin{compactitem}
-	\item The LPC1769 microcontroller is used on the Smoothieboard v1 and SKR 1.4 Turbo boards.
-	\item The STM32F103RCT6 microcontroller is used on the SKR Mini E3 and Creality Ender-3 V2 board.
-	\item The Atmel SAM4E8E microcontroller is used on the Duet 2 Wifi board.
-	\item The LPC1768 is used on the MKS SBASE V1.3 (note this board also makes use of the DRV8825 stepper motor drivers) and Re-ARM boards.
-	\item The SAM3X8E microcontroller is used on the Archim2 board.
-\end{compactitem}
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\centering
+	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{2.3cm}|>{\raggedright}m{1.5cm}|>{\raggedright\arraybackslash}m{8cm}|}
+		\hline
+		\textbf{Pin No.} & \textbf{Pin Name(s)} & \textbf{Type} & \textbf{Description} \\
+		\hline
+		2,3,4 & M0, M1, M2 & Input & Microstepping resolution selection \\
+		\hline
+		5 & $\overline{\text{RESET}}$ & Input & Reset the driver's step indexer \\
+		\hline
+		6 & $\overline{\text{SLEEP}}$ & Input & Place the motor in a low-power sleep state \\
+		\hline
+		7 & STEP & Input & Motor rotation direction selection \\
+		\hline
+		8 & DIR & Input & Advance the motor one step on rising edge \\
+		\hline
+		10 & $\overline{\text{FAULT}}$ & Output & Overheat and overcurrent event flag \\
+		\hline
+	\end{tabular}
+	\caption[Caption for LOF]{\label{tab:drv8825-input-pins}DRV8825 breakout board control and status pins.\footnotemark}
+\end{table}
 
-STM32L072RZT6
+\footnotetext{The overline notation, $\overline{\text{PIN}}$, on a pin name indicates the control input or status output is active low.}
 
-Programming
+In order to facilitate serial communication with the \textit{PC Subsystem}, the universal asynchronous receiver-transmitter (UART) protocol was selected as the basis for this communication. The selection was made as the communication with the \textit{PC System} was expected to only consist of simple asynchronous control commands and status updates which are easily supported by UART. The universal serial bus (USB) interface of the \textit{PC System} is not directly compatible with the UART serial interface peripheral and, as such, the CH340G integrated circuit (IC) was selected as the communication data conversion point between these two interfaces. The CH340G exposes a transmitter (TX) pin and receiver (RX) pin for the microcontroller to interface with. Therefore, the microcontroller requires one digital input pin, one digital output pin and a UART peripheral to support serial communication. The serial communication component is discussed further in Section \ref{sec:Serial Communication}
 
-The STM32L0 series does not support JTAG programming and rather only offers the SWD programming interface. Therefore, the SWD approach will be used to program the device. The SWD programming interface requires the following 5 pins:
+In addition to the stepper motor and UART control pins, a single digital output pin was required to control the vacuum system servo motor along with a timer peripheral to act as the time base for the pulse width modulation (PWM) signal. An analog input pin, in conjunction with a corresponding analog-to-digital converter (ADC) peripheral, was required to capture the ADP5111 gauge pressure sensor reading. Lastly, for the purpose of reducing the power consumption of the system in idle state, it was elected to make both the robot workspace lighting and embedded controller cooling fan controllable through software. To this end, two additional digital output pins were required in the microcontroller.
+
+%TODO: Possible add MOSFET circuit design
+%TODO: Possibly add table summarising microcontroller requirements
+
+In terms of performance, the microcontroller needed to have the computational power to control the four stepper motors almost simultaneously using acceleration profiles. At the same time, the microcontroller needed to control the vacuum system servo motor, monitor the vacuum system pressure and support serial communication with the \textit{PC System}. Furthermore, the use of microstepping to achieve smooth stepper motor motion (see Section \ref{sec:Motor Control}) also increased the computational load as more step pulses needed to be sent to the stepper motor drivers per unit time. The use of an 8-bit microcontroller was considered since it could potentially achieve this performance with highly optimised code. However, in general, 32-bit microcontrollers offer greater computational power which facilitate greater leeway in the stepper motor control computations. Furthermore, the current trend in industry, especially in the 3D printing space, is towards 32-bit controller boards. For these reasons, it was decided to use a 32-bit microcontroller as the basis for the embedded platform. Lastly, with regards to clock speed, controllers with similar requirements to the controller in this project have been successfully implemented using 16 MHz microcontrollers. Therefore, 16 MHz was considered to be the minimum acceptable microcontroller clock speed.
+
+The STM32L072RZT6 microcontroller was selected as the computational foundation for the embedded controller in this project since it satisfied all the digital I/O, peripheral and computational speed requirements discussed above. Note that this microcontroller is part of the STMicroelectronics low-power microcontroller range. The low-power property of this range wasn't strictly necessary for this project since the \textit{Robotic System} uses mains electricity for power. However, due to availability issues resulting from the global semi-conductor shortage, the STM32L072RZT6 chosen over similar microcontrollers that would not be available for the foreseeable future.
+
+%The general design of 3D printers is similar to the design of the robotic subsystem required in this project in terms of the size of the robotic subsystem, the Cartesian nature of the robot and the number of stepper motors that require control. Therefore, the control board required to be developed for this project will bear resemblance to many existing 3D printer control boards. For this reason, the common microcontrollers used on these control boards were researched and listed below as a starting point for selection:
+
+%\begin{compactitem}
+%	\item The LPC1769 microcontroller is used on the Smoothieboard v1 and SKR 1.4 Turbo boards.
+%	\item The STM32F103RCT6 microcontroller is used on the SKR Mini E3 and Creality Ender-3 V2 board.
+%	\item The Atmel SAM4E8E microcontroller is used on the Duet 2 Wifi board.
+%	\item The LPC1768 is used on the MKS SBASE V1.3 (note this board also makes use of the DRV8825 stepper motor drivers) and Re-ARM boards.
+%	\item The SAM3X8E microcontroller is used on the Archim2 board.
+%\end{compactitem}
+
+
+
+%TODO: Possibly add table summarising microcontroller requirements and show how the STM32L072RZT6 meets these requirements
+
+The STM32L0 microcontroller series does not support the JTAG programming interface. However, the SWD programming interface is supported. Therefore, the SWD approach was used to program the device and the following five pins on the STM32L072RZT6 were used in service of this:
 
 \begin{compactitem}
 	\item SWDIO - Data input/output
@@ -566,70 +601,37 @@ The STM32L0 series does not support JTAG programming and rather only offers the 
 
 Note that the NRST pin is not actually necessary with SWD interface programming since SWD bypasses the bootloader and is capable of resetting and flashing the device directly.
 
-Power
+%TODO: Insert list of pin connections used on the microcontrollers
 
-The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range is not necessary. However, the use of the maximum CPU frequency of 32 MHz is preferable. Therefore, range 1 was selected as the power consumption range for the purposes of this project.
+\subsubsection{Power Regulation}
 
-The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. It needs to be ensured that the 3.3 V regulator powering the device is capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all fo the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all fo the I/O pins and control pins combined is 90 mA.
+The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range was not necessary. However, the use of the maximum CPU frequency of 32 MHz was preferable. Therefore, range 1 was selected as the power consumption range for this project.
 
-According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors should be connected across the power supply pins. $V_{DDA}$ indicates a pin dedicated to supply the ADC with power if a very clean and stable power source is required. For the purposes of this project, the ADC is only being used to monitor a pressure sensor. Therefore, high ADC performance is not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
+The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. The 3.3 V regulator powering the device needed to be capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all fo the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all fo the I/O pins and control pins combined is 90 mA.
 
-General Notes
+According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors needed to be connected across the power supply pins. The $V_{DDA}$ is dedicated a pin dedicated to supplying the ADC with power if a very clean and stable power source is required. For the this project, the ADC was only used to monitor the output of the ADP5111 gauge pressure sensor. Therefore, high ADC performance was not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
 
-\begin{compactitem}
-	\item Unless otherwise specified by a note, all I/Os are set as floating inputs during and after reset.
-	\item General PCB design guidelines are discussed on pg 105 of the datasheet.
-\end{compactitem}
+The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the PSU and connected by means of an arbitrary length of wire. Therefore, the controller was designed with a $10\mu F$ ceramic 
+capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ is used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which met the stated requirements and reduced the number of components that needed to be sourced.
 
-Supporting Components
+%LED Strip
 
-The following components are required to support the operation of the STM32L072RZT6 microcontroller:
+%A white LED strip was selected to provide sufficient lighting to support the computer vision component of the project. The LED strip contains 3528 SMD white LEDs which consume a maximum of 20 mA each. The LED density of the strip is 60 LEDs/m. This project maximum LED strip length that this project will use is 3m which implies that a maximum of 180 LEDs will be powered.
 
-\begin{compactitem}
-	\item 3.3 V regulator to step down 12 V input from the power supply to power the microcontroller. The TLV70233 from Texas Instruments is an example of a SMD 3.3 V regulator that could potentially be used.
-\end{compactitem}
+%TODO: Insert discussion on how the motors, fan and lighting were powered.
 
-Pin Connections
+\subsubsection{PCB Design} \label{sec:PCB Design}
 
-The pin connections for the STM32L072RZT6 are as follows:
-
-\begin{compactitem}
-	\item Pin 1 - $V_{DD}$
-	\item Pin 5 - OSC\_IN
-	\item Pin 6 - OSC\_OUT
-	\item Pin 7 - NRST
-	\item Pin 12 - $V_{SSA}$
-	\item Pin 13 - $V_{DDA}$
-	\item Pin 18 - $V_{SS}$
-	\item Pin 19 - $V_{DD}$
-	\item Pin 31 - $V_{SS}$
-	\item Pin 32 - $V_{DD}$
-	\item Pin 46 - SWDIO
-	\item Pin 47 - $V_{SS}$
-	\item Pin 48 - $V_{DD\_USB}$
-	\item Pin 49 - SWCLK
-	\item Pin 60 - BOOT0
-	\item Pin 63 - $V_{SS}$
-	\item Pin 64 - $V_{DD}$
-\end{compactitem}
-
-\subsubsection{PCB Design}
-
-The robotic controller prototype was created by soldering the STM32L072RZT6 microcontroller to a TQFP breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which was removed using solder wick. Finally the solder flux residue was cleaned using IPA. The final prototype is shown in Figure \ref{fig:robotic-controller-prototype}.
+Before the development of the PCB began, a breadboard based prototype of the embedded controller was first created to identify any issues present with the circuit design. In order to provide breadboard access to the SMD STM32L072RZT6 microcontroller, the device was soldered to a TQFP breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which was removed using solder wick. Finally, the solder flux residue was cleaned using IPA. The final robotic controller prototype is shown in Figure \ref{fig:robotic-controller-prototype}.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/robotic-controller-prototype.JPG}
-	\caption{Robotic controller prototype.}
+	\includegraphics[width=0.6\linewidth]{figures/robotic-controller-prototype.JPG}
+	\caption{Embedded robotic controller prototype.}
 	\label{fig:robotic-controller-prototype}
 \end{figure}
 
-Power
-
-The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the PSU and connected by means of an arbitrary length of wire. Therefore, controller was designed with a $10\mu F$ ceramic 
-capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ is used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which meets the stated requirements. Furthermore, this reduces the range of components required to be sourced.
-
-In order to determine the width of the power supply trace, the maximum current that could flow on that trace needs to be known. Therefore, the maximum current draw of the components needs to be known. The maximum current ratings of each of the components are listed below.
+After the prototype controller was confirmed to be functioning correctly, the PCB design process was initiated. The PCB design was developed using the KiCAD schematic capture and PCB design software. The design process consisted of two steps. The first step involved the development of the electrical design in which all the electrical component pins were assigned to electrical nodes. In other words, the component connections were defined in this step. This was followed by the PCB component layout and trace routing step. In order to determine the width of the power supply trace used on the PCB, the maximum current that could flow on that trace needed to be determined based on the current ratings of the constituent components. The maximum current ratings of each of the components are listed below:
 
 \begin{compactitem}
 	\item 42BYGHW920L21B2 - 2.2 A
@@ -638,28 +640,29 @@ In order to determine the width of the power supply trace, the maximum current t
 	\item 20BYGH406 stepper motor - 0.6 A
 	\item DS3118MG servo motor - 2 A
 	\item STM32L072RZT6 microcontroller - 105 mA
-	\item CH340G chip - 30 mA
+	\item CH340G chip - 30 mA.
 \end{compactitem}
 
-Based on the sum of these values, the initial power connection trace needs to be able to support 5.835 A of current. A value of 6 A was used to incorporate a degree of engineering safety margin. Furthermore, a maximum temperature rise tolerance of $10\;^{\circ}C$ and a copper thickness of $1 \text{oz/ft}^2$ was used in the calculation of the trace width. Based on this, it was calculated a trace width of at least 140 mil or 3.56 mm is required. A similar procedure was used to calculate the power trace sections which supported fewer components. The board house, JLC PCB, charges a significantly greater amount for 2 oz outer copper weight over 1 oz. Therefore 1 oz was selected as the outer copper weight for the PCB. 
+Based on the sum of these values, the initial power connection trace needed to support 5.835 A of current. A current value of 6 A was used to incorporate an engineering safety margin. Furthermore, a maximum temperature rise tolerance of $10\;^{\circ}C$ and a copper thickness of $1 \text{oz/ft}^2$ was used in the calculation of the trace width. Based on this, it was calculated that a trace width of at least 140 mil, or 3.56 mm, was required. A similar procedure was used to calculate the widths of power traces that supported fewer components. For the thickness of the PCB traces, it was noted that 2 oz outer copper weight is generally notably more expensive than 1 oz outer copper weight. Therefore, the latter was used for traces for the PCB developed in this project. 
 
-USB Differential Routing
+%TODO: Insert equations used to calculate the trace widths
 
-The D+ and D- lines for the USB portion of the USB to serial converter constitute a differential pair. As such, a number of PCB layout guidelines need to be adhered to ensure the integrity of the differential pair signal. The following guidelines were considered for this purpose:
+The D+ and D- lines for the USB portion of the USB to serial converter constitute a differential pair. As such, a number of PCB layout guidelines needed to be adhered to ensure the integrity of the differential pair signal. The following guidelines were followed for this purpose:
 
+% https://resources.pcb.cadence.com/blog/2021-efficient-differential-pair-routing-guidelines-to-speed-up-pcb-routing
 \begin{compactitem}
-	\item The use of vias should be minimised. In the case of the PCB for this project, vias were not used at all for the differential signal.
-	\item The differential pair should be isolated from the other traces. This was achieved by enforcing a clearance of three standard trace widths from other traces for a total clearance of 0.75mm.
+	\item The use of vias should be minimised. 
+	\item The differential pair should be isolated from the other traces. 
 	\item Differential pair traces should mirror each other as far as possible.
 	\item The lengths of each trace in the differential pair must be identical even if symmetry needs be sacrificed to achieve this.
 \end{compactitem}
 
-% https://resources.pcb.cadence.com/blog/2021-efficient-differential-pair-routing-guidelines-to-speed-up-pcb-routing
+%TODO: Possibly insert image of differential pair on PCB
 
-Oscillator
+In this project, vias were not used at all for the differential USB signal traces. Additionally, the trace isolation condition was satisfied by enforcing a clearance of three standard trace widths from other traces for a total clearance of 0.75mm. Similarly, for both the STM32L072RZT6 external oscillator and the CH340G external oscillator, the following guidelines were adhered to during the PCB layout process:
 
+%Oscillator
 % See https://ecsxtal.com/crystal-and-oscillator-printed-circuit-board-design-considerations
-
 \begin{compactitem}
 	\item The crystal and its supporting capacitors should be placed as close as possible to the oscillator input and output pins on the microcontroller.
 	\item The trace length in the oscillator circuit should be minimised.
@@ -671,68 +674,75 @@ Oscillator
 	\item Power and digital signal on other layers of the board should not pass under the crystal. 
 \end{compactitem}
 
-LED Strip
+%TODO: Possibly insert image of oscillators on PCB
+In addition to the PCB design components discussed above, the PCB was designed in such a manner that all the components were placed on the top layer of the two layer PCB. The top layer was referred to as the signal layer since traces were routed on the top layer as far as possible. Only when necessary, the traces were routed onto the bottom layer to pass below other traces before being returned to the signal layer by means of vias. This routing strategy allowed a ground plane fill to be applied to the majority of the bottom plane. This improved the radio frequency (RF) characteristics of the PCB as higher frequency signal components could return much more closely to their signal path which minimised the current loop size. Furthermore, the trace routing was simplified as an electrical node on the signal plane could be grounded by simply adding a via to the ground plane. The PCB layout with the routing complete is shown in Figure \ref{fig:pcb-routing} while the physical realisation of this design after manufacturing is shown in Figure \ref{fig:empty-robotic-controller}. A 3D model was created using KiCAD's rendering functionality to identify any logistical issues that could arise during the assembly process due to the 3D form factor of the components. This model is shown in Figure \ref{fig:robotic-controller-model}. The final manufactured PCB after assembly is shown in Figure \ref{fig:assembled-robotic-controller} without the motor drivers inserted.
 
-A white LED strip was selected to provide sufficient lighting to support the computer vision component of the project. The LED strip contains 3528 SMD white LEDs which consume a maximum of 20 mA each. The LED density of the strip is 60 LEDs/m. This project maximum LED strip length that this project will use is 3m which implies that a maximum of 180 LEDs will be powered.
-
-Implementation
-
-The PCB design was developed using the KiCAD software design environment and the design process consisted of two steps. The first step involved the electrical design in which all the pins of the electrical components were assigned to electrical nodes. This was followed by the PCB routing process . The result of this routing process is shown in Figure \ref{fig:pcb-routing} below. A 3D render of the PCB with all the components assembled is also shown in Figure \ref{fig:robotic-controller-model} below.
-
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/robotic-controller-model.png}
-	\caption{3D model showing the assembled robotic controller PCB.}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/pcb-routing.png}
+		\caption{Embedded controller PCB routing}
+		\label{fig:pcb-routing}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/pcb-board.jpg}
+		\caption{Manufactured controller PCB}
+		\label{fig:empty-robotic-controller}
+	\end{subfigure}%
+	\caption{Design of the PCB board component and trace layout before and after manufacturing.}
+	\label{fig:pcb-design-process}
+\end{figure}
+
+\begin{figure}[!ht]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/robotic-controller-model.png}
+		\caption{Embedded controller PCB 3D model}
 	\label{fig:robotic-controller-model}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/final-pcb.jpg}
+		\caption{Assembled controller PCB}
+	\label{fig:assembled-robotic-controller}
+	\end{subfigure}%
+	\caption{Final PCB after all components have been assembled.}
+	\label{fig:pcb-assembly}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=1\linewidth]{figures/pcb-routing.PNG}
-	\caption{PCB routing layout for robotic controller.}
-	\label{fig:pcb-routing}
-\end{figure}
+%The components required to assemble the board were acquired prior to the delivery of the PCB board. Due to the close proximity of the components, the components were required to be strategically soldered in order to prevent any obstructions that prevented subsequent components from being soldered in their intended location. Due to the fine pitch (0.5mm) nature of the STM32L072RZT6 microcontroller package, a drag soldering technique was used in conjunction with a significant amount of solder flux to successfully solder the component. The board was cleaned using IPA alcohol throughout the soldering process. The assembled PCB board is shown in Figure \ref{fig:assembled-robotic-controller}.
 
-PCB Assembly
-
-The PCB for the main robotic controller board as well as the supporting pressure sensor and LED breakout boards were received from the JLC PCB board house. The top-view of the main controller board is shown in Figure \ref{fig:empty-pcb} below.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/pcb-board.jpg}
-	\caption{Empty PCB board as received from the JLC PCB board house.}
-	\label{fig:empty-pcb}
-\end{figure}
-
-The components required to assemble the board were acquired prior to the delivery of the PCB board. Due to the close proximity of the components, the components were required to be strategically soldered in order to prevent any obstructions that prevented subsequent components from being soldered in their intended location. Due to the fine pitch (0.5mm) nature of the STM32L072RZT6 microcontroller package, a drag soldering technique was used in conjunction with a significant amount of solder flux to successfully solder the component. The board was cleaned using IPA alcohol throughout the soldering process. The assembled PCB board is shown in Figure \ref{fig:assembled-pcb} below.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/final-pcb.jpg}
-	\caption{PCB board containing all the required components after soldering.}
-	\label{fig:assembled-pcb}
-\end{figure}
+%TODO: Add images of other PCBs
 
 \subsubsection{Firmware}
 
 \ldots
 
-\subsubsection{Servo Motor Control}
+\subsubsection{Motor Control} \label{sec:Motor Control}
 
-The first step in configuring PWM requires the configuration of the counter clock speed. A counter clock speed of $1\;MHz$ is desired given that the system clock frequency is $f_{CK}=32\;MHz$. These two quantities are related by the timer prescalar PSC[15:0] as
+The DS3118MG servo motor used as the actuation driver for the vacuum generation mechanism and has a angular rotation range of $180\degree$. The medium of control for the servo motor is a PWM signal that has two degrees of freedom which motor responds to. Firstly, the period of the PWM signal determines the fraction of the angular rotation range available to the servo motor. The input period can be set from 3 ms to 20 ms (333 Hz to 50 Hz) where a period of 20 ms corresponds to the full range of rotation for the servo. Since the vacuum generation mechanism was designed on the assumption that the servo operates with $180\degree$ of rotational motion, 20 ms was chosen as the PWM period.
 
-\begin{align}
-	\text{CK\_CNT}=\frac{f_{CK}}{\text{PSC[15:0]}}.
-	\label{pwm-counter-clock}
-\end{align}
+The second degree of freedom in control of the servo offered by the PWM signal exists in the high-time of the pulse, or pulse width. The position of the servo is altered by changing this parameter between 500$\mu s$ and 2500$\mu s$ where the bounds of this range correspond to the 0$\degree$ and 180$\degree$ servo motor positions\footnote{This assumes the PWM period is set to 20 ms.}. The release, idle and actuate positions of the vacuum generation mechanism were selected by setting the PWM pulse width to either 2400$\mu s$, 2100 $\mu s$ or 1500 $\mu s$ respectively.
+
+%The first step in configuring PWM requires the configuration of the counter clock speed. A counter clock speed of $1\;MHz$ is desired given that the system clock frequency is $f_{CK}=32\;MHz$. These two quantities are related by the timer prescalar PSC[15:0] as
+%
+%\begin{align}
+%	\text{CK\_CNT}=\frac{f_{CK}}{\text{PSC[15:0]}}.
+%	\label{pwm-counter-clock}
+%\end{align}
 
 %Using Equation \ref{pwm-counter-clock}, the required prescalar value is calculated as 31. The DS3118MG servo motor requires a PWM period of $20\;ms$ to make use of its full rotational range of $180^{\circ}$. Given that the counter has a clock frequency of $1\;MHz$, a value of 19 999 (where 1 is subtracted since the counter counts the rollover time-step) is required as the counter reload trigger value.
 
-\subsubsection{Stepper Motor Control}
+As mentioned in Section \ref{sec:Circuit Design}, the DRV8825 drivers were selected to provide an interface to the microcontroller to control the stepper motors. This interface includes the \textit{STEP} control input, which moves the motor one step\footnote{The size of the step the motor takes is dependent on the microstepping mode configuration.}, as well as the \textit{DIR} control input which indicates the rotational direction in which the step is taken. The first design consideration in the control of the stepper motors is the step resolution, or microstepping mode, employed. The microstepping mode selection control inputs $M0$, $M1$ and $M2$ were connected to the microcontroller as part of the circuit design which allowed the microstepping mode to be selected in software. In general, increasing the step resolution improves the smoothness of the stepper motor rotation but also increases the pulse rate required to move the motor at the same speed. This is turn increases the computational load on the microcontroller.
 
-\ldots
+The DRV8825 supports a maximum of 1/32 microstepping.\footnote{For each step in 1/32 microstepping mode, the motor rotates 1/32 of the full step angle.} Since this project has specifications relating the the accuracy of the system but not the speed of the system, the maximum microstepping mode was selected to reduce vibrations as far as possible. It was noted that increasing the microstepping resolution did not correspond to an increase in position resolution. This is due to the fact that there is an exponential reduction in holding torque in microstep positions as the microstepping resolution increases. For this reason, the motor control firmware was designed such that the stepper motors only make use of microstep positions during the movement phase to reduce vibration and only rest in full step positions.
 
-\subsubsection{Serial Communication}
+The simplest form of control for the stepper motors is constant speed control where the rate at which pulses are sent to the motor is always constant. This was the control initially implemented. However, when the pulses are started or stopped, a near instantaneous change in velocity occurred which resulted in a peak in acceleration that induced a mechanical jolt in the \textit{Robotic System}. This limited the maximum motor speed that could be used to ensure the mechanical jolt generated was minimal. To overcome this issue, a linear acceleration profile was implemented for each stepper motor. This was achieved by altering the period of the underlying microcontroller timer peripheral for each stepper motor.
+
+\subsubsection{Serial Communication} \label{sec:Serial Communication}
 
 A communication protocol needs to be developed between the robotic controller and the PC running the GUI software. The PC needs to be able to issue the following commands to the robotic controller:
 
@@ -779,7 +789,7 @@ The datasheet specifies an error tolerance of $3\%$ for the USART receiver with 
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10.5cm}|}
+	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10cm}|}
 		\hline
 		\textbf{} & \textbf{} & \textbf{} \\
 		\hline
@@ -794,7 +804,7 @@ The datasheet specifies an error tolerance of $3\%$ for the USART receiver with 
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10.5cm}|}
+	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10cm}|}
 		\hline
 		\textbf{Control Byte} & \textbf{Command} & \textbf{Description} \\
 		\hline
@@ -1297,7 +1307,7 @@ Once all the grid cells have been classified, the orientation reference cells at
 
 \subsubsection{Square Corner Detection} \label{sec:Square Corner Detection}
 
-Both the fiducial identification (see Section \ref{sec:Fiducial Identification}) and cube orientation computation (see Section \ref{sec:Cube Pose Estimation}) algorithms require the corners of the contours to be known in the image coordinate system. It was decided to extract these corners from a given contour based on the assumption that the underlying shape is a square. The first step in the corner detection process is the computation of the centroid of the contour. Following this, the Euclidean distance between the centroid and each of the contour points is computed. The contour point that has the greatest Euclidean distance from the centroid is taken to be the first corner. The remaining contour points are then segmented into four quadrants with the origin of the quadrant axes coincident with the centroid of the contour and the axes oriented such that the detected corner falls at the centre of the first quadrant. This is based on the fact that the four corners of a square can be similarly separated into four quadrants. The contour points with the greatest Euclidean distance from the centroid in each of the remaining three quadrants are taken to be the remaining three corners.
+Both the fiducial identification (see Section \ref{sec:Fiducial Identification}) and cube orientation computation (see Section \ref{sec:Cube Pose Estimation}) algorithms require the corners of the contours to be known in the image coordinate system. It was decided to extract these corners from a given contour based on the assumption that the underlying shape is a square. The first step in the corner detection process is the computation of the centroid of the contour. Following this, the Euclidean distances between the centroid and each of the contour points are computed. The contour point that has the greatest Euclidean distance from the centroid is taken to be the first corner. The remaining contour points are then segmented into four quadrants with the origin of the quadrant axes coincident with the centroid of the contour and the axes oriented such that the detected corner falls at the centre of the first quadrant. This is based on the fact that the four corners of a square can be separated into four quadrants. The contour points with the greatest Euclidean distance from the centroid in each of the remaining three quadrants are taken to be the remaining three corners.
 
 % TODO: Insert diagram showing corner detection sequence
 
@@ -1314,9 +1324,7 @@ Since the corners are defined with respect to the image frame, they are also pro
 
 \subsection{System Controller}
 
-Software Requirements
-
-The core requirements that the PC-based software needs to fulfil are as follows:
+The core requirements that the PC-based software needed to fulfil are as follows:
 
 \begin{compactitem}
 	\item The software needs to capture the desired 3D shape to be constructed from the user.
