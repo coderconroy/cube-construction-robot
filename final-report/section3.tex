@@ -14,45 +14,45 @@
 
 This section presents a summary of the project design tasks as well as the implementation of these tasks (see Tables \ref{tab:design_summary_p1}-\ref{tab:design_summary_p2}).
 
-\begin{table}[h]
+\begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{5cm}|>{\raggedright}m{4cm}|>{\raggedright\arraybackslash}m{4cm}|}
+	\begin{tabular}{|>{\raggedright}m{5cm}|>{\raggedright}m{5cm}|>{\raggedright\arraybackslash}m{4cm}|}
 		\hline
 		\textbf{Deliverable or task} & \textbf{Implementation} & \textbf{Completion of deliverable or task, and section in the report} \\
 		\hline
-		Mechanical design and construction of robotic manipulator & & \\
+		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & \\
 		\hline
-		Mechanical design and construction of robotic end-effector mechanism & & \\
+		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & \\
 		\hline
-		Design of embedded robot controller circuit & & \\
+		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & \\
 		\hline
-		Design of printed circuit board (PCB) for embedded robot controller & & \\
+		Design of printed circuit board (PCB) for embedded robot controller & The PCB design was completed using the KiCAD software package from first principles. & \\
 		\hline
-		Development of firmware for embedded robot controller & & \\
+		Development of firmware for embedded robot controller & Firmware was developed from first principles using C. & \\
 		\hline
-		Design of communication protocol for communication between the embedded robot controller and the PC-based software & & \\
+		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & \\
 		\hline
-		Design and implementation of shape definition graphical user interface (GUI) based on a low-level graphics application programming interface (API) & & \\
+		Design and implementation of shape definition graphical user interface (GUI) based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p1}Design summary.}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
 	\begin{tabular}{|>{\raggedright}m{5cm}|>{\raggedright}m{4cm}|>{\raggedright\arraybackslash}m{4cm}|}
 		\hline
-		Development of computer vision cube detection algorithm & & \\
+		Development of computer vision cube detection algorithm & The computer vision cube detection algorithm was developed mostly from first principles using C++. A few basic image image processing functions were used from OpenCV. & \\
 		\hline
-		Development of computer vision cube localisation algorithm & & \\
+		Development of computer vision cube localisation algorithm & The computer vision cube detection algorithm was developed mostly from first principles using C++. A few basic image image processing functions and camera calibration functions were used from OpenCV. & \\
 		\hline
-		Development of construction planner software component & & \\
+		Development of construction planner software component & The construction planner software component was developed from first principles. & \\
 		\hline
-		Development of robotic motion planner software component & & \\
+		Development of robotic motion planner software component & The robotic motion planner software component was developed from first principles & \\
 		\hline
-		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & & \\
+		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & The system control software was developed from first principles using the QT C++ framework. & \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p2}Design summary continued.}
@@ -1017,7 +1017,7 @@ The desired camera behaviour was defined as follows:
 %	\item The option to load and save model files.
 %\end{compactitem}
 
-\subsection{Computer Vision System}
+\subsection{Computer Vision System} \label{sec:Computer Vision System}
 
 The design of the overall system facilitates open-loop operation of the robotic subsystem when the computer vision subsystem is excluded. This means that the system is capable of arbitrary shape construction without visual feedback during the construction process, given that the initial cube positions are known. However, should a cube be dropped during this process, the system would not be capable of an intelligent response\footnote{The system would be able to detect the dropped cube condition through the pressure sensor in the vacuum system detecting the unplanned pressure decrease.}. Furthermore, any significant disturbance of the shape under construction would be undetectable by the system. The computer vision system is required, and was designed, to address these two cases. In the first case, the dropped cube should be detected and localised with respect to the robot coordinate system if it falls within the camera's field of view. Secondly, when damage to the structure is detected in the image input data, the computer vision system should signal a construction halt condition. This section begins with an overview of the cube detection approaches investigated. A description of the method used to map points detected in the image frame to the world frame follows in Section \ref{sec:3D Localisation}. These sections lay the foundation for the integrated computer vision algorithm and supporting functions discussed from Section \ref{sec:Top-Level Design} onward.
 

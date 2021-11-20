@@ -6,20 +6,234 @@
 
 \section{Discussion}
 
+%The idea in the Discussion section (specifically in section 5.1 and 5.2) is that you haveto
+%stand back and give your own (properly motivated) opinion of what you have achieved.
+%I.e., these are your findings.
+
+% Evaluate your work and place your results into context.
+% Does my solution solve the problem?
+% Does it solve it to a larger extent than other (published) solutions?
+% What are the implications of my solution? In other words, because I have solved this problem,it will now be easier to do this or that; more cost effective to do this or that? How do my solutions correspond to what others have done before me?
+% Saying "my system is good at this aspect, but not so good at that aspect" (with proper motivation for your statements) will show that you have the ability to evaluate your own work.
+
 \subsection{Interpretation of results}
+
+% Part 1 - evaluate results and ask these questions about each result
+
+The integrated system developed in this project, which comprises the \textit{PC System} and the \textit{Robotic System}, has one overarching mission goal. That goal is successful the construction of 3D shapes using small construction cubes. The system can be considered to have successfully attained this goal if it satisfies the first two system specifications. These are the system's capability to build 3D shapes and the system's capability to facilitate the definition of these shapes. With these two specifications met, the system is capable of capturing an arbitrary 3D shape concept and producing a physical realisation thereof. The remaining four specifications are primarily concerned with how well and how robustly the various subsystems support this task.
+
+\subsubsection{Shape Construction}
+
+%Qualification Test 1: Test of the system’s capability to build 3D shapes
+
+Considering the cube construction specification, it was observed the system had a success rate of 100\% when constructing the predefined set of 3D test shapes. In order evaluate the weight of this result, the nature of the 3D test shape set first needs to be discussed. Firstly, all of the test shapes were chosen to comply with the shape construction specification. This means that all of the 3D test shape models consisted of at least 30 cubes\footnote{In fact, each test shape consisted of exactly 30 cubes as, at the time of writing, only 30 cubes were available for testing purposes.} and were at least 4 cubes in height. Furthermore, recall that the fourth system specification requires at least 2mm of linear repeatability. Based on this, the 3D test shape models were assigned a spacing tolerance of 2 mm between cubes. However, within these constraints, there are an infinite number of shapes that can be constructed. 
+
+To the student's knowledge, there is no known set of shapes that, if constructed, definitively proves all shapes within these constraints are constructible by the system. As such, the test shapes were chosen to exhibit as wide a range of properties across the set as possible that may arise from arbitrarily defined shapes. These properties included arbitrary cube rotation about the z-axis, partially supported cubes, structures up to the maximum height of 6 cubes, single cube tower stacks, slanted single cube tower stack and finally structures that span that majority of the robot's workspace. Lastly, the tolerance between cubes was reduced to 1 mm between cubes for some structures to test the envelope of the system's capability. With the nature of the 3D test shapes considered, the 100\% construction success rate indicates with a strong degree of confidence that the system is capable of successfully constructing arbitrary 3D shapes.
+
+\subsubsection{Shape Definition}
+%Qualification Test 2: Test of system’s capability to facilitate the definition of 3D shapes
+
+All of the test shape's defined using the \textit{Shape Definition} component of the system which is indicative that the system is capable of facilitating the definition of arbitrary 3D shapes. It was shown that the \textit{Shape Definition} input controls allow the linear x- and y-axis position of each individual cube to be specified with a resolution of 0.2 mm and the rotational position of each cube to be specified with a resolution of 0.9 degrees. These values originate from the resolution of the stepper motors in the \textit{Robotic Subsystem}. Specifically, the use of a 20 tooth timing belt pulley on a stepper motor with 1.8 degrees of resolution in full-step mode results in a linear step size of 0.2mm. Furthermore, the 1.8 degree end-effector rotation stepper motor has a step size of 0.9 degrees in half-step mode. Therefore, the use of higher resolutions in the \textit{Shape Definition} component is not practical as this is not physically realisable. Based on this, the system meets the shape definition specification which requires 1 mm linear step resolution and 1 degree rotational resolution. 
+
+The \textit{Shape Definition} component relies predominantly on OpenGL to create a 3D model of the shape under construction that can be interacted with to create the structure. The use of a 3D model to facilitate shape construction provides a far more intuitive experience for the user than simply specifying the coordinates of each cube or working with 2D slices of the shape. Furthermore, the lower-level graphics API nature of OpenGL also offered further control over the scene being rendered than higher level solutions which allowed the \textit{Shape Definition} component to be better tuned to the task at hand. However, these benefits are offset by the greater time investment that is required when developing software with OpenGL. Due to the simplistic nature of the rendering task in the \textit{Shape Definition} component, this was not considered a major drawback.
+
+\subsubsection{Robotic System} \label{sec5:Robotic System}
+
+%Qualification Test 3: Test of end-effector’s capability to manipulate cubes
+
+The system depends on the end-effector as interface to enable the system to interact with the cube. Therefore, in order, to construct 3D shapes, the system relies heavily on this component during the manipulation of the pose of each cube. As such, the success of the system observed when testing the system's shape construction ability implied that the end-effector was capable of manipulating cubes. However, there is no guarantee that the most strenuous conditions possible for the end-effector were arbitrarily encountered during this process. Therefore, due to the critical nature of this component, a test was required to verify its capability in isolation. Based on the acceleration and movement speed of similar existing systems as well as the approximate dimensions of the workspace, it was estimated that the maximum duration the end-effector would be required to grip the cube for would never exceed 20 seconds. The third system specification is based on this estimate. 
+
+The test results showed that for 10 iterations, the end-effector achieved a 100 \% success rate in maintaining the cube in its grip for 30 seconds. The test was halted at 30 seconds which indicates the maximum possible duration is likely longer, yet still clearly demonstrates the end-effector complies with the specification. Furthermore, the nature of the test means the end-effector was exposed to the maximum force it was expected to endure during the period of motor acceleration. This is backed by early tests of the vacuum system which yielded holding times of up to 8 hours. However, there may be trade-off with the lifetime of the vacuum system servo motor and the suction force. The first servo motor installed in the vacuum system failed and ceased during operation. It is suspected that the large forces endured by the motor when inducing a comparatively low pressure in the vacuum system shortened the lifespan of the motor. However, despite reducing the suction force of the vacuum system with the new servo motor, the end-effector still performed within the desired specification. A number of other approaches were considered for the end-effector mechanism from electromagnetic solutions to finger grippers. However, only the suction cup based vacuum approach met all the functional requirements of the end-effector and was selected as a result.
+
+%Qualification Test 4: Measurement of robotic manipulator linear accuracy
+%Qualification Test 5: Measurement of robotic manipulator’s rotational accuracy
+
+The tests concerning the capability of the system to construct arbitrary 3D shapes generally only offer information at a qualitative level. This is due to the difficulty that exists in measuring the accuracy of the position and orientation of the cubes internal to the structure under construction. Therefore, to attain a quantitative measurement of this process, the assumption was made that the accuracy of the constructed 3D structure can be assessed, at least in part, from the accuracy of the mechanism responsible for placing the cubes. The repeatability of the robotic manipulator is the quantitative indicator that was assessed during the testing process of this component. The linear repeatability of robotic manipulator along each Cartesian axis and its rotational repeatability about the z-axis is
+
+<INSERT QTP 4 + 5> results
+
+In comparison to the specification for the robot's repeatability, the repeatability along each linear axis is very good and comfortably within the required 2mm. The rotational repeatability is excellent in comparison to to the $5\degree$ requirement. The rotational repeatability remains impressive when compared to the rotational step size. However, the linear step size of 0.2mm is notably less than the linear repeatability. This would indicate that the stepper motors are potentially losing steps. However, due to the nature of the repeatability test, the linear repeatability performance is likely underrated. Specifically, a mechanical pencil with a lead size of 0.5 mm was used to mark the position of the end-effector during the test. This size is comparable to the magnitude of the robot's repeatability measurement which was based on the spread of pencil marks. This indicates the width of the pencil lead likely inflated the repeatability readings. 
+
+One way to correct for this would be to simply subtract the width of a single mark left by the pencil from the repeatability measurement. However, there are a number of variables that determine the size of a mark and therefore an exact measurement of this is difficult to ascertain. However, for the purposes of the repeatability test in this project, it was considered sufficient to ignore this step and simply use the measurement as an upper bound that is highly unlikely to be an underestimation. Therefore, the repeatability was judged to have met the specification with a very high degree of confidence. The accuracy of the \textit{Robotic System} is largely based on the robust design of the mechanical manipulator.
+
+Previous iterations of this project suffered with precision control issues due to vibration. Therefore, a large emphasis was placed on the mechanical design aspect of this project to eliminate these issues. A gantry robot approach was selected with these factors in mind as this design generally exhibits better accuracy than the articulated robot and SCARA approach. The gantry approach offered a much greater opportunity to ensure stability through its frame. Finally, the accuracy of gantry robots are constant across their workspace and are better suited to Cartesian based problems as a result. In order to introduce stability to the \textit{Robotic System}, 20x40 aluminium extrusions were used instead of the linear rail seen in previous projects. Furthermore, the robot was designed such that the \textit{Y-Axis Assembly} moves on top of the frame to allow the frame's centre of gravity to be lowered. This design approach resulted in a very stable \textit{Robotic System} that mostly eliminated vibration issues and facilitated precision control. Overall, the mechanical component of the \textit{Robotic System} was highly successful in fulfilling its functions and provided a solid foundation for the other subsystems within this project.
+
+\subsubsection{Computer Vision System} \label{sec5:Computer Vision System}
+%Qualification Test 6: Measurement of computer vision cube detection accuracy
+
+As mentioned in Section \ref{sec:Computer Vision System}, the \textit{Vision System} is not required for open-loop shape construction but is required to make the system closed-loop so that it can handle unexpected events. The \textit{Vision System} is centred around the detection of cubes and the classification of cubes into \textit{source cubes}, \textit{structure cubes} and \textit{independent cubes}. The reliability of this classification as well as the accuracy with which the robot is able to re-grip a dropped cube depends on the accuracy with which the \textit{Vision System} is able to estimate the pose of a cube in the world coordinate system. The accuracy of cube localisation of the \textit{Vision System} for the base plane is as follows:
+
+<INSERT QTP 4 + 5> results
+
+These results indicate that the \textit{Vision System} cube localisation process meets the linear accuracy specification of 2mm as well as the rotational accuracy specification of 5$\degree$. When gripping a cube, the distance from the edge of the cube to the outer perimeter of the suction cup centred on the top face of the cube is greater than the cube localisation linear deviation. This implies that the localisation inaccuracies should not prevent the system from re-gripping a cube. However, there is still a degree of inaccuracy introduced nonetheless which limits how far the inter-cube tolerance can be reduced when the system constructs a shape in closed-loop mode. However, with an inter-cube tolerance of greater or equal to 2 mm should almost always ensure successful construction in closed-loop mode.
+
+The main source of inaccuracy is introduced by the pin-hole camera based approach used to map between the world coordinate system and the image coordinate system. This approach is dependent on the accuracy of the known positions of the fiducials in the world coordinate system. However, due to the obstructed nature of the robot's workspace and the form of the end-effector which defines the robot's workspace, it is challenging to measure the exact world coordinates of the each fiducial. Furthermore, the centre point of each fiducial is identified by the \textit{Vision System} as the centre of the fiducial's contour. However, lighting variations and noise in the square corner detection processes can cause misalignment between the centroid and actual fiducial centre. These sources of uncertainty contribute to the inaccuracy exhibited in the cube localisation process. 
+
+Since the dropped cubes to be re-gripped are almost exclusively found on the base plane, a the use of a homography to perform the mapping was considered. However, the cube classification step requires the classification of cubes in all planes which cannot be solved using only a homography. Overall the cube localisation approach was considered successful, however, the system would benefit from accuracy improvements in this process.
+
+The system makes use of the vacuum system pressure sensor to detect a dropped cube case and the \textit{Vision System} to deal with the dropped cube case and detect the construction failure case. The test of the system's response to unexpected events showed that the system was able to respond to all dropped cube cases and detect all construction failures. The dropped cube test involved forcing a dropped cube response by removing the cube during every possible phase of the robot's cube handling movement during construction. This revealed that the system was also successfully able to deal with the missing cube case where a cube is removed from its \textit{source cube} position before the end-effector reaches this position. Supplementing the \textit{Vision System} with the pressure sensor made the dropped cube detection mechanism robust as indicated by the test results. Finally, each construction failure case was also successfully detected. These results demonstrate compliance of the system with the sixth and final system specification.
+
+
+%Qualification Test 7: Test of system’s capability to detect a dropped cube and and shape construction failure
+
+
+
+%- Most of the construction inaccuracy comes from the misalignment of the suction cup gripping source cubes and the poor 3D printed gear teeth on the end-effector
+
+%What do the results mean? Are they very good, acceptable, or poor? What are the
+%implications? It is important to be honest here. If the results are not what you hoped for
+%or designed for, you as an (aspiring) engineer should be able to recognise that, and the
+%exam panel will specifically evaluate this aspect.
+
+%You should also indicate in this section why you think the results turned out as they did
+%and what you think the application and/or consequences of the results are. Consider
+%questions like:
+%o What is the cause or origin of a specific result?
+%o How were your measurements influenced by external factors?
+%o Why could you not meet a particular technical specification?
+
+%Expand the discussion on (design) considerations (briefly mentioned in the Approach
+%section), the alternatives that you have considered and trade-offs.
+
+%Evaluate (in hindsight) the choices that you have made and defend them (where
+%appropriate). What worked well and what did not? You may address aspects like: specific
+%implementation choices made (e.g., which part of the design was implemented in software
+%and which in hardware) and the consequences; which techniques you chose (e.g., which
+%design procedure, which method for deriving a model, which method for solving
+%differential equations, which experimental protocol) and whether these were good
+%choices;technical and economic feasibility and implementability.
 
 \subsection{Critical evaluation of the design}
 
-- 3D printed X-axis assembly comes loose over time - look into linear rails instead
-- Z-axis motor mount relies on friction between linear rods to pull rods and entire z-axis assembly. The plastic wears and becomes loose over time leading to slippage - correct this by incorporating a clamping mechanism into the design
+%In this subsection, address (i) aspects to be improved; (ii) what you regard as particularly
+%strong points of your design; (iii) what you regard as the extremities of the abilities of the
+%system beyond which you expect it to fail.
+
+\subsubsection{Aspects to be improved in the present design}
+
+%Are there any unsolved problems in your present design? Are there aspects of the
+%design that you would improve on if you had more time, more funding, or could
+%start the project from scratch?
+%Are there problems that you could not solve?
+
+Due to the number of subsystems within this project and the depth to which each subsystem was explored, it is expected that there would be many facets which could not be explored sufficiently or issues which could not be corrected within the given time frame. As a result, there are many aspects that could be improved in the current design. With respect to the mechanical component of the \textit{Robotic Subsystem}, the z-axis motor mount exhibited issues in securely gripping the \textit{Z-Axis Assembly} linear rods. The z-axis motor mount relied on the tightness of the hole around the linear rod in the 3D printed part to create a connection. However, this connection became looser over time and should be replaced with a clamping mechanism. Secondly, the robotic manipulator was far more rigid than anticipated. This is a desirable characteristic, however, the height of the system could be increased significantly to take advantage of this and facilitate taller structure construction. Lastly, the 3D printed rotational end-effector rod has slightly too much play which reduces the cube placement accuracy. This part should be re-printed with tighter tolerances.
+
+The design of the robotic controller had an error that was not uncovered until the PCB was received and assembled where two of the I/O pins were not powered correctly. These pins corresponded to the y-axis motor driver microstepping mode selection inputs. This meant the motor could not be configured in 1/32 microstepping mode but rather only 1/16 microstepping mode which introduced additional vibrations and noise. This design error should be corrected and the PCB re-manufactured. In addition, the global semi-conductor shortage resulted in the selection of a microcontroller with a slightly lower clock speed than desired. A faster microcontroller would allow a higher stepper motor pulse rate and faster system operation.
+
+The first aspect of the \textit{Vision System} that needs to be improved is the system's tolerance to lighting variability. The system uses a fixed camera exposure level and binary threshold level which need to be adjusted when operating in notably different lighting conditions. This should be upgraded to an adaptive threshold mechanism. Secondly, the mapping between the world and image coordinate system only considers the camera intrinsics and not the distortion coefficients. Including these in the mapping computation should improve cube localisation accuracy. In addition, the fiducial pattern should be updated to facilitate more accurate identification of a world reference point as discussed in \ref{sec5:Computer Vision System}.
+
+The \textit{Shape Definition} component also has a number of elements that can be improved. The primary form of cube manipulation is through a number of keyboard controls to alter the position and orientation of the cube. However, when a cube needs to be moved to a position far from its initial insertion point, it can take a while due to the small step resolution of the system. The implementation of controls to specify the coordinates of the cube directly as well as the option to change the step resolution of the translation action would improve the usability of the \textit{Shape Definition} component.
+
+%Shape definition component
+%- Grid in order to asses where the cubes will be placed exactly
+%- Specify exact location of each cube
+%- Option to rotate multiple cubes 
+%
+%- Integration
+%- Mapping between coordinate systems
+%- 3D render coordinate system
+%- Robot coordinate system
+%- Camera coordinate system
+%- Would have chosen robot coordinate system differently
+%
+%- Path planning
+
+\subsubsection{Strong points of the current design}
+
+%What turned out well in the design or in the project? And why? E.g., becauseof
+%the way it was designed, the system is especially robust (e.g. against noise, against
+%hacking, against mechanical damage). With which parts of the results are you
+%pleased, and why? In hindsight: were the implementation alternatives chosen
+%appropriate?
+
+The primary strong point of the design is the rigidity of the mechanical component of the \textit{Robotic System}. This was discussed in depth in Section \ref{sec5:Robotic System}. The rigidity provides a very stable foundation for the motion of the \textit{Y-Axis Assembly} and \textit{X-Axis Assembly} which ultimately results in a high degree of accuracy in the positioning of the robotic end-effector. This in turn allows shapes to be constructed with a small tolerance which facilitates the construction of a wide range of shapes. Furthermore, this rigidity, combined with the low centre of mass of the robotic manipulator reduces the vibrations the reach the robot's workspace and end-effector significantly.
+
+The embedded robotic controller has also proved to be a very reliable component of the design. The controller has only required minor firmware tweaks since its completion and allowed the design focus to be on the \textit{PC System} software for the latter phases of the project. The controller is also robust and highly compact as it was manufactured as a PCB. Lastly, the \textit{Vision System} approach, despite having the potential for accuracy improvements, has provided a very solid foundation for mapping between the image frame and the world frame. Once the mathematical challenges in projecting back from the image frame to the world frame were resolved, the solid theoretical foundation of the approach allowed the relatively fast and seamless introduction of fiducials, cube classification based on location and vision detection region bounding in the world plane into the \textit{Vision System}.
+
+
+\subsubsection{Under which circumstances is the system expected to fail?}
+
+%What are the design limitations? What are possible criticisms against theresults?
+%What will happen when a failure occurs, i.e. will the system fail gracefully or will
+%it blow up? E.g., in a particular software design, if more than 10 users log on, the
+%system will not be able to carry the load and everything will slow down (or the
+%program will crash). Or, in a secure network, under which circumstances will a
+%hacker be allowed access? Or, in a communication system design, under which
+%circumstances will the communication link be lost? Thus, try to think of all the
+%circumstances, whether inherent in your design or environmental, that will or could
+%cause your system to fail.
+%Stand back and critically evaluate what you have achieved. Try to think of which
+%aspects other engineers or researchers will criticise. Compare your results and
+%interpretation thereof with findings reported in literature.
+
+The \textit{Shape Definition} component has a number of ways in which a failure state could be induced. Firstly, the component does not include any intersection or collision logic between cubes in the design. Therefore, a design with intersecting cubes could be produced which would lead to a failed construction in the physical world. Secondly, the component does not perform any analysis of the physics of the cubes. Therefore, it is possible to design a shape where the cube is not correctly supported which would also lead to a construction failure in the physical world. It is also possible for a system failure to occur during a dropped cube event. If a cube is dropped near a structure, it is possible for the \textit{Z-Axis Assembly} to collide with the structure when moving down to re-grip the cube.
+
+%- Invalid shape position definition -> collision + no support
+%- Pick up cube in position that will cause the end effector to knock over the structure
+%- Detection of cube in cube detection region but outside workspace
+%- Foreign object within detection view
 
 \subsection{Design ergonomics}
 
-- Robust as the rigid structure facilitates easy transportation with no disturbance to the structure
+%In this brief section, give a description of the ergonomics that you built into your design.
+%This will include any aspects relating to the interaction of the user with the product. You
+%may include a discussion of user-friendly graphical interfaces, layout of front panels,
+%positioning of controls, accessibility of physical interfaces, packaging, ease of installation
+%(relevant for both software and hardware), reliability of software and other relevant
+%aspects of the design.
+
+During the development of the system, a number of design decisions were made that took the ergonomics of the design into consideration. Firstly, the robotic manipulator was designed to be as compact as possible. The design of the custom \textit{X-Axis Assembly} belt clamps that do not protrude from the assembly to improve compactness along the x-axis is an example of this. The culmination of these decisions resulted in a robot that fits on a desktop with all the cables and tubes routed very cleanly to the back left of the robot. The aesthetics of a system can also be considered as an ergonomics factor. The robot exhibits a sleek plain black design with white highlights that gives the the robot a professional feel. Lastly, the robot was designed with the intention of being viewed from the front perspective. This facilitates a view of the shape under construction with minimal occlusions.
+
+The \textit{System Control} software also exhibits a number of ergonomic features. The \textit{Shape Definition} component allows the intuitive 3D design and inspection of the shape to be constructed. Furthermore, the \textit{Construction} view interface offers a real-time 3D visualisation of the cube belief states during the construction process. Furthermore, this can be viewed in isolation or in conjunction with the computer vision feed which can also be viewed in isolation. The computer vision display also has a number of controls that allow the computer vision stages and information displayed to be customised.
+
+%Shape definition
+%- Easy to see shape and use compared to 2D solution. More intuitive if cubes were controlled through mouse
+%
+%- Robust as the rigid structure facilitates easy transportation with no disturbance to the structure
+%- Compact sits on desk
+%	- Feet attached to base to sit well
+%- PCB
+%- Sleek housing for vacuum actuator
+%- All black 
+%	- very visually pleasing
+%	- Excellent cable management
+%	- White shelving liner used around edges of chip board
+%	- Black and white theme used as far as possible
+%- Easy to interface with
+%- User friendly graphical features
+%- All cables, vacuum tube, lighting and camera cables are routed to the back left
+%	- Visualisation of cubes in model using 3D render
+%	- Easy connection to robot controller
+%	- Simple to understand and use interface
+%	- System was designed to be viewed from the front - thinner horizontal extrusion used at the front to improve the visibility of the extrusion
+%	- Controls grouped by function in GUI
+%	- Can expand computer vision view or model view exclusively
+%	- Info log to make debugging and understanding the operation of the system more intuitive
+%	- Software reliability
 
 \subsection{Health, safety and environmental impact}
 
+%You have to include a brief summary of the safety features of the design in this section.
+%This may include aspects (where relevant) like electrical safety, provision for safety
+%against burns (where hot surfaces appear in the product) and hearing protection (for a
+%noisy product, e.g., an alarm). This particular section may be less relevant for strongly
+%software-focused projects, but a clearly motivated statement to the effect that the design
+%does or does not create potential health or safety risks must still be included.
+%Next, address environmental protection issues of your design. State clearlyhow you
+%designed your product to contribute to environmental protection. E.g., discuss aspects
+%like: How could your product potentiallypollute the environment? Does it create noise
+%(which may include, e.g., acoustic noise)? Does it contribute to electromagnetic noise?
+%What happens if your product reaches the end of its lifetime - can it be recycled? How
+%have you considered and/or solved these problems in the design?
+
+The primary safety concern in this project is electrical safety. The greatest danger is posed through the main's electricity wires connecting to the power supply. In order the protect against this, a cover for the power supply connection pins was designed and 3D printed. It is not possible to touch the electrical connection points without removing the cover. The main PCB board was designed with mounting holes to facilitate mounting in an electrical cover box which had not yet been created at the time of writing. A number of wires were spliced together in the design. Heat shrink tubing was used to cover these connections. Lastly, the moving mechanical parts of the robot pose an injury threat. Limit switches are included in the design which prevents the robot from exceeding the limits of its axes. However, it cannot sense obstructions in its path so care must be taken not to get body parts caught in the robot during operation.
+
+In terms of environmental impact, the stepper motors of the robot produce acoustic noise during operation. Microstepping was implemented which reduces the vibrations generated by the motors which in turn reduces the acoustic noise generated. Furthermore, by ensuring the motors only rest in full step positions, the ringing noise that is emitted in microstep positions is eliminated. The PCB was designed in such a manner as to reduce the size of the current loops formed which minimises electromagnetic noise. In addition, the use of a ground plane on the PCB also helps to shield electromagnetic noise.
+
 \subsection{Social and legal impact of the design}
+
+The technology developed and utilised in this project relate directly to the field of industrial robotics and automation. If social issues are considered from the perspective that the technology developed in this project supports the rate of development in these domains, then there may be an increase in the number of jobs lost to automation as a result. However, such efficiency improvements will likely lead to the creation of wealth, and therefore jobs, in other domains. The project can also be viewed as a general robotic platform which could be purchased and adapted to various applications, such as 3D printing or laser engraving. In this sense, the project has the potential to generate wealth and improve the economic standing of one or more individuals. Lastly, in the same vein of thought, the project as a product could serve as a educational platform as an entry point to using computer vision with robotics in a highly constrained environment. However, due to the unavoidable potential for injury resulting from the mechanical component of the robot, the legal issues relating to this need to be taken into consideration.
+
 
 %% Potential improvements
 %% - Used an improved approach to solve the PnP and estimate the extrinsic matrix
