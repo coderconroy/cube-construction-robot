@@ -14,6 +14,56 @@
 \newcommand{\matr}[1]{\bm{#1}}
 \newcommand{\vect}[1]{\bm{#1}}
 
+\newcommand{\subsubsecnonum}[1]{%
+	\phantomsection
+	\addcontentsline{toc}{subsubsection}{\numberline{}#1}
+	\textbf{#1}
+}
+
+\newcommand{\subsubsecnonumhidden}[1]{%
+	\phantomsection
+	\textbf{#1}
+}
+
+\newcommand{\paragrapsecnonum}[1]{%
+	\phantomsection
+	\addcontentsline{toc}{paragraph}{\numberline{}\textit{#1}}
+	\textit{#1}
+}
+
+\newcommand{\paragraphsecnonumhidden}[1]{%
+	\phantomsection
+	\textit{#1}
+}
+
+% Additional settings
+\setcounter{tocdepth}{4}
+
+% ---- Record sections start ----
+\newcounter{nrecord}% Counter
+\renewcommand{\thenrecord}{\arabic{nrecord}}
+
+\newcounter{nrecordsub}% Counter
+\renewcommand{\thenrecordsub}{\arabic{nrecordsub}}
+
+\setcounter{nrecord}{0}% Start value
+
+\newcommand{\secrecord}[1]{%
+	
+	\phantomsection
+	\stepcounter{nrecord}
+	\setcounter{nrecordsub}{0}% Start value
+	\textbf{Record \thenrecord. #1}
+}
+
+\newcommand{\subsecrecord}[1]{%
+	
+	\phantomsection
+	\stepcounter{nrecordsub}
+	\textbf{\hspace{1.42cm}Record \thenrecord.\thenrecordsub. #1}
+}
+% ---- Record sections done ----
+
 %% EDIT: Replace the following with your information.
 \eprtitle{3D cube-world construction robot}
 \eprcode{EPR402}
@@ -43,6 +93,7 @@
 
 %% Add the Table of Contents.
 \tableofcontents
+
 \thispagestyle{empty}
 \newpage
 
