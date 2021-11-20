@@ -4,7 +4,7 @@
 %%  Copyright (C) 2011-2021 University of Pretoria.
 %%
 
-\section{Design and implementation}
+\section{Design and implementation} \label{sec:Design and Implementation}
 
 % Note on notation and conventions
 % Contour detection
@@ -33,7 +33,7 @@ This section presents a summary of the project design tasks as well as the imple
 		\hline
 		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & \\
 		\hline
-		Design and implementation of shape definition graphical user interface (GUI) based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & \\
+		Design and implementation of shape definition GUI based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p1}Design summary.}
@@ -519,7 +519,7 @@ The second design that needs to be completed in order to complete the robotic su
 %	\label{fig:machined-components}
 %\end{figure}
 
-\subsection{Embedded Robot Controller}
+\subsection{Embedded Robot Controller} \label{sec:Embedded Robot Controller}
 
 The \textit{Robotic System} required an embedded controller to drive the end-effector mechanism and the robotic manipulator developed as part of the mechanical robotic component in Section \ref{sec:Mechancial Robotic Component} as well as to facilitate communication with the \textit{PC System}. Specifically, in service of these requirements, the embedded controller needed to fulfill the following functions:
 
@@ -564,7 +564,7 @@ The DRV8825 driver control inputs and status outputs of interest for this projec
 
 \footnotetext{The overline notation, $\overline{\text{PIN}}$, on a pin name indicates the control input or status output is active low.}
 
-In order to facilitate serial communication with the \textit{PC Subsystem}, the universal asynchronous receiver-transmitter (UART) protocol was selected as the basis for this communication. The selection was made as the communication with the \textit{PC System} was expected to only consist of simple asynchronous control commands and status updates which are easily supported by UART. The universal serial bus (USB) interface of the \textit{PC System} is not directly compatible with the UART serial interface peripheral and, as such, the CH340G integrated circuit (IC) was selected as the communication data conversion point between these two interfaces. The CH340G exposes a transmitter (TX) pin and receiver (RX) pin for the microcontroller to interface with. Therefore, the microcontroller requires one digital input pin, one digital output pin and a UART peripheral to support serial communication. The serial communication component is discussed further in Section \ref{sec:Serial Communication}
+In order to facilitate serial communication with the \textit{PC Subsystem}, the UART protocol was selected as the basis for this communication. The selection was made as the communication with the \textit{PC System} was expected to only consist of simple asynchronous control commands and status updates which are easily supported by UART. The universal serial bus (USB) interface of the \textit{PC System} is not directly compatible with the UART serial interface peripheral and, as such, the CH340G IC was selected as the communication data conversion point between these two interfaces. The CH340G exposes a transmitter (TX) pin and receiver (RX) pin for the microcontroller to interface with. Therefore, the microcontroller requires one digital input pin, one digital output pin and a UART peripheral to support serial communication. The serial communication component is discussed further in Section \ref{sec:Serial Communication}
 
 In addition to the stepper motor and UART control pins, a single digital output pin was required to control the vacuum system servo motor along with a timer peripheral to act as the time base for the pulse width modulation (PWM) signal. An analog input pin, in conjunction with a corresponding analog-to-digital converter (ADC) peripheral, was required to capture the ADP5111 gauge pressure sensor reading. Lastly, for the purpose of reducing the power consumption of the system in idle state, it was elected to make both the robot workspace lighting and embedded controller cooling fan controllable through software. To this end, two additional digital output pins were required in the microcontroller.
 
@@ -832,7 +832,7 @@ The datasheet specifies an error tolerance of $3\%$ for the USART receiver with 
 	\caption{\label{tab:serial-communication-protocol}Serial communication protocol utilised between the \textit{PC System} and the \textit{Robotic System}.}
 \end{table}
 
-\subsection{Shape Definition Interface}
+\subsection{Shape Definition Interface} \label{sec:Shape Definition Interface}
 
 \subsubsection{Background}
 
@@ -1322,7 +1322,7 @@ Since the corners are defined with respect to the image frame, they are also pro
 % TODO: Possibly add algorithm step graphcis
 % TODO: Add cube orientation annotation close up
 
-\subsection{System Controller}
+\subsection{System Controller} \label{sec:System Controller}
 
 The core requirements that the PC-based software needed to fulfil are as follows:
 
