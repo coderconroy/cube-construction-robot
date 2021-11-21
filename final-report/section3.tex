@@ -17,23 +17,21 @@ This section presents a summary of the project design tasks as well as the imple
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{5cm}|>{\raggedright}m{5cm}|>{\raggedright\arraybackslash}m{4cm}|}
+	\begin{tabular}{|>{\raggedright}m{4.6cm}|>{\raggedright}m{6.6cm}|>{\raggedright\arraybackslash}m{3cm}|}
 		\hline
 		\textbf{Deliverable or task} & \textbf{Implementation} & \textbf{Completion of deliverable or task, and section in the report} \\
 		\hline
-		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & \\
+		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & Completed. Section \ref{} \\
 		\hline
-		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & \\
+		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & Completed. Section \ref{} \\
 		\hline
-		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & \\
+		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & Completed. Section \ref{} \\
 		\hline
-		Design of printed circuit board (PCB) for embedded robot controller & The PCB design was completed using the KiCAD software package from first principles. & \\
+		Design of printed circuit board (PCB) for embedded robot controller & The PCB design was completed using the KiCAD software package from first principles. & Completed. Section \ref{} \\
 		\hline
-		Development of firmware for embedded robot controller & Firmware was developed from first principles using C. & \\
+		Development of firmware for embedded robot controller & Firmware was developed from first principles using C. & Completed. Section \ref{} \\
 		\hline
-		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & \\
-		\hline
-		Design and implementation of shape definition GUI based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & \\
+		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & Completed. Section \ref{} \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p1}Design summary.}
@@ -42,17 +40,21 @@ This section presents a summary of the project design tasks as well as the imple
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
-	\begin{tabular}{|>{\raggedright}m{5cm}|>{\raggedright}m{4cm}|>{\raggedright\arraybackslash}m{4cm}|}
+	\begin{tabular}{|>{\raggedright}m{4.6cm}|>{\raggedright}m{6.6cm}|>{\raggedright\arraybackslash}m{3cm}|}
 		\hline
-		Development of computer vision cube detection algorithm & The computer vision cube detection algorithm was developed mostly from first principles using C++. A few basic image image processing functions were used from OpenCV. & \\
+		\textbf{Deliverable or task} & \textbf{Implementation} & \textbf{Completion of deliverable or task, and section in the report} \\
 		\hline
-		Development of computer vision cube localisation algorithm & The computer vision cube detection algorithm was developed mostly from first principles using C++. A few basic image image processing functions and camera calibration functions were used from OpenCV. & \\
+		Design and implementation of shape definition GUI based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & Completed. Section \ref{} \\
 		\hline
-		Development of construction planner software component & The construction planner software component was developed from first principles. & \\
+		Development of computer vision cube detection algorithm & The computer vision cube detection algorithm was developed from first principles using C++. A few basic image image processing functions were used from OpenCV. & Completed. Section \ref{} \\
 		\hline
-		Development of robotic motion planner software component & The robotic motion planner software component was developed from first principles & \\
+		Development of computer vision cube localisation algorithm & The computer vision cube localisation algorithm was developed from first principles using C++. A few basic image image processing functions and camera calibration functions were used from OpenCV. & Completed. Section \ref{} \\
 		\hline
-		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & The system control software was developed from first principles using the QT C++ framework. & \\
+		Development of construction planner software component & The construction planner software component was developed from first principles. & Completed. Section \ref{} \\
+		\hline
+		Development of robotic motion planner software component & The robotic motion planner software component was developed from first principles & Completed. Section \ref{} \\
+		\hline
+		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & The system control software was developed from first principles using the QT C++ framework. & Completed. Section \ref{} \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p2}Design summary continued.}
@@ -527,7 +529,7 @@ The \textit{Robotic System} required an embedded controller to drive the end-eff
 	\item The controller should provide control signals to control the four robotic manipulator stepper motors as well as the vacuum mechanism servo motor.
 	\item The controller should capture the pressure sensor reading in the vacuum system.
 	\item The controller should facilitate bi-directional communication with the \textit{PC System} such that the \textit{PC System} can send control commands to and receive status information from the \textit{Robotic Subsystem}.
-	\item The controller should distribute energy from a power supply to the components in the \item Robotic System including the stepper motors, servo motor, cooling fan (for the embedded controller) and robot workspace lights.
+	\item The controller should distribute energy from a power supply to the components in the \textit{Robotic System} including the stepper motors, servo motor, cooling fan (for the embedded controller) and robot workspace lights.
 	\item The controller should monitor the robotic manipulator limit switches on each Cartesian axis.
 \end{compactitem}
 
@@ -537,7 +539,7 @@ The hardware considerations of the circuit designed to fulfill these requirement
 
 As noted in the project proposal, the motor drivers for the robotic manipulator stepper motors were taken off-the-shelf. The DRV8825 stepper motor driver was selected for this purpose since the driver is capable of supplying up to 1.5 A to the motor which is sufficient for the selected robotic manipulator motors. Specifically, the DRV8825 driver breakout board was selected for use in this project. Each DRV8825 driver exposes four output drive pins to control the current in both coils in the connected stepper motor. Furthermore, the DRV8825 driver exposes a number of input pins to control the operation of the motor and the driver.
 
-The DRV8825 driver control inputs and status outputs of interest for this project are shown in Table \ref{tab:drv8825-input-pins} and their use in this project is detailed in Section \ref{sec:Motor Control}. Therefore, the microcontroller around which the embedded controller is based needs to provide seven digital output pins and one digital input pin is per stepper motor. Furthermore, the STEP pin needs to be controlled with time-sensitive signals and as such one timer peripheral is required for each stepper motor. Since the robotic manipulator makes use of four stepper motors, a total of 28 digital output pins, four digital input pins and four timer peripherals are required in the microcontroller to control the motors.
+The DRV8825 driver control inputs and status outputs of interest for this project are shown in Table \ref{tab:drv8825-input-pins} and their use in this project is detailed in Section \ref{sec:Motor Control}. Therefore, the microcontroller around which the embedded controller is based needs to provide seven digital output pins and one digital input pin per stepper motor. Furthermore, the STEP pin needs to be controlled with time-sensitive signals and as such one timer peripheral is required for each stepper motor. Since the robotic manipulator makes use of four stepper motors, a total of 28 digital output pins, four digital input pins and four timer peripherals are required in the microcontroller to control the motors.
 
 \begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
@@ -559,7 +561,7 @@ The DRV8825 driver control inputs and status outputs of interest for this projec
 		10 & $\overline{\text{FAULT}}$ & Output & Overheat and overcurrent event flag \\
 		\hline
 	\end{tabular}
-	\caption[Caption for LOF]{\label{tab:drv8825-input-pins}DRV8825 breakout board control and status pins.\footnotemark}
+	\caption[Caption for LOF]{\label{tab:drv8825-input-pins}DRV8825 breakout board control and status pins utilised.\footnotemark}
 \end{table}
 
 \footnotetext{The overline notation, $\overline{\text{PIN}}$, on a pin name indicates the control input or status output is active low.}
@@ -573,7 +575,7 @@ In addition to the stepper motor and UART control pins, a single digital output 
 
 In terms of performance, the microcontroller needed to have the computational power to control the four stepper motors almost simultaneously using acceleration profiles. At the same time, the microcontroller needed to control the vacuum system servo motor, monitor the vacuum system pressure and support serial communication with the \textit{PC System}. Furthermore, the use of microstepping to achieve smooth stepper motor motion (see Section \ref{sec:Motor Control}) also increased the computational load as more step pulses needed to be sent to the stepper motor drivers per unit time. The use of an 8-bit microcontroller was considered since it could potentially achieve this performance with highly optimised code. However, in general, 32-bit microcontrollers offer greater computational power which facilitate greater leeway in the stepper motor control computations. Furthermore, the current trend in industry, especially in the 3D printing space, is towards 32-bit controller boards. For these reasons, it was decided to use a 32-bit microcontroller as the basis for the embedded platform. Lastly, with regards to clock speed, controllers with similar requirements to the controller in this project have been successfully implemented using 16 MHz microcontrollers. Therefore, 16 MHz was considered to be the minimum acceptable microcontroller clock speed.
 
-The STM32L072RZT6 microcontroller was selected as the computational foundation for the embedded controller in this project since it satisfied all the digital I/O, peripheral and computational speed requirements discussed above. Note that this microcontroller is part of the STMicroelectronics low-power microcontroller range. The low-power property of this range wasn't strictly necessary for this project since the \textit{Robotic System} uses mains electricity for power. However, due to availability issues resulting from the global semi-conductor shortage, the STM32L072RZT6 chosen over similar microcontrollers that would not be available for the foreseeable future.
+The STM32L072RZT6 microcontroller was selected as the computational foundation for the embedded controller in this project since it satisfied all the digital I/O, peripheral and computational speed requirements discussed above. Note that this microcontroller is part of the STMicroelectronics low-power microcontroller range. The low-power property of this range wasn't strictly necessary for this project since the \textit{Robotic System} uses mains electricity for power. However, due to availability issues resulting from the global semi-conductor shortage, the STM32L072RZT6 was chosen over similar microcontrollers that would not be available for the foreseeable future.
 
 %The general design of 3D printers is similar to the design of the robotic subsystem required in this project in terms of the size of the robotic subsystem, the Cartesian nature of the robot and the number of stepper motors that require control. Therefore, the control board required to be developed for this project will bear resemblance to many existing 3D printer control boards. For this reason, the common microcontrollers used on these control boards were researched and listed below as a starting point for selection:
 
@@ -607,12 +609,11 @@ Note that the NRST pin is not actually necessary with SWD interface programming 
 
 The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range was not necessary. However, the use of the maximum CPU frequency of 32 MHz was preferable. Therefore, range 1 was selected as the power consumption range for this project.
 
-The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. The 3.3 V regulator powering the device needed to be capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all fo the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all fo the I/O pins and control pins combined is 90 mA.
+The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. The 3.3 V regulator powering the device needed to be capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all of the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all of the I/O pins and control pins combined is 90 mA.
 
 According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors needed to be connected across the power supply pins. The $V_{DDA}$ is dedicated a pin dedicated to supplying the ADC with power if a very clean and stable power source is required. For the this project, the ADC was only used to monitor the output of the ADP5111 gauge pressure sensor. Therefore, high ADC performance was not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
 
-The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the PSU and connected by means of an arbitrary length of wire. Therefore, the controller was designed with a $10\mu F$ ceramic 
-capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ is used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which met the stated requirements and reduced the number of components that needed to be sourced.
+The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the power supply unit (PSU) and connected by means of an arbitrary length of wire. Therefore, the controller was designed with a $10\mu F$ ceramic capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ be used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which met the stated requirements and reduced the number of components that needed to be sourced.
 
 %LED Strip
 
@@ -634,7 +635,7 @@ Before the development of the PCB began, a breadboard based prototype of the emb
 After the prototype controller was confirmed to be functioning correctly, the PCB design process was initiated. The PCB design was developed using the KiCAD schematic capture and PCB design software. The design process consisted of two steps. The first step involved the development of the electrical design in which all the electrical component pins were assigned to electrical nodes. In other words, the component connections were defined in this step. This was followed by the PCB component layout and trace routing step. In order to determine the width of the power supply trace used on the PCB, the maximum current that could flow on that trace needed to be determined based on the current ratings of the constituent components. The maximum current ratings of each of the components are listed below:
 
 \begin{compactitem}
-	\item 42BYGHW920L21B2 - 2.2 A
+	\item 42BYGHW920L21B2 stepper motor - 2.2 A
 	\item 42BYGHW609 stepper motor - 1.7 A
 	\item 35BYGH312P1 stepper motor - 1.2 A
 	\item 20BYGH406 stepper motor - 0.6 A
@@ -647,7 +648,7 @@ Based on the sum of these values, the initial power connection trace needed to s
 
 %TODO: Insert equations used to calculate the trace widths
 
-The D+ and D- lines for the USB portion of the USB to serial converter constitute a differential pair. As such, a number of PCB layout guidelines needed to be adhered to ensure the integrity of the differential pair signal. The following guidelines were followed for this purpose:
+The D+ and D- lines for the USB portion of the USB to serial converter constitute a differential pair. As such, a number of PCB layout guidelines needed to be adhered to, to ensure the integrity of the differential pair signal. The following guidelines were followed for this purpose:
 
 % https://resources.pcb.cadence.com/blog/2021-efficient-differential-pair-routing-guidelines-to-speed-up-pcb-routing
 \begin{compactitem}
@@ -738,7 +739,7 @@ The second degree of freedom in control of the servo offered by the PWM signal e
 
 As mentioned in Section \ref{sec:Circuit Design}, the DRV8825 drivers were selected to provide an interface to the microcontroller to control the stepper motors. This interface includes the \textit{STEP} control input, which moves the motor one step\footnote{The size of the step the motor takes is dependent on the microstepping mode configuration.}, as well as the \textit{DIR} control input which indicates the rotational direction in which the step is taken. The first design consideration in the control of the stepper motors is the step resolution, or microstepping mode, employed. The microstepping mode selection control inputs $M0$, $M1$ and $M2$ were connected to the microcontroller as part of the circuit design which allowed the microstepping mode to be selected in software. In general, increasing the step resolution improves the smoothness of the stepper motor rotation but also increases the pulse rate required to move the motor at the same speed. This is turn increases the computational load on the microcontroller.
 
-The DRV8825 supports a maximum of 1/32 microstepping.\footnote{For each step in 1/32 microstepping mode, the motor rotates 1/32 of the full step angle.} Since this project has specifications relating the the accuracy of the system but not the speed of the system, the maximum microstepping mode was selected to reduce vibrations as far as possible. It was noted that increasing the microstepping resolution did not correspond to an increase in position resolution. This is due to the fact that there is an exponential reduction in holding torque in microstep positions as the microstepping resolution increases. For this reason, the motor control firmware was designed such that the stepper motors only make use of microstep positions during the movement phase to reduce vibration and only rest in full step positions.
+The DRV8825 supports a maximum of 1/32 microstepping.\footnote{For each step in 1/32 microstepping mode, the motor rotates 1/32 of the full step angle.} Since this project has specifications relating the accuracy of the system but not the speed of the system, the maximum microstepping mode was selected to reduce vibrations as far as possible. It was noted that increasing the microstepping resolution did not correspond to an increase in position resolution. This is due to the fact that there is an exponential reduction in holding torque in microstep positions as the microstepping resolution increases. For this reason, the motor control firmware was designed such that the stepper motors only make use of microstep positions during the movement phase to reduce vibration and only rest in full step positions.
 
 The simplest form of control for the stepper motors is constant speed control where the rate at which pulses are sent to the motor is always constant. This was the control initially implemented. However, when the pulses are started or stopped, a near instantaneous change in velocity occurred which resulted in a peak in acceleration that induced a mechanical jolt in the \textit{Robotic System}. This limited the maximum motor speed that could be used to ensure the mechanical jolt generated was minimal. To overcome this issue, a linear acceleration profile was implemented for each stepper motor. This was achieved by altering the period of the underlying microcontroller timer peripheral for each stepper motor.
 
@@ -931,7 +932,7 @@ The results of Equations \ref{eqn:opengl-camera-z}, \ref{eqn:opengl-camera-x} an
 
 \begin{equation}
 	\renewcommand*{\arraystretch}{1.3}
-	\matr{T}^{vw}=
+	\matr{M}^{vw}=
 	\begin{bmatrix}
 		\hat{u}^w_{x,0} & \hat{u}^w_{x,1} & \hat{u}^w_{x,2} & 0 \\
 		\hat{u}^w_{y,0} & \hat{u}^w_{y,1} & \hat{u}^w_{y,2} & 0 \\
@@ -949,7 +950,7 @@ The results of Equations \ref{eqn:opengl-camera-z}, \ref{eqn:opengl-camera-x} an
 where $\hat{u}^w_{x,i}$, $\hat{u}^w_{y,i}$, $\hat{u}^w_{z,i}$ and $p^w_{c,i}$ are the \textit{i}th elements of $\hat{\vect{u}}^w_{x}$, $\hat{\vect{u}}^w_{y}$, $\hat{\vect{u}}^w_{z}$ and $\vect{p}^w_{c}$ respectively. The final transformation that was implemented is the mapping of view space to clip space using the projection matrix. The points that are clipped are selected based on their location with respect to a frustum defined in the view frame. Points that fall within this frustum are kept and converted to NDCs while points outside of this frustum are clipped. The shape of this frustum defines the nature of the projection. Specifically, if the frustum is a rectangular prism, the resulting projection is an orthographic projection. However, if the frustum is not a uniform prism, the resulting projection is a perspective projection. The perspective projection is how the world appears to the human eye and, therefore, was selected as the projection method for this project to ease the process of comparing the 3D shape model and the constructed shape. The projection matrix is defined as
 
 \begin{equation}
-	\matr{T}^{cv}=
+	\matr{M}^{cv}=
 	\begin{bmatrix}
 		\frac{n}{r} & 0 & 0 & 0 \\
 		0 & \frac{n}{t} & 0 & 0 \\
@@ -1023,11 +1024,11 @@ The design of the overall system facilitates open-loop operation of the robotic 
 
 \subsubsection{Cube Feature Investigation} \label{sec:Cube Feature Investigation}
 
-Detection of an object in a single-view image generally involves the identification of features in the image which can be compared to a template set of features for the desired object to determine its presence and location in the image. Furthermore, certain features may be used in to generate further information about the object beyond feature matching. For example, edges and corners may be used to identify planes which are combined to identify the presence of a cuboid. The OpenCV C++ library was utilised as the source of various pre-written image processing and machine vision functions required to create a prototype of the feature detection process. Specifically, a set of cube images were captured and the Canny edge detector, Harris corner detector and SIFT feature descriptor implementations were utilised to detect edges, corners and features in the cube images respectively. 
+Detection of an object in a single-view image generally involves the identification of features in the image which can be compared to a template set of features for the desired object to determine its presence and location in the image. Furthermore, certain features may be used to generate further information about the object beyond feature matching. For example, edges and corners may be used to identify planes which are combined to identify the presence of a cuboid. The OpenCV C++ library was utilised as the source of various pre-written image processing and machine vision functions required to create a prototype of the feature detection process. Specifically, a set of cube images were captured and the Canny edge detector, Harris corner detector and SIFT feature descriptor implementations were utilised to detect edges, corners and features in the cube images respectively. 
 
 The primary challenge encountered in cube detection process was the extraction of useful feature information from individual cubes. The aluminium cubes used in this project are a singular shade of grey with an almost textureless surfaces which offers little unique information to detect the cubes. As a result, the prototype feature detection algorithms discussed above performed poorly and did not extract a sufficient number of features to uniquely detect the cubes. Specifically, in even lighting conditions, the Canny edge detector failed to identify internal edges within the outer bounding contour. Similarly, the Harris corner detector failed to consistently identify the corners of the cube while the SIFT algorithm failed to identify a sufficient number of features on the cube itself. The Hough transform parameterised for lines was also explored with limited success.  
 
-The process of image segmentation was also explored to isolate the cubes from the background. Histogram plots showing pixel intensity distributions for each of the RGB colour channels were generated from images containing cubes with various monochrome background colours. Each of he colour channels exhibited nearly identical distributions which indicated the primary information in these images was grey-scale intensity information. The grey-scale histogram information from the images with a matte black background exhibited a peak at greater pixel intensity values corresponding with the cube pixels. Based on this, the cubes were successfully segmented in the image through through application of a binary threshold. 
+The process of image segmentation was also explored to isolate the cubes from the background. Histogram plots showing pixel intensity distributions for each of the RGB colour channels were generated from images containing cubes with various monochrome background colours. Each of the colour channels exhibited nearly identical distributions which indicated the primary information in these images was grey-scale intensity information. The grey-scale histogram information from the images with a matte black background exhibited a peak at greater pixel intensity values corresponding with the cube pixels. Based on this, the cubes were successfully segmented in the image through application of a binary threshold. 
 
 In even lighting conditions, the cube faces could not be distinguished from each other with a significant degree of reliability. This presents a problem as face segmentation is necessary for cube pose estimation. However, when the dominant lighting source was placed directly above the cubes, a peak in the pixel intensity histogram was observed which corresponded to the top face of the cube. This allowed the segmentation of the top face with a great degree of reliability. If the scene is constrained such that cubes are the only objects present and the assumption is made that a cube face is always parallel to the base plane, then the segmented top cube face is sufficient information to detect a cube and uniquely determine its orientation about the z-axis. Therefore, this approach was selected as the basis of the computer vision cube detection component.
 
