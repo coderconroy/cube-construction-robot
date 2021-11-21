@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QListWidget>
+#include <QLabel>
 
 class DesignView: public QWidget
 {
@@ -44,6 +45,10 @@ private:
     QPushButton* saveModel; /*! Save cube world model to file */
     QPushButton* loadModel; /*! Load cube world model from file */
     QPushButton* clearModel; /*! Remove all cubes from the cube world model */
+    QLabel* cubeXPosition;
+    QLabel* cubeYPosition;
+    QLabel* cubeZPosition;
+    QLabel* cubeRotation;
     QMap<QString, const Cube*> cubeMap; /*! Map of items in cube list to cube instances */
     QTimer* openGLTimer; /*! Timer to trigger update of OpenGL shape view */
 

@@ -18,6 +18,10 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	saveModel = new QPushButton("Save Model");
 	loadModel = new QPushButton("Load Model");
 	clearModel = new QPushButton("Clear Model");
+	cubeXPosition = new QLabel("X Position = 0 mm");
+	cubeYPosition = new QLabel("Y Position = 0 mm");
+	cubeZPosition = new QLabel("Z Position = Layer 0");
+	cubeRotation = new QLabel("Rotation = 0 degrees");
 	cubeList = new QListWidget();
 
 	cubeList->setMaximumWidth(200);
@@ -46,6 +50,10 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	controlsLayout->addWidget(clearModel);
 	controlsLayout->addWidget(insertCube);
 	controlsLayout->addWidget(removeCube);
+	controlsLayout->addWidget(cubeXPosition);
+	controlsLayout->addWidget(cubeYPosition);
+	controlsLayout->addWidget(cubeZPosition);
+	controlsLayout->addWidget(cubeRotation);
 	controlsLayout->addWidget(cubeList);
 
 	updateControlState();

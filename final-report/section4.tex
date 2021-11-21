@@ -55,7 +55,7 @@
 		\hline
 		\multicolumn{3}{|l|}{\textbf{Field condition requirements and specifications}} \\
 		\hline
-		The system should work under laboratory conditions. The ambient lighting level should be approximately 500 lux. & & Section 4.2.6 \\
+		The system should work under laboratory conditions. The ambient lighting level should be approximately 500 lux. & The computer vision test was performed in laboratory lighting conditions of approximately 500 lux and worked correctly. & Section 4.2.6 \\
 		\hline
 		The image background should be controlled. The immediate background of the construction cubes in the captured images should be non-reflective and of a single hue.& The immediate image background of the construction cubes was matte black rubber which is non-reflective and is of a single hue. & Section 4.2.6 \\
 		\hline
@@ -108,7 +108,7 @@ The following steps were completed in preparation for this qualification test:
 \begin{compactenum}
 	\item Ensure the \textit{General System Initialisation} procedure has been completed.
 	\item Navigate to the \textit{Construction} view in the system control GUI.
-	\item Click on the \textit{Load model} button and verify the \textit{.cubeworld} test shape files are available for construction.
+	\item Click on the \textit{Load Model} button and verify the \textit{.cubeworld} test shape files are available for construction.
 \end{compactenum}
 
 \textit{Steps followed in the test or experiment}
@@ -188,10 +188,10 @@ The following steps were carried out to execute this qualification test:
 \textit{Test setup and experimental parameters}
 
 The following steps were completed in preparation for this qualification test:
-\begin{compactitem}
+\begin{compactenum}
 	\item Start the system control software on the PC.
 	\item Navigate to the \textit{Shape Design} view in the system control GUI.
-\end{compactitem}
+\end{compactenum}
 
 \textit{Steps followed in the test or experiment}
 
@@ -491,7 +491,7 @@ The following steps were carried out to execute this qualification test:
 	\item Remove the cube from the robot's workspace.
 	\item Let the first and last 200 mm long grid lines be denoted by $y_0$ and $y_1$ respectively. Use the placed ruler to draw a line that extends the full length of the grid and intersects with $y_0$ and $y_1$.
 	\item Repeat steps to 1 to 14 until a total of 18 iterations have been completed using a different 250 mm grid line in each instance.
-	\item Using the digital caliper, measure the deviation of the intersection of for each drawn line with $y_0$ from the intersection of the corresponding 250 mm grid line with $y_0$. Repeat this with $y_1$.
+	\item Using the digital caliper, measure the deviation of the intersection of each drawn line with $y_0$ from the intersection of the corresponding 250 mm grid line with $y_0$. Repeat this with $y_1$.
 	\item Calculate $\phi$, the angle of each drawn line with respect to the corresponding 250 mm grid line as
 	
 \begin{equation}
@@ -638,15 +638,15 @@ The following steps were completed in preparation for this qualification test:
 The following steps were carried out to execute this qualification test:
 
 \begin{compactenum}
-	\item Click on the \textit{Load model} button and select the \textit{.cubeworld} an arbitrary 30 cube test shape file.
+	\item Click on the \textit{Load Model} button and select an arbitrary 30 cube shape model.
 	\item Clear the \textit{Robotic Subsystem's} workspace and place the 30 cubes at the pre-defined \textit{source cube} locations.
 	\item Click on the \textit{Start Construction} button in the system control software to initiate the construction process.
 	\item For each of the first 5 cubes, click the \textit{Release Actuator} button in the system control software to force the robot to drop the cube while carrying the cube to the structure. Note whether the robot detects the dropped cube condition before in the GUI info log before proceeding with construction.
 	\item For cubes 6 to 10, manually remove the cube from the grip of the end-effector during the robot's final downward movement to place the cube and place the cube in the robot's workspace.
 	\item Note whether the robot detects the dropped cube condition before in the GUI info log before proceeding with construction.
-	\item Repeat steps 5 to 6 with cubes 11 to 15, but remove the cube during the robot's horizontal motion while moving the cube to the structure.
-	\item Repeat steps 5 to 6 with cubes 16 to 20, but remove the cube during the robot's upward motion after gripping the cube.
-	\item Repeat steps 5 to 6 with cubes 21 to 25, but remove the cube while the robot is moving to grip the cube.
+	\item Repeat steps 5 to 6 with cubes 11 to 15, but remove the cube from the end-effector during the robot's horizontal motion while moving the cube to the structure.
+	\item Repeat steps 5 to 6 with cubes 16 to 20, but remove the cube from the end-effector during the robot's upward motion after gripping the cube.
+	\item Repeat steps 5 to 6 with cubes 21 to 25, but remove the cube from the end-effector while the robot is moving to grip the cube.
 	\item After the 25th cube has been placed, push the structure under construction until at least 1 cube falls from the structure.
 	\item Note whether the system detects a construction failure condition using the GUI info log.
 	\item Repeat steps 1 to 11 with a different test shape structure until 5 iterations have been completed.

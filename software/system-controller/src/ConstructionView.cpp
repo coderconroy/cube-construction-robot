@@ -53,6 +53,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     idleRobotActuator = new QPushButton("Actuator->Idle");
     actuateRobotActuator = new QPushButton("Actuator->Actuate");
     releaseRobotActuator = new QPushButton("Actuator->Release");
+    executeQTP3 = new QPushButton("Execute QTP 3");
 
     int maxWidth = 200;
     showVisionView->setMaximumWidth(maxWidth);
@@ -66,6 +67,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     idleRobotActuator->setMaximumWidth(maxWidth);
     actuateRobotActuator->setMaximumWidth(maxWidth);
     releaseRobotActuator->setMaximumWidth(maxWidth);
+    executeQTP3->setMaximumWidth(maxWidth);
 
     // Connect button click events to handler slots
     connect(showVisionView, &QPushButton::clicked, this, &ConstructionView::showVisionViewClicked);
@@ -96,6 +98,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotCommandLayout->addWidget(idleRobotActuator);
     robotCommandLayout->addWidget(actuateRobotActuator);
     robotCommandLayout->addWidget(releaseRobotActuator);
+    robotCommandLayout->addWidget(executeQTP3);
 
     // Initialize robot position control
     xPositionLabel = new QLabel("X steps: [0, 1015]");
@@ -312,8 +315,8 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     connect(pressureTimer, &QTimer::timeout, this, &ConstructionView::requestPressureUpdate);
 
     // Initialize source cubes in the world space model
-    //int numCubes = 15;
-    int numCubes = 0;
+    int numCubes = 15;
+    //int numCubes = 0;
     int xStart = 134;
     int xStop = 1015;
     float xStep = ((float) (xStop - xStart)) / (numCubes - 1);

@@ -21,17 +21,17 @@ This section presents a summary of the project design tasks as well as the imple
 		\hline
 		\textbf{Deliverable or task} & \textbf{Implementation} & \textbf{Completion of deliverable or task, and section in the report} \\
 		\hline
-		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & Completed. Section \ref{} \\
+		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & Completed. Section \ref{sec:Mechancial Robotic Component} \\
 		\hline
-		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & Completed. Section \ref{} \\
+		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & Completed. Section \ref{sec:Mechancial Robotic Component} \\
 		\hline
-		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & Completed. Section \ref{} \\
+		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & Completed. Section \ref{sec:Embedded Robot Controller} \\
 		\hline
-		Design of printed circuit board (PCB) for embedded robot controller & The PCB design was completed using the KiCAD software package from first principles. & Completed. Section \ref{} \\
+		Design of printed circuit board (PCB) for embedded robot controller & The PCB design was completed using the KiCAD software package from first principles. & Completed. Section \ref{sec:PCB Design} \\
 		\hline
-		Development of firmware for embedded robot controller & Firmware was developed from first principles using C. & Completed. Section \ref{} \\
+		Development of firmware for embedded robot controller & Firmware was developed from first principles using C. & Completed. Section \ref{sec:Serial Communication} Section \ref{sec:Motor Control} \\
 		\hline
-		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & Completed. Section \ref{} \\
+		Design of communication protocol for communication between the embedded robot controller and the PC-based software & The communication protocol design was completed from first principles and implemented between the embedded robot controller and PC. & Completed. Section \ref{sec:Serial Communication} \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p1}Design summary.}
@@ -44,17 +44,17 @@ This section presents a summary of the project design tasks as well as the imple
 		\hline
 		\textbf{Deliverable or task} & \textbf{Implementation} & \textbf{Completion of deliverable or task, and section in the report} \\
 		\hline
-		Design and implementation of shape definition GUI based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & Completed. Section \ref{} \\
+		Design and implementation of shape definition GUI based on a low-level graphics application programming interface (API) & The shape definition GUI was designed and implemented from first principles using the OpenGL graphics API. & Completed. Section \ref{sec:Shape Definition Interface} \\
 		\hline
-		Development of computer vision cube detection algorithm & The computer vision cube detection algorithm was developed from first principles using C++. A few basic image image processing functions were used from OpenCV. & Completed. Section \ref{} \\
+		Development of computer vision cube detection algorithm & The computer vision cube detection algorithm was developed from first principles using C++. A few basic image processing functions were used from OpenCV. & Completed. Section \ref{sec:Cube Feature Investigation} Section \ref{sec:Top-Level Design} Section \ref{sec:Square Corner Detection} Section\ref{sec:Cube Pose Estimation}  \\
 		\hline
-		Development of computer vision cube localisation algorithm & The computer vision cube localisation algorithm was developed from first principles using C++. A few basic image image processing functions and camera calibration functions were used from OpenCV. & Completed. Section \ref{} \\
+		Development of computer vision cube localisation algorithm & The computer vision cube localisation algorithm was developed from first principles using C++. A few basic image processing functions and camera calibration functions were used from OpenCV. & Completed. Section \ref{sec:3D Localisation} Section \ref{sec:Top-Level Design}  Section \ref{sec:Square Corner Detection} Section \ref{sec:Fiducial Identification} \\
 		\hline
-		Development of construction planner software component & The construction planner software component was developed from first principles. & Completed. Section \ref{} \\
+		Development of construction planner software component & The construction planner software component was developed from first principles. & Completed. Section \ref{sec:Construction Planner} \\
 		\hline
-		Development of robotic motion planner software component & The robotic motion planner software component was developed from first principles & Completed. Section \ref{} \\
+		Development of robotic motion planner software component & The robotic motion planner software component was developed from first principles & Completed. Section \ref{sec:Robotic Motion Planner} \\
 		\hline
-		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & The system control software was developed from first principles using the QT C++ framework. & Completed. Section \ref{} \\
+		Development of system control software that integrates the shape definition, computer vision, construction planner and robotic motion planner software components & The system control software was developed from first principles using the QT C++ framework. & Completed. Section \ref{sec:Integrated Software} \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:design_summary_p2}Design summary continued.}
@@ -104,71 +104,49 @@ A relatively large backlash of 0.3 mm was selected due to the high tolerance req
 
 %Torque Calculations
 
-The point of entry for calculating the various mass elements that need to be translated and rotated is the aluminium cube that needs to be manipulated. The density of aluminum is $2.7 g/cm^3$. Since the cube has a maximum side length of $1.3 cm$, the cube has a maximum mass of $5.94 g$. Using the updated design of the end-effector rod, the 3D model was converted to a triangle mesh and exported to the 3D printing slicer Cura. Using PLA 1.75mm filament, Cura estimated the weight of the part to be 7g when printed at 50\% infill. The following is a summary of the masses of the components that comprise the rotating mass in the end-effector as well as the mass of the cube gripped by the end-effector:
-
-\begin{compactitem}
-	\item Aluminium cube mass = 5.94 g
-	\item 3D printed rotary rod at 50\% infill = 7 g
-	\item ZPT08UN-B5 vacuum pad = 6 g
-	\item M-5AU-6 barbed connector = 1.8 g
-	\item Total mass = 20.74 g
-\end{compactitem}
+The point of entry for calculating the various mass elements that need to be translated and rotated is the aluminium cube that needs to be manipulated. The density of aluminum is $2.7 g/cm^3$. Since the cube has a maximum side length of $1.3 cm$, the cube has a maximum mass of $5.94 g$. Using the updated design of the end-effector rod, the 3D model was converted to a triangle mesh and exported to the 3D printing slicer Cura. Using PLA 1.75mm filament, Cura estimated the weight of the part to be 7g when printed at 50\% infill. The total rotating mass in the end-effector was 20.74 g.
 
 The system does not have any explicit angular velocity and angular acceleration specifications that it is required to meet from the project proposal. Therefore, it is decided that on a qualitative basis that the end-effector should be capable of completing a single rotation once every 4 seconds when at maximum velocity. Similarly, it is also decided that the end-effector should be capable of reaching this speed in 0.5 seconds from standstill. The angular velocity is computed as shown below in Equation \ref{eqn:angular-velocity}.
 
 \begin{align}
-	\omega&=\frac{\Delta \theta}{\Delta t}
-	\label{eqn:angular-velocity} \\
-	\omega&=\frac{2\pi}{4}=\frac{\pi}{2} \text{ rad/s}
+	\omega&=\frac{\Delta \theta}{\Delta t}=\frac{\pi}{2} \text{ rad/s}
+	\label{eqn:angular-velocity}
 \end{align}
 
 The maximum angular acceleration the motor should be capable of driving is as calculated in Equation \ref{eqn:angular-acceleration} below assuming that the system accelerates linearly to the maximum velocity from standstill.
 
 \begin{align}
-	\alpha&=\frac{\Delta \omega}{\Delta t} 
-	\label{eqn:angular-acceleration} \\
-	\alpha&=\frac{\pi / 2 - 0}{0.5 - 0}=\frac{\pi}{4} \text{ rad/s}^2
+	\alpha&=\frac{\Delta \omega}{\Delta t} =\frac{\pi}{4} \text{ rad/s}^2
+	\label{eqn:angular-acceleration}
 \end{align}
 
 In order to calculate the torque required to rotate the end-effector component, the moment of inertia $I_O$ about the centre of rotation $O$ of the component needs to be computed. The component is modeled as a cylinder with a radius of 10 mm and all of its mass located in its outer shell only. This is the cylindrical configuration that has the greatest moment of inertia and therefore requires the greatest torque to rotate. This guarantees that a motor capable of rotating this is capable of rotating the actual component. The moment of inertia for the cylindrical model is calculated as shown in Equation \ref{eqn:moment-of-inertia} below
 
 \begin{align}
-	I_O&=mr^2
-	\label{eqn:moment-of-inertia} \\
-	I_O&=(20.74 \times 10^{-3})(10 \times 10^{-3})^2=2.074 \times 10^{-6} \: kg\cdot m^2
+	I_O&=mr^2=2.074 \times 10^{-6} \: kg\cdot m^2
+	\label{eqn:moment-of-inertia} 
 \end{align}
 
 where $m$ is the mass of the cylinder and $r$ is the radius of the outer shell of the cylinder. In order to relate the kinematic motion of the rotary end-effector component to the external forces applied to it, the moment equation for rotation about a fixed axis $O$ shown in Equation \ref{eqn:moment-equation} below can be used
 
 \begin{align}
-	\sum M_{Oi} = I_O \alpha
-	\label{eqn:moment-equation} \\
-	\sum F_i r_i = I_O \alpha
+	\sum M_{Oi} =\sum F_i r_i = I_O \alpha
+	\label{eqn:moment-equation}
 \end{align}
 
-where $M_{Oi}$ is the moment that results from the application of force $F_i$ at the $i^{th}$ point at perpendicular distance $r_i$ from the axis of rotation $O$. Two external forces to the rotary end-effector component are considered, namely the force of static friction $F_{fs}$ and the force $F_A$ applied to the component gear by the gear on the motor's drive shaft. Only static friction is considered as it is generally greater than kinetic friction and therefore more challenging to overcome. The coefficient of static friction for plastic on plastic used in these calculations is $\mu _s = 0.4$. Furthermore, it is assumed that the friction only acts along the outer edge of the cylinder model since this is requires the most torque to overcome. $F_{fs}$ is computed as shown in equation Equation \ref{eqn:static-friction} below
-
-\begin{align}
-	F_{fs}=\mu _s \times F_N
-	\label{eqn:static-friction}
-\end{align}
-
-where $F_N$ is the normal force from the weight of the end-effector component on the bottom support. Using Equation \ref{eqn:moment-equation}, the force required to accelerate the end-effector component from standstill at the required rate can be calculated as shown in Equation \ref{eqn:Fa-required}
+where $M_{Oi}$ is the moment that results from the application of force $F_i$ at the $i^{th}$ point at perpendicular distance $r_i$ from the axis of rotation $O$. Two external forces to the rotary end-effector component are considered, namely the force of static friction $F_{fs}$ and the force $F_A$ applied to the component gear by the gear on the motor's drive shaft. Only static friction is considered as it is generally greater than kinetic friction and therefore more challenging to overcome. The coefficient of static friction for plastic on plastic used in these calculations is $\mu _s = 0.4$. Furthermore, it is assumed that the friction only acts along the outer edge of the cylinder model since this is requires the most torque to overcome. Using Equation \ref{eqn:moment-equation}, the force required to accelerate the end-effector component from standstill at the required rate can be calculated as shown in Equation \ref{eqn:Fa-required}
 
 \begin{align}
 	&F_A r_A - F_{fs} r_{fs} = I_O \alpha
 	\label{eqn:Fa-required} \\
-	&F_A (10 \times 10^{-3}) - [(0.4)(20.74 \times 10^{-3})(9.81)] (10 \times 10^{-3}) = (2.074 \times 10^{-6})\left(\frac{\pi}{4}\right) \\
 	&F_A = 81.52 \times 10^{-3} \, N
 \end{align}
 
 where $r_A$ and $r_{fs}$ are the distances between the point of force application and the centre of rotation O and for the forces $F_A$ and $F_{fs}$ respectively. Since the gear on the motor shaft is to be 3D printed, its mass is taken to be negligible. Since the pitch circle radius $r_m$ of the motor gear is 10 mm, the torque $\tau$ required to be generated by the motor in order to exert $F_A$ on the end-effector rotor is calculated as shown in Equation \ref{eqn:end-effector-motor-torque} below.
 
 \begin{align}
-	& \tau = F_A \times r_m
+	& \tau = F_A \times r_m = 815.2 \times 10^{-6} \: N \cdot m
 	\label{eqn:end-effector-motor-torque} \\
-	& \tau = (81.55 \times 10^{-3}) \times (10 \times 10^{-3}) \\
-	& \tau = 815.2 \times 10^{-6} \: N \cdot m
 \end{align}
 
 Using an engineering safety factor of 2 to account for inaccuracies in modeling the end-effector rotor and to ensure there is at least a 50\% torque margin for the motor, a minimum required motor holding torque of $1.63 \times 10^{-3} \; N \cdot m$ or $16.63 \; g \cdot cm$. Using the Wantai Motor product line as a reference, the smallest available stepper motor is the 20BYGH202 model which has a holding torque of $\tau_H=140 \; g \cdot cm$, detent torque of $\tau_D=20 \; g \cdot cm$ and a mass of $50 \; g$. The detent torque of the motor refers to the amount of torque generated by the motor when the windings of the motor are not energized. The holding torque, on the other hand, is the amount of torque required to rotate the motor one step when the rotor is stationary but the windings are energized. The running torque $\tau_R$ of the motor is limited by the motor's current rating and at low speeds is equal can be calculated using Equation \ref{eqn:running-torque} below.
@@ -180,68 +158,86 @@ Using an engineering safety factor of 2 to account for inaccuracies in modeling 
 
 The running torque of the 20BYGH202 model is calculated as $\tau_R=100 \; g \cdot cm$ which comfortably meets the torque requirement of $16.63 \; g \cdot cm$. The excess torque can be used to implement greater acceleration or micro-stepping functionality. In the interest of keeping costs down for the project, the ISG component bank was considered when sourcing the motor. The smallest NEMA 8 motor contained in the bank was the 20BYGH406 which has a holding torque of $\tau_H=260 \; g \cdot cm$, detent torque of $\tau_D=50 \; g \cdot cm$ and a mass of $80 \; g$ which yields a running torque of $\tau_R=160 \; g \cdot cm$ which also comfortably meets the torque requirement. The additional $30\;g$ of mass was considered acceptable for the project and, therefore, the 20BYGH406 model was selected as the end-effector motor.
 
-Vacuum Actuator
+\subsubsection{Vacuum Actuation Mechanism}
+%
+%The measured dimensions of the syringe tube are as follows:
+%
+%\begin{compactitem}
+%	\item Outer diameter = 20.80 mm
+%	\item Inner diameter = 18.60 mm
+%	\item Length (excluding nozzle) = 97.00 mm
+%	\item Length (including nozzle) = 108.00 mm
+%	\item Nozzle length = 11.00 mm
+%	\item Nozzle base ridge diameter = 6.24 mm
+%	\item Nozzle base ridge height = 2.04 mm
+%	\item Nozzle base diameter = 4.50 mm
+%	\item Nozzle top outer diameter = 4.00 mm
+%	\item Nozzle top inner diameter = 2.14 mm
+%	\item Shortest distance from nozzle base to main outer tube outer diameter = 1.14 mm
+%	\item Flange diameter = 23.55 mm
+%	\item Flange overall length = 37.04 mm
+%	\item Flange thickness = 1.60 mm
+%	\item Flange edge length = 12.80 mm
+%\end{compactitem}
+%
+%The dimensions of the syringe plunger are as follows:
+%
+%\begin{compactitem}
+%	\item Flange diameter = 21.70 mm
+%	\item Flange thickness = 1.60 mm
+%	\item Flat strut width (wide section) = 18.00 mm
+%	\item Flat strut width (narrow section) = 13.24 mm
+%	\item Strut width transition offset from flange (initial) = 13.30 mm
+%	\item Strut width transition offset from flange (final) = 19.90 mm
+%	\item Length = 111.00 mm
+%	\item Rubber height = 9.609 mm 
+%	\item Flat strut thickness = 1.20 mm
+%	\item Rubber end piece height = 9.00 mm
+%\end{compactitem}
 
-The measured dimensions of the syringe tube are as follows:
+A syringe was used as the basic component to generate the vacuum within the vacuum system. The syringe has a maximum range of linear travel of 78 mm. The servo has a maximum range of rotational motion of $180^{\circ}$. Therefore, in order to achieve the full range of linear motion for the syringe, the mechanism connecting the servo to the syringe needs to translate the servo's $180^{\circ}$ of rotational motion into 78 mm of linear motion. A rack and pinion system is a mechanism that is commonly used for converting translational motion into rotational motion. Therefore, half of the circumference of the pitch diameter circle of the gear needs to be equal to the length of linear travel for these specifications to be achieved. A gear with a pitch diameter of 49.66 mm satisfies this requirement. Therefore, it was selected to use a gear with a pitch diameter of 50 mm. The mechanical connection mechanism to connect the syringe to the servo motor is shown as a 3D model in Figure \ref{fig:vacuum-actuator-model} as well as the physical realisation in Figure \ref{fig:vacuum-actuator} below.
 
-\begin{compactitem}
-	\item Outer diameter = 20.80 mm
-	\item Inner diameter = 18.60 mm
-	\item Length (excluding nozzle) = 97.00 mm
-	\item Length (including nozzle) = 108.00 mm
-	\item Nozzle length = 11.00 mm
-	\item Nozzle base ridge diameter = 6.24 mm
-	\item Nozzle base ridge height = 2.04 mm
-	\item Nozzle base diameter = 4.50 mm
-	\item Nozzle top outer diameter = 4.00 mm
-	\item Nozzle top inner diameter = 2.14 mm
-	\item Shortest distance from nozzle base to main outer tube outer diameter = 1.14 mm
-	\item Flange diameter = 23.55 mm
-	\item Flange overall length = 37.04 mm
-	\item Flange thickness = 1.60 mm
-	\item Flange edge length = 12.80 mm
-\end{compactitem}
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{figures/vacuum-actuator-model.PNG}
+%	\caption{3D model of vacuum actuator designed in Fusion 360.}
+%	\label{fig:vacuum-actuator-model}
+%\end{figure}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{figures/vacuum-actuator.JPG}
+%	\caption{Physical vacuum actuator model manufactured using 3D printing processes.}
+%	\label{fig:vacuum-actuator}
+%\end{figure}
 
-The dimensions of the syringe plunger are as follows:
-
-\begin{compactitem}
-	\item Flange diameter = 21.70 mm
-	\item Flange thickness = 1.60 mm
-	\item Flat strut width (wide section) = 18.00 mm
-	\item Flat strut width (narrow section) = 13.24 mm
-	\item Strut width transition offset from flange (initial) = 13.30 mm
-	\item Strut width transition offset from flange (final) = 19.90 mm
-	\item Length = 111.00 mm
-	\item Rubber height = 9.609 mm 
-	\item Flat strut thickness = 1.20 mm
-	\item Rubber end piece height = 9.00 mm
-\end{compactitem}
-
-The syringe has a maximum range of linear travel of 78 mm. The servo has a maximum range of rotational motion of $180^{\circ}$. Therefore, in order to achieve the full range of linear motion for the syringe, the mechanism connecting the servo to the syringe needs to translate the servo's $180^{\circ}$ of rotational motion into 78 mm of linear motion. A rack and pinion system is a mechanism that is commonly used for converting translational motion into rotational motion. Therefore, half of the circumference of the pitch diameter circle of the gear needs to be equal to the length of linear travel for these specifications to be achieved. A gear with a pitch diameter of 49.66 mm satisfies this requirement. Therefore, it was selected to use a gear with a pitch diameter of 50 mm. The mechanical connection mechanism to connect the syringe to the servo motor is shown as a 3D model in Figure \ref{fig:vacuum-actuator-model} as well as the physical realisation in Figure \ref{fig:vacuum-actuator} below.
-
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/vacuum-actuator-model.PNG}
-	\caption{3D model of vacuum actuator designed in Fusion 360.}
-	\label{fig:vacuum-actuator-model}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/vacuum-actuator-model.PNG}
+		\caption{3D vacuum actuator model}
+		\label{fig:vacuum-actuator-model}
+	\end{subfigure}%
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/vacuum-actuator.JPG}
+		\caption{Physical vacuum actuator}
+		\label{fig:vacuum-actuator}
+	\end{subfigure}%
+	\caption{Vacuum generation mechanism for the end-effector mechanism.}
+	\label{fig:vacuum-generator}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/vacuum-actuator.JPG}
-	\caption{Physical vacuum actuator model manufactured using 3D printing processes.}
-	\label{fig:vacuum-actuator}
-\end{figure}
-
-\subsubsection{Robotic Manipulator}
-
-The general motor-driven gantry robotic system design is currently the leading option for use in this project's solution. The reasons for this are as follows:
-
-\begin{compactitem}
-	\item A gantry-style robotic system offers the most structural stability due to the multiple mounting points for both the frame as well as the moving sub-components within the system. This mechanical stability improves the precision of the system which is one of the leading requirements in this application. It is for this reason that the gantry design is common in other high-precision applications such as pick-and-place operations in circuit manufacturing.
-	\item Due to the Cartesian nature of the gantry movement, the precision of the system is relatively constant across all coordinates in the workspace. This stands in contrast to robotic arms which experience a deterioration in accurary as the distance from the robotic base increases.
-	\item The frame of the gantry has the potential to include an integrated mount for the computer vision camera/s. This would allow the camera to always operate from a similar point relative to the workspace and reduce the inaccuracies that are introduced from positional shifts of the camera each time the system is used.
-\end{compactitem}
+%\subsubsection{Robotic Manipulator}
+%
+%The general motor-driven gantry robotic system design is currently the leading option for use in this project's solution. The reasons for this are as follows:
+%
+%\begin{compactitem}
+%	\item A gantry-style robotic system offers the most structural stability due to the multiple mounting points for both the frame as well as the moving sub-components within the system. This mechanical stability improves the precision of the system which is one of the leading requirements in this application. It is for this reason that the gantry design is common in other high-precision applications such as pick-and-place operations in circuit manufacturing.
+%	\item Due to the Cartesian nature of the gantry movement, the precision of the system is relatively constant across all coordinates in the workspace. This stands in contrast to robotic arms which experience a deterioration in accurary as the distance from the robotic base increases.
+%	\item The frame of the gantry has the potential to include an integrated mount for the computer vision camera/s. This would allow the camera to always operate from a similar point relative to the workspace and reduce the inaccuracies that are introduced from positional shifts of the camera each time the system is used.
+%\end{compactitem}
 
 \subsubsection{End-Effector Assembly}
 
@@ -257,18 +253,36 @@ The end-effector mount was designed to fulfil to following requirements:
 
 Figure \ref{fig:end-effector-disassembled} shows the end-effector mount and supporting components that were designed to meet these requirements along with the 20BYGH406 stepper motor and vacuum rod. The end-effector mount, motor mount and vacuum rod top mound were originally designed as a single piece. The vacuum rod top mount was separated as a component to facilitate the insertion of the vacuum rod into the end-effector assembly. The motor mount was similarly separated to facilitate the manufacturing of this part using FDM 3D printing methods as the overhang was not capable of being printed without support. Figure \ref{fig:end-effector-assembled} shows the same components when assembled to form the complete end-effector mount assembly.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/end-effector-disassembled.png}
-	\caption{Disassembled end-effector mount assembly.}
-	\label{fig:end-effector-disassembled}
-\end{figure}
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{figures/end-effector-disassembled.png}
+%	\caption{Disassembled end-effector mount assembly.}
+%	\label{fig:end-effector-disassembled}
+%\end{figure}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.3\linewidth]{figures/end-effector-assembled.png}
+%	\caption{Assembled end-effector mount assembly.}
+%	\label{fig:end-effector-assembled}
+%\end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.3\linewidth]{figures/end-effector-assembled.png}
-	\caption{Assembled end-effector mount assembly.}
-	\label{fig:end-effector-assembled}
+	\begin{subfigure}{.59\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/end-effector-disassembled.png}
+		\caption{Disassembled end-effector mount}
+		\label{fig:end-effector-disassembled}
+	\end{subfigure}%
+	\begin{subfigure}{.4\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/end-effector-assembled.png}
+		\caption{Assembled end-effector mount.}
+		\label{fig:end-effector-assembled}
+	\end{subfigure}%
+	\caption{End-effector mount assembly that provides the mechanical connection between the end-effector mechanism and the robotic manipulator.}
+	\label{fig:end-effector-assembly}
 \end{figure}
 
 \subsubsection{Z-Axis Assembly}
@@ -279,46 +293,62 @@ Another variation of this approach is to include the linear guides as well as th
 
 With the approach including both the z-axis drive mechanism as well as the linear guides as part of the z-axis assembly, there are two primary design decisions. These are with regards to the selection of the linear guide components as well as the selection of the linear drive mechanism. The most popular drive mechanisms are the lead screw drive solution and the timing belt based drive mechanism. Timing belts are beneficial when the load needs to be moved over a relatively large distance at a relatively high speed. However, they generally require larger motors with more torque. Therefore, they are suited to motion along directions where they are not working against gravity. Lead screw drives, on the other hand, generally require small motors with less torque to drive the same load and are suited to moving loads slowly and accurately over small distances. Since the z-axis motor forms part of the moving z-axis assembly in the design approach discussed above, a smaller motor is preferable to reduce the moving mass of the assembly. Secondly, the range of motion along the z-axis is relatively small compared to the range of motion required along the x and y axes. Therefore a lead screw drive approach was selected for the z-axis assembly.
 
-There are two popular linear guide mechanisms with regards to motion along the z-axis. The first is the linear rail guide which has excellent characteristics when it comes to resisting forces and torque in any other direction than its line of travel. Unfortunately, these preferable characteristics come at a cost. The linear rails in themselves are not completely stiff and need to be mounted to a supporting structure such as an aluminium v-slot extrusion which would increase the moving mass of the z-axis assembly to an unreasonable level. Secondly, the financial cost of the linear rails per relatively high. Therefore, linear rails were not selected for linear motion along the z-axis. Rather the alternative linear guide mechanism, namely linear rods, was selected instead. Specifically, 8mm diameter chromed steel linear rods were selected since they are one of smallest linear rod diameters available and the vertical nature of the z-axis assembly does not exert much torque on the linear rails.
+There are two popular linear guide mechanisms with regards to motion along the z-axis. The first is the linear rail guide which has excellent characteristics when it comes to resisting forces and torque in any other direction than its line of travel. Unfortunately, these preferable characteristics come at a cost. The linear rails in themselves are not completely stiff and need to be mounted to a supporting structure such as an aluminium v-slot extrusion which would increase the moving mass of the z-axis assembly to an unreasonable level. Secondly, the financial cost of the linear rails per relatively high. Therefore, linear rails were not selected for linear motion along the z-axis. Rather the alternative linear guide mechanism, namely linear rods, was selected instead. Specifically, 8mm diameter chromed steel linear rods were selected since they are one of smallest linear rod diameters available and the vertical nature of the z-axis assembly does not exert much torque on the linear rails. Figure \ref{fig:z-axis-assembly} shows how all of these components are integrated to form the final z-axis assembly.
+%
+%Figure \ref{fig:end-effector-disassembled} shows that the end-effector mount already incorporates mounting points for the linear rods. A custom component needed to be designed to complete the z-axis assembly and needed to perform the following functions:
+%
+%\begin{compactitem}
+%	\item It should provide a mounting location for the 35BYGH312P1 stepper motor in an orientation with the drive shaft at the bottom aligned with the z-axis.
+%	\item It should provide mounting points for the 8mm diameter linear chromed steel rods.
+%	\item It should provide a mounting point for the first line of the drag chain that will be used to route the cables for the 20BYGH406 stepper motor, the 35BYGH312P1 stepper motor and finally the vacuum tubing coming from the vacuum rod.
+%\end{compactitem}
+%
+%Figure \ref{fig:z-axis-motor-mount} shows the component that was designed in order to meet these requirements. The component was designed in a such a manner that it is amenable to being manufactured using the process of FDM 3D printing with the use of supports for the overhang used to mount the drag chain link.
 
-Figure \ref{fig:end-effector-disassembled} shows that the end-effector mount already incorporates mounting points for the linear rods. A custom component needed to be designed to complete the z-axis assembly and needed to perform the following functions:
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.4\linewidth]{figures/z-axis-motor-mount.png}
+%	\caption{Z-axis motor mount.}
+%	\label{fig:z-axis-motor-mount}
+%\end{figure}
 
-\begin{compactitem}
-	\item It should provide a mounting location for the 35BYGH312P1 stepper motor in an orientation with the drive shaft at the bottom aligned with the z-axis.
-	\item It should provide mounting points for the 8mm diameter linear chromed steel rods.
-	\item It should provide a mounting point for the first line of the drag chain that will be used to route the cables for the 20BYGH406 stepper motor, the 35BYGH312P1 stepper motor and finally the vacuum tubing coming from the vacuum rod.
-\end{compactitem}
+%The components that the z-axis assembly comprises of are summarised in the list below:
+%
+%\begin{compactitem}
+%	\item End-effector mount assembly
+%	\item Z-axis motor mount
+%	\item 8mm diameter, 8mm pitch lead screw of length 168mm
+%	\item 8mm diameter to 5mm diameter rigid coupling to connect the lead screw to the shaft of the stepper motor
+%	\item 35BYGH312P1 stepper motor
+%	\item 2x 8mm diameter linear chromed steel rods of length 195mm
+%\end{compactitem}
 
-Figure \ref{fig:z-axis-motor-mount} shows the component that was designed in order to meet these requirements. The component was designed in a such a manner that it is amenable to being manufactured using the process of FDM 3D printing with the use of supports for the overhang used to mount the drag chain link.
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.4\linewidth]{figures/z-axis-assembly.png}
+%	\caption{Z-axis assembly.}
+%	\label{fig:z-axis-assembly}
+%\end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.4\linewidth]{figures/z-axis-motor-mount.png}
-	\caption{Z-axis motor mount.}
-	\label{fig:z-axis-motor-mount}
+	\begin{subfigure}{.6\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/x-axis-assembly.png}
+		\caption{X-axis assembly.}
+		\label{fig:x-axis-assembly}
+	\end{subfigure}%
+	\begin{subfigure}{.39\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/z-axis-assembly.png}
+		\caption{Z-axis assembly.}
+		\label{fig:z-axis-assembly}
+	\end{subfigure}%
+	\caption{Assembled z-axis assembly and its integration into the x-axis assembly.}
+	\label{fig:z-x-axis-assemblies}
 \end{figure}
 
-The components that the z-axis assembly comprises of are summarised in the list below:
-
-\begin{compactitem}
-	\item End-effector mount assembly
-	\item Z-axis motor mount
-	\item 8mm diameter, 8mm pitch lead screw of length 168mm
-	\item 8mm diameter to 5mm diameter rigid coupling to connect the lead screw to the shaft of the stepper motor
-	\item 35BYGH312P1 stepper motor
-	\item 2x 8mm diameter linear chromed steel rods of length 195mm
-\end{compactitem}
-
-Figure \ref{fig:z-axis-assembly} shows how all of these components are integrated to form the final z-axis assembly.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.6\linewidth]{figures/z-axis-assembly.png}
-	\caption{Z-axis assembly.}
-	\label{fig:z-axis-assembly}
-\end{figure}
-
-Z-Axis Mount
+\subsubsection{Z-Axis Mount}
 
 It was decided to use aluminium v-slot extrusions as the foundation of the robotic subsystem primarily due to the design flexibility offered this structure. The profile of the extrusion offers considerable stiffness required by the frame structure as well as mounting locations along any position of the structure by means of T-nuts. Furthermore, the v-shape present along the grooves in the extrusion allow the extrusion to be used as a linear guide. The extrusion was not considered as an option for a linear guide in the z-axis assembly due to its comparatively large mass compared to the mass of the z-assembly. However, in comparison to the mass of the x-axis assembly, the mass of the extrusion is much more reasonable and offers greater structural support in comparison to other linear guides such as linear chromed steel rods. The fact that the aluminium v-slot extrusion approach was selected for the rest of the robotic subsystem structure combined with the reasons discussed earlier was considered sufficient to select an aluminium extrusion as the x-axis linear guide. To assist in countering the torque generated about the x-axis by the z-axis assembly, it was decided to use a 2040 aluminium v-slot extrusion as opposed to a 2020 aluminium v-slot extrusion.
 
@@ -334,35 +364,56 @@ Linear motion along the aluminium v-slot extrusion is facilitated by v-slot whee
 	\item The component needs to support assembly with all of its supporting components.
 \end{compactitem}
 
-\begin{figure}[H]
+Figure \ref{fig:z-axis-mount} shows the z-axis mount developed to meet these requirements with various design features relating to these requirements highlighted. The walls of the eccentric spacer measure 1.76 mm and 0.34 mm. That means the bolt may be offset a maximum of 0.71 mm in any direction from the centre of the outer radius of the eccentric spacer which is accommodated in the design by the feature identified as the eccentric M5 nut slot. Figure \ref{fig:z-axis-mount-assembled} shows the z-axis mount assembled. The 8mm pitch lead screw nut can be seen centred near the bottom of the component. One of the timing belt clamps can be seen placed over the timing belt clamp slot on the side of the z-axis mount.
+
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.35\linewidth]{figures/z-axis-mount.png}
+%	\caption{Z-axis mount component for the z-axis assembly without supporting components.}
+%	\label{fig:z-axis-mount}
+%\end{figure}
+
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.35\linewidth]{figures/z-axis-mount.png}
-	\caption{Z-axis mount component for the z-axis assembly without supporting components.}
-	\label{fig:z-axis-mount}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/z-axis-mount.png}
+		\caption{Plain z-axis mount}
+		\label{fig:z-axis-mount}
+	\end{subfigure}%
+	\begin{subfigure}{.35\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/z-axis-mount-assembled.png}
+		\caption{Assembled z-axis mount}
+		\label{fig:z-axis-mount-assembled}
+	\end{subfigure}%
+	\caption{3D design of the z-axis mounting component and its integration with supporting components.}
+	\label{fig:z-axis-mount-container}
 \end{figure}
 
-Figure \ref{fig:z-axis-mount} shows the z-axis mount developed to meet these requirements with various design features relating to these requirements highlighted. The walls of the eccentric spacer measure 1.76 mm and 0.34 mm. That means the bolt may be offset a maximum of 0.71 mm in any direction from the centre of the outer radius of the eccentric spacer which is accommodated in the design by the feature identified as the eccentric M5 nut slot.
 
-The following components are used in conjunction with the z-axis mount:
+%The following components are used in conjunction with the z-axis mount:
+%
+%\begin{compactitem}
+%	\item 4x delrin solid v-wheels
+%	\item 4x LM8UU linear bearings
+%	\item 8mm pitch delrin lead screw nut
+%	\item 2x eccentric nuts for v-wheels
+%	\item 4x M5x30 DIN 84 slotted cheese head machine screws
+%	\item 4x M5 washers
+%	\item 2x custom designed timing belt clamps
+%\end{compactitem}
 
-\begin{compactitem}
-	\item 4x delrin solid v-wheels
-	\item 4x LM8UU linear bearings
-	\item 8mm pitch delrin lead screw nut
-	\item 2x eccentric nuts for v-wheels
-	\item 4x M5x30 DIN 84 slotted cheese head machine screws
-	\item 4x M5 washers
-	\item 2x custom designed timing belt clamps
-\end{compactitem}
 
-Figure \ref{fig:z-axis-mount-assembled} shows the z-axis mount assembled with all the components listed above is shown from an angled perspective from below the component. The 8mm pitch lead screw nut can be seen centred near the bottom of the component. One of the timing belt clamps can be seen placed over the timing belt clamp slot on the side of the z-axis mount.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.3\linewidth]{figures/z-axis-mount-assembled.png}
-	\caption{Z-axis mount component for the z-axis assembly with supporting components.}
-	\label{fig:z-axis-mount-assembled}
-\end{figure}
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.3\linewidth]{figures/z-axis-mount-assembled.png}
+%	\caption{Z-axis mount component for the z-axis assembly with supporting components.}
+%	\label{fig:z-axis-mount-assembled}
+%\end{figure}
+
+
 
 \subsubsection{X-Axis Assembly}
 
@@ -370,12 +421,12 @@ For the purposes of this project, the x-axis assembly is defined in a similar ma
 
 The second design consideration is the selection of the drive mechanism. Again, a lead screw approach was considered against a timing belt based approach. In this situation, the drive mechanism does not need to work directly against gravity as was the case with z-axis assembly. Furthermore, the range of motion of the x-axis assembly is significantly greater than that of the z-axis assembly. Based on these factors, in conjunction with the discussion of the drive mechanisms covered during the z-axis assembly analysis, the timing belt approach was selected. Due to the existence of the v-wheels to connect the z-axis mount to the aluminium extrusion, it was identified as being significantly more complicated to route the timing belt with the flat face parallel to the base plane. However, there were no obvious restrictions in routing the timing belt with the front face parallel to the x-axis aluminium v-slot extrusion. Furthermore, the aluminium v-slot extrusion facilitates the routing of the far side of the belt through the centre of the extrusion. For these reasons, it was decided to route the timing belt in this manner. Therefore, with all of the above considered, the x-axis assembly is defined to only consist of the z-axis mount as well as the z-axis assembly. Figure \ref{fig:x-axis-assembly} shows x-axis assembly positioned on the x-axis aluminium v-slot extrusion.
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.8\linewidth]{figures/x-axis-assembly.png}
-	\caption{X-axis assembly consisting of the z-axis mount supporting the z-axis assembly.}
-	\label{fig:x-axis-assembly}
-\end{figure}
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.6\linewidth]{figures/x-axis-assembly.png}
+%	\caption{X-axis assembly consisting of the z-axis mount supporting the z-axis assembly.}
+%	\label{fig:x-axis-assembly}
+%\end{figure}
 
 \subsubsection{Y-Axis Assembly}
 
@@ -394,79 +445,103 @@ For these reasons, the linear rail was selected as the linear guide along the y-
 	\item The component needs to be capable of being manufactured using FDM 3D printing techniques.
 \end{compactitem}
 
-Figure \ref{fig:x-axis-mount-left} shows the left x-axis mount that was designed to meet these requirements along with indications of the roles of the various parts of the design. Similarly, the requirements of the second component are:
+Figure \ref{fig:x-axis-mount-left} shows the left x-axis mount that was designed to meet these requirements along with indications of the roles of the various parts of the design. Similarly, the right x-axis mount was designed in a similar manner and the result is shown in Figure \ref{fig:x-axis-mount-right}.
 
-\begin{compactitem}
-	\item The component needs to connect the right side of the x-axis 2040 aluminium v-slot extrusion to the right MGN12H linear bearing.
-	\item The component needs to provide a mounting point for an idler pulley for a 6mm timing.
-	\item The component needs to facilitate the movement of the idler pulley along the x-axis to allow the x-axis timing belt to be adjusted to the correct tension.
-	\item The component needs to provide a timing belt clamping point on both sides of the component for the right y-axis timing belt.
-	\item The component needs to facilitate the routing of the x-axis timing belt.
-	\item The component needs to be capable of being manufactured using FDM 3D printing techniques.
-\end{compactitem}
+%the requirements of the second component are:
 
-Figure \ref{fig:x-axis-mount-right} shows the right x-axis mount that was designed to meet these requirements along with indications of the roles of the various parts of the design.
+%\begin{compactitem}
+%	\item The component needs to connect the right side of the x-axis 2040 aluminium v-slot extrusion to the right MGN12H linear bearing.
+%	\item The component needs to provide a mounting point for an idler pulley for a 6mm timing.
+%	\item The component needs to facilitate the movement of the idler pulley along the x-axis to allow the x-axis timing belt to be adjusted to the correct tension.
+%	\item The component needs to provide a timing belt clamping point on both sides of the component for the right y-axis timing belt.
+%	\item The component needs to facilitate the routing of the x-axis timing belt.
+%	\item The component needs to be capable of being manufactured using FDM 3D printing techniques.
+%\end{compactitem}
 
-\begin{figure}[H]
+%Figure \ref{fig:x-axis-mount-right} shows the right x-axis mount that was designed to meet these requirements along with indications of the roles of the various parts of the design.
+
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.45\linewidth]{figures/x-axis-mount-left.png}
+%	\caption{X-axis assembly left mount.}
+%	\label{fig:x-axis-mount-left}
+%\end{figure}
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.4\linewidth]{figures/x-axis-mount-right.png}
+%	\caption{X-axis assembly right mount.}
+%	\label{fig:x-axis-mount-right}
+%\end{figure}
+
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.45\linewidth]{figures/x-axis-mount-left.png}
-	\caption{X-axis assembly left mount.}
-	\label{fig:x-axis-mount-left}
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=1\linewidth]{figures/x-axis-mount-left.png}
+		\caption{X-axis assembly left mount.}
+		\label{fig:x-axis-mount-left}
+	\end{subfigure}%
+	\begin{subfigure}{.49\textwidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{figures/x-axis-mount-right.png}
+		\caption{X-axis assembly right mount.}
+		\label{fig:x-axis-mount-right}
+	\end{subfigure}%
+	\caption{Mounting pair for the left and right sides of the x-axis assembly.}
+	\label{fig:x-axis-assembly-mounts}
 \end{figure}
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.4\linewidth]{figures/x-axis-mount-right.png}
-	\caption{X-axis assembly right mount.}
-	\label{fig:x-axis-mount-right}
-\end{figure}
-
-The components that comprise the y-axis assembly are as follows:
-
-\begin{compactitem}
-	\item X-axis assembly
-	\item X-axis 2040 aluminium v-slot extrusion of length 320mm
-	\item Left x-axis mount
-	\item Right x-axis mount
-	\item 2x MGN12H linear bearings
-	\item 42BYGHW609 stepper motor
-	\item 4x custom timing belt clamps
-	\item 20 tooth GT2 pulley for GT2 timing belt
-	\item Idler pulley for 6mm belt
-\end{compactitem}
+%The components that comprise the y-axis assembly are as follows:
+%
+%\begin{compactitem}
+%	\item X-axis assembly
+%	\item X-axis 2040 aluminium v-slot extrusion of length 320mm
+%	\item Left x-axis mount
+%	\item Right x-axis mount
+%	\item 2x MGN12H linear bearings
+%	\item 42BYGHW609 stepper motor
+%	\item 4x custom timing belt clamps
+%	\item 20 tooth GT2 pulley for GT2 timing belt
+%	\item Idler pulley for 6mm belt
+%\end{compactitem}
 
 \subsubsection{Final Assembly}
 
-The highest level component of the robotic subsystem at this point in the design is the y-axis assembly. In order to complete the design, several components still need to be developed, namely the belt tensioners to be used on both the left and right y-axis timing belts as well as the y-axis drive mechanism. The y-axis belt tensioners have identical functions with the only difference being their operation on opposite sides of the robotic subsystem. Therefore, the left and right y-axis timing belt tensioners are mirror images of each other and essentially share the same design. The y-axis belt tensioner component needs to meet the following requirements.
+%The highest level component of the robotic subsystem at this point in the design is the y-axis assembly. In order to complete the design, several components still need to be developed, namely the belt tensioners to be used on both the left and right y-axis timing belts as well as the y-axis drive mechanism. 
 
-\begin{compactitem}
-	\item The component needs to provide a mounting point for the idler pulley for a 6mm timing belt.
-	\item The component needs to facilitate mounting of itself to the aluminium v-slot frame of the robotic subsystem.
-	\item The component needs to facilitate adjustment of the position of the idler pulley along the y-axis to allow the tension of the y-axis timing belt to be adjusted.
-	\item The component needs to be capable of being manufactured using FDM 3D printing techniques.
-\end{compactitem}
+%The y-axis belt tensioners have identical functions with the only difference being their operation on opposite sides of the robotic subsystem. Therefore, the left and right y-axis timing belt tensioners are mirror images of each other and essentially share the same design. The y-axis belt tensioner component needs to meet the following requirements.
+%
+%\begin{compactitem}
+%	\item The component needs to provide a mounting point for the idler pulley for a 6mm timing belt.
+%	\item The component needs to facilitate mounting of itself to the aluminium v-slot frame of the robotic subsystem.
+%	\item The component needs to facilitate adjustment of the position of the idler pulley along the y-axis to allow the tension of the y-axis timing belt to be adjusted.
+%	\item The component needs to be capable of being manufactured using FDM 3D printing techniques.
+%\end{compactitem}
+%
+%Figure \ref{fig:y-axis-belt-tensioner-right} shows the y-axis belt tensioner that was designed to fulfil these requirements on the right side of the robotic subsystem.
+%
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.4\linewidth]{figures/y-axis-belt-tensioner-right.png}
+%	\caption{Y-axis belt tensioner for the right drive side.}
+%	\label{fig:y-axis-belt-tensioner-right}
+%\end{figure}
 
-Figure \ref{fig:y-axis-belt-tensioner-right} shows the y-axis belt tensioner that was designed to fulfil these requirements on the right side of the robotic subsystem.
+%The second design that needs to be completed in order to complete the robotic subsystem is the y-axis drive mechanism. 
+
+The primary requirement of the y-axis drive mechanism is that it needs to be capable of driving the y-axis timing belts on both the left and right side of the robotic subsystem. The obvious basis of this mechanism is to use a dual shaft stepper motor with each shaft used to drive one of the y-axis timing belts. The 42BYGHW920L21B2 stepper motor was selected for this characteristic. Unfortunately, the length of the stepper motor is not sufficient to drive each belt directly off each shaft. Instead it was decided to drive only the left side y-axis timing belt directly off the shaft using a 20 tooth pulley for a 6mm GT2 timing belt with a 5mm bore. In order to drive the right side y-axis timing belt, the torque needs to be transferred from the stepper motor shaft to a pulley connected to the timing belt. It was decided to use an 8mm linear chromed steel rod in order to transfer this torque to a 20 tooth pulley for a 6mm GT2 timing belt with a 8mm bore. An 8mm diameter to 5mm diameter coupling is required to connect the stepper motor shaft to the 8mm linear rod. The rigid coupling is not sufficient to support the linear rod along the drive axis. Therefore, two KP08 8mm pillow block bearings were introduced to support the linear rod. In order to connect the pillow blocks to the aluminium v-slot extrusion frame of the robotic subsystem, two custom connector components needed to be designed. Similarly, a component needed to be designed to connect the 42BYGHW920L21B2 stepper motor to the frame as well. All of the components discussed above form the y-axis drive mechanism. The final robotic system assembly is shown in Figure \ref{fig:final-assembly}.
+
+%\begin{figure}[H]
+%	\centering
+%	\includegraphics[width=0.7\linewidth]{figures/y-axis-drive-assembly.png}
+%	\caption{Y-axis drive assembly.}
+%	\label{fig:y-axis-drive-assembly}
+%\end{figure}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.4\linewidth]{figures/y-axis-belt-tensioner-right.png}
-	\caption{Y-axis belt tensioner for the right drive side.}
-	\label{fig:y-axis-belt-tensioner-right}
-\end{figure}
-
-The second design that needs to be completed in order to complete the robotic subsystem is the y-axis drive mechanism. The primary requirement of this mechanism is that it needs to be capable of driving the y-axis timing belts on both the left and right side of the robotic subsystem. The obvious basis of this mechanism is to use a dual shaft stepper motor with each shaft used to drive one of the y-axis timing belts. The 42BYGHW920L21B2 stepper motor was selected for this characteristic. Unfortunately, the length of the stepper motor is not sufficient to drive each belt directly off each shaft. Instead it was decided to drive only the left side y-axis timing belt directly off the shaft using a 20 tooth pulley for a 6mm GT2 timing belt with a 5mm bore. In order to drive the right side y-axis timing belt, the torque needs to be transferred from the stepper motor shaft to a pulley connected to the timing belt. It was decided to use an 8mm linear chromed steel rod in order to transfer this torque to a 20 tooth pulley for a 6mm GT2 timing belt with a 8mm bore. An 8mm diameter to 5mm diameter coupling is required to connect the stepper motor shaft to the 8mm linear rod. The rigid coupling is not sufficient to support the linear rod along the drive axis. Therefore, two KP08 8mm pillow block bearings were introduced to support the linear rod. In order to connect the pillow blocks to the aluminium v-slot extrusion frame of the robotic subsystem, two custom connector components needed to be designed. Similarly, a component needed to be designed to connect the 42BYGHW920L21B2 stepper motor to the frame as well. All of the components discussed above form the y-axis drive mechanism which is shown attached to the robotic subsystem in Figure \ref{fig:y-axis-drive-assembly}. The final robotic subsystem assembly is shown in Figure \ref{fig:final-assembly}.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/y-axis-drive-assembly.png}
-	\caption{Y-axis drive assembly.}
-	\label{fig:y-axis-drive-assembly}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.9\linewidth]{figures/final-assembly.png}
+	\includegraphics[width=0.7\linewidth]{figures/final-assembly.png}
 	\caption{Final robotic subsystem assembly.}
 	\label{fig:final-assembly}
 \end{figure}
@@ -587,33 +662,20 @@ The STM32L072RZT6 microcontroller was selected as the computational foundation f
 %	\item The SAM3X8E microcontroller is used on the Archim2 board.
 %\end{compactitem}
 
-
-
 %TODO: Possibly add table summarising microcontroller requirements and show how the STM32L072RZT6 meets these requirements
 
-The STM32L0 microcontroller series does not support the JTAG programming interface. However, the SWD programming interface is supported. Therefore, the SWD approach was used to program the device and the following five pins on the STM32L072RZT6 were used in service of this:
-
-\begin{compactitem}
-	\item SWDIO - Data input/output
-	\item SWCLK - Clock signal
-	\item NRST - Reset signal
-	\item VDD - Supply voltage
-	\item GND - Ground reference
-\end{compactitem}
-
-Note that the NRST pin is not actually necessary with SWD interface programming since SWD bypasses the bootloader and is capable of resetting and flashing the device directly.
 
 %TODO: Insert list of pin connections used on the microcontrollers
 
-\subsubsection{Power Regulation}
-
-The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range was not necessary. However, the use of the maximum CPU frequency of 32 MHz was preferable. Therefore, range 1 was selected as the power consumption range for this project.
-
-The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. The 3.3 V regulator powering the device needed to be capable of supporting this current. Furthermore, all I/O pins except FTf pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all of the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all of the I/O pins and control pins combined is 90 mA.
-
-According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors needed to be connected across the power supply pins. The $V_{DDA}$ is dedicated a pin dedicated to supplying the ADC with power if a very clean and stable power source is required. For the this project, the ADC was only used to monitor the output of the ADP5111 gauge pressure sensor. Therefore, high ADC performance was not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
-
-The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the power supply unit (PSU) and connected by means of an arbitrary length of wire. Therefore, the controller was designed with a $10\mu F$ ceramic capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ be used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which met the stated requirements and reduced the number of components that needed to be sourced.
+%\subsubsection{Power Regulation}
+%
+%The STM32L072xx series supports a power supply of 1.65-3.6 V. However, this full range is only applicable under certain conditions. The microcontrollers in the series feature three power consumption ranges depending on the system's maximum operating frequency as well as the external voltage supply. Range 1 supports a CPU speed of up to the maximum 32 MHz but limits the $V_{DD}$ range to 1.71-3.6 V. Range 2 and 3 both support the full power supply range but only support a maximum CPU frequency of up to 16 MHz and 4.2 MHz respectively. For the purposes of this project, access to the full power supply range was not necessary. However, the use of the maximum CPU frequency of 32 MHz was preferable. Therefore, range 1 was selected as the power consumption range for this project.
+%
+%The $V_{DD}$ pins on the device can source a maximum of 100 mA individually and 105 mA combined while the $V_{SS}$ pins combined can sink a maximum of 100 mA individually and 105 mA combined. The 3.3 V regulator powering the device needed to be capable of supporting this current. Furthermore, all I/O pins can both sink and source a maximum output current of 16 mA individually. The total output current that can be sunk by all of the I/O pins and control pins combined (excluding PA11 and PA12) is 90 mA. The total output current that can be sunk by I/O pins PA11 and PA12 is 25 mA. The total output current that can be sourced by all of the I/O pins and control pins combined is 90 mA.
+%
+%According to the general PCB design guidelines in the STM32L072x8/B/Z datasheet, $1\mu F$ ceramic decoupling capacitors in parallel with $100 nF$ ceramic decoupling capacitors needed to be connected across the power supply pins. The $V_{DDA}$ is dedicated a pin dedicated to supplying the ADC with power if a very clean and stable power source is required. For the this project, the ADC was only used to monitor the output of the ADP5111 gauge pressure sensor. Therefore, high ADC performance was not required and it was decided to supply the ADC with the same power supply as for the rest of the device.
+%
+%The datasheet for the NCP1117 voltage regulators recommend the use of an input bypass capacitor if the device is significantly far away from the power source. The robotic controller PCB board is separate to the power supply unit (PSU) and connected by means of an arbitrary length of wire. Therefore, the controller was designed with a $10\mu F$ ceramic capacitor across the input terminals of each NCP1117 voltage regulator. Similarly, in order to provide frequency compensation for the voltage regulator, the datasheet recommends a capacitor with a capacitance of at least $4.7\mu F$ be used. The capacitor may be of any type as long as it has an equivalent series resistance of between $33m\Omega$ and $2.2\Omega$. Therefore, it was decided to use the same capacitor as the bypass input capacitor which met the stated requirements and reduced the number of components that needed to be sourced.
 
 %LED Strip
 
@@ -623,7 +685,7 @@ The datasheet for the NCP1117 voltage regulators recommend the use of an input b
 
 \subsubsection{PCB Design} \label{sec:PCB Design}
 
-Before the development of the PCB began, a breadboard based prototype of the embedded controller was first created to identify any issues present with the circuit design. In order to provide breadboard access to the SMD STM32L072RZT6 microcontroller, the device was soldered to a TQFP breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which was removed using solder wick. Finally, the solder flux residue was cleaned using IPA. The final robotic controller prototype is shown in Figure \ref{fig:robotic-controller-prototype}.
+Before the development of the PCB began, a breadboard based prototype of the embedded controller was first created to identify any issues present with the circuit design. In order to provide breadboard access to the SMD STM32L072RZT6 microcontroller, the device was soldered to a TQFP breakout board with a pin pitch of 0.5mm. Due to the fine pitch of the pins, solder flux was required to be used in conjunction with the drag solder hand soldering technique for the process to be successful. Furthermore, several bridges formed during the initial drag solder pass which were removed using solder wick. Finally, the solder flux residue was cleaned using IPA. The final robotic controller prototype is shown in Figure \ref{fig:robotic-controller-prototype}.
 
 \begin{figure}[H]
 	\centering
@@ -718,10 +780,6 @@ In addition to the PCB design components discussed above, the PCB was designed i
 
 %TODO: Add images of other PCBs
 
-\subsubsection{Firmware}
-
-\ldots
-
 \subsubsection{Motor Control} \label{sec:Motor Control}
 
 The DS3118MG servo motor used as the actuation driver for the vacuum generation mechanism and has a angular rotation range of $180\degree$. The medium of control for the servo motor is a PWM signal that has two degrees of freedom which motor responds to. Firstly, the period of the PWM signal determines the fraction of the angular rotation range available to the servo motor. The input period can be set from 3 ms to 20 ms (333 Hz to 50 Hz) where a period of 20 ms corresponds to the full range of rotation for the servo. Since the vacuum generation mechanism was designed on the assumption that the servo operates with $180\degree$ of rotational motion, 20 ms was chosen as the PWM period.
@@ -745,64 +803,9 @@ The simplest form of control for the stepper motors is constant speed control wh
 
 \subsubsection{Serial Communication} \label{sec:Serial Communication}
 
-A communication protocol needs to be developed between the robotic controller and the PC running the GUI software. The PC needs to be able to issue the following commands to the robotic controller:
+A communication protocol needed to be developed between the robotic controller and the PC running the system control software. It was noted that the maximum data unit that needed to be transmitted between the \textit{Robotic Subsystem} and the PC-based software component was a command instruction the robot to move to a target position. Since the position of each of the robot's axes was specified by a 16 bit number, eight data bytes were required to contain this information. Furthermore, an additional control byte was required to distinguish between the purpose of each data byte for a given packet. Each packet was formed by specifying the control byte followed with a concatenation of the four data bytes. The definitions assigned to each of the control bytes are also determined by the direction of transmission and given in Table \ref{tab:serial-communication-protocol}.
 
-\begin{compactitem}
-	\item Calibrate axes - The robot must home its motor to find the zero position on each axis as indicated when each limit switch is triggered. The robot must also place the rotational motor into sleep mode briefly to allow any rotational tension on the vacuum tube to be released. Following this the rotational motor must be removed from sleep mode and its current angular position reset as the zero angular position. 
-	\item Go to position - The robot must move to the specified position in 3D Cartesian space as well as the specified z-axis angular position.
-	\item Actuate vacuum mechanism - Set the actuation of the servo motor controlling the vacuum mechanism
-	\item Report pressure in vacuum system
-\end{compactitem}
-
-For the serial communication component, a word length of 8 bits was selected with no parity bit and 1 stop bit as this the most common structure used and there was no reason to choose an altered structure. A baud rate of 115200 bits/s was also selected with the maximum oversampling rate of 16 samples chosen to minimise the effective noise during data reception. The value of USARTDIV in the \textit{USART\_BRR} register of the STM32L072RZT6 is used to define the baud rate. Different equations are used to compute the baud rate based on the oversampling frequency used. For an oversampling rate of 16, the baud equation is
-
-\begin{equation}
-	\text{Baud Rate}=\frac{f_{CK}}{\textit{USARTDIV}},
-\end{equation}
-
-where $f_{CK}$ is the system clock frequency. Given that $f_{CK}=32MHz$, the value of \textit{USARTDIV} is calculated as 
-
-\begin{align}
-	\text{USARTDIV}&=\frac{f_{CK}}{\text{Baud Rate}},\\
-	&=\frac{32\times10^6}{115200},\\
-	&=277.78\approx278.
-\end{align} 
-
-Since USARTDIV must be an integer value, a quantisation error is introduced when $f_{CK}$ is not divisible by
-the baud rate. In order for the USART receiver to function correctly when operating in asynchronous mode, the total deviation of the clock system must be within the USART receiver's tolerances. The actual baud rate achieved using the quantised USARTDIV value is 
-
-\begin{align}
-	\text{Actual Baud Rate}&=\frac{f_{CK}}{\text{USARTDIV}},\\
-	&=\frac{32\times10^6}{278},\\
-	&=115107.91\;\text{bits/s}.
-\end{align}
-
-The baud rate error can then be calculated as
-
-\begin{align}
-	\text{\% Error}&=\frac{\text{Actual Baud Rate - Desired Baud Rate}}{\text{Desired Baud Rate}} \times 100,\\
-	&=\frac{115107.91-115200}{15200} \times 100,\\
-	&=-0.08\;\text{\%}.
-\end{align}
-
-The datasheet specifies an error tolerance of $3\%$ for the USART receiver with the given configuration. Therefore, the error is acceptable and has sufficient margin to account for other error sources such as transmitter clock deviation, local oscillator deviation and errors introduced by the transmission line.
-
-\begin{table}[H]
-	\renewcommand{\arraystretch}{1.3}
-	\centering
-	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10cm}|}
-		\hline
-		\textbf{} & \textbf{} & \textbf{} \\
-		\hline
-		\multicolumn{3}{|l|}{\textbf{}} \\
-		\hline
-		 & & \\
-		\hline
-	\end{tabular}
-	\caption{\label{tab:packet-format}Packet format.}
-\end{table}
-
-\begin{table}[H]
+\begin{table}[!ht]
 	\renewcommand{\arraystretch}{1.3}
 	\centering
 	\begin{tabular}{|>{\raggedright}m{1.5cm}|>{\raggedright}m{3cm}|>{\raggedright\arraybackslash}m{10cm}|}
@@ -811,27 +814,63 @@ The datasheet specifies an error tolerance of $3\%$ for the USART receiver with 
 		\hline
 		\multicolumn{3}{|l|}{\textbf{\textit{PC System} to \textit{Robotic System}}} \\
 		\hline
-		0x1 & Wake & \\
+		0x1 & Wake & Place the stepper motors into active state from sleep state. \\
 		\hline
-		0x2 & Calibrate & \\
+		0x2 & Calibrate & Initiate the robot calibration sequence to move along each and find the limit switch on linear axis. \\
 		\hline
-		0x3 & Set target position & \\
+		0x3 & Set target position & Set the desired step position on each axis to define the position to which the robot will move. \\
 		\hline
-		0x4 & Actuate vacuum mechanism & \\
+		0x4 & Actuate vacuum mechanism & Move the vacuum system servo motor the suction position. \\
 		\hline
-		0x5 & Delay & \\
+		0x5 & Delay & Delay the robot's command complete return packet by a short period of time. \\
 		\hline
-		0x6 & Request pressure update & \\
+		0x6 & Request pressure update & Trigger the \textit{Robotic System} to respond with a packet containing the pressure sensor reading. \\
 		\hline
 		\multicolumn{3}{|l|}{\textbf{\textit{Robotic System} to \textit{PC System}}} \\
 		\hline
-		0x1 & Command complete & \\
+		0x1 & Command complete & Indicates the previously received packet has been processed successfully. \\
 		\hline
-		0x6 & Pressure update & \\
+		0x6 & Pressure update & Sends the current reading of the pressure sensor. \\
 		\hline
 	\end{tabular}
 	\caption{\label{tab:serial-communication-protocol}Serial communication protocol utilised between the \textit{PC System} and the \textit{Robotic System}.}
 \end{table}
+
+For the serial communication component required to facilitate the use of this protocol, a word length of 8 bits was selected with no parity bit and 1 stop bit as this the most common structure used and there was no reason to choose an altered structure. A baud rate of 115200 bits/s was also selected with the maximum oversampling rate of 16 samples chosen to minimise the effective noise during data reception. 
+
+
+%The value of USARTDIV in the \textit{USART\_BRR} register of the STM32L072RZT6 is used to define the baud rate. Different equations are used to compute the baud rate based on the oversampling frequency used. For an oversampling rate of 16, the baud equation is
+%
+%\begin{equation}
+%	\text{Baud Rate}=\frac{f_{CK}}{\textit{USARTDIV}},
+%\end{equation}
+%
+%where $f_{CK}$ is the system clock frequency. Given that $f_{CK}=32MHz$, the value of \textit{USARTDIV} is calculated as 
+%
+%\begin{align}
+%	\text{USARTDIV}&=\frac{f_{CK}}{\text{Baud Rate}},\\
+%	&=\frac{32\times10^6}{115200},\\
+%	&=277.78\approx278.
+%\end{align} 
+%
+%Since USARTDIV must be an integer value, a quantisation error is introduced when $f_{CK}$ is not divisible by
+%the baud rate. In order for the USART receiver to function correctly when operating in asynchronous mode, the total deviation of the clock system must be within the USART receiver's tolerances. The actual baud rate achieved using the quantised USARTDIV value is 
+%
+%\begin{align}
+%	\text{Actual Baud Rate}&=\frac{f_{CK}}{\text{USARTDIV}},\\
+%	&=\frac{32\times10^6}{278},\\
+%	&=115107.91\;\text{bits/s}.
+%\end{align}
+%
+%The baud rate error can then be calculated as
+%
+%\begin{align}
+%	\text{\% Error}&=\frac{\text{Actual Baud Rate - Desired Baud Rate}}{\text{Desired Baud Rate}} \times 100,\\
+%	&=\frac{115107.91-115200}{15200} \times 100,\\
+%	&=-0.08\;\text{\%}.
+%\end{align}
+%
+%The datasheet specifies an error tolerance of $3\%$ for the USART receiver with the given configuration. Therefore, the error is acceptable and has sufficient margin to account for other error sources such as transmitter clock deviation, local oscillator deviation and errors introduced by the transmission line.
 
 \subsection{Shape Definition Interface} \label{sec:Shape Definition Interface}
 
@@ -839,29 +878,20 @@ The datasheet specifies an error tolerance of $3\%$ for the USART receiver with 
 
 The second system specification for this project requires the development of a PC-based GUI software component that allows the user to define 3D shapes to be constructed by the robot using the small construction cubes. Furthermore, this specification also indicates that this software component must make use of graphical primitives to generate a 3D render of the shape as part of this process. To this extent, the OpenGL specification was selected as the basis for the 3D rendering component. DirectX was considered as an alternative to OpenGL. However, DirectX is only supported for the Windows operating system and XBox while OpenGL is cross-platform. The C++ QT framework used as the basis for the PC-based software component is inherently cross-platform and also offers better support for OpenGL integration which justified its selection for use in this project. It is noted that OpenGL is only a specification for a graphics API and not an implementation in itself. This API is usually implemented by the graphics card manufacturers. Furthermore, it is noted that OpenGL can be considered to be a state machine which is referred to as the graphical context. The behaviour of various OpenGL instructions depends on the state of the OpenGL context.
 
-The approach to developing the \textit{Shape Definition} component was split into two phases. The first phase involved the prototype development of the component in an environment isolated from the QT environment. The Graphics Library Framework (GLFW) was used to provide a simple window to render and manage the OpenGL context in as well as to provide basic mechanisms of interaction with this window through computer peripherals. Secondly, as OpenGL is just a specification, there are a number of versions of drivers that implement this specification. However, the location of these drivers is usually unknown at the point of compilation and, as a result, their locations need to be fetched upon execution of the OpenGL dependent program. In order to overcome this issue, the OpenGL loading library, GLAD, was used to fetch the location of such drivers and makes them available for use in the OpenGL prototype. The second phase of the \textit{Shape Definition} component development process involved the integration of the OpenGL prototype with the QT-based PC software component. Specifically, the \textit{QOpenGLWidget} QT class was used to facilitate this, which is essentially an OpenGL wrapper class that allows native OpenGL API calls and offers functionality similar to both GLFW and GLAD.
+%The approach to developing the \textit{Shape Definition} component was split into two phases. The first phase involved the prototype development of the component in an environment isolated from the QT environment. The Graphics Library Framework (GLFW) was used to provide a simple window to render and manage the OpenGL context in as well as to provide basic mechanisms of interaction with this window through computer peripherals. Secondly, as OpenGL is just a specification, there are a number of versions of drivers that implement this specification. However, the location of these drivers is usually unknown at the point of compilation and, as a result, their locations need to be fetched upon execution of the OpenGL dependent program. In order to overcome this issue, the OpenGL loading library, GLAD, was used to fetch the location of such drivers and makes them available for use in the OpenGL prototype. The second phase of the \textit{Shape Definition} component development process involved the integration of the OpenGL prototype with the QT-based PC software component. Specifically, the \textit{QOpenGLWidget} QT class was used to facilitate this, which is essentially an OpenGL wrapper class that allows native OpenGL API calls and offers functionality similar to both GLFW and GLAD.
 
-The foundation of rendering using OpenGL is centred around the use of vertices. Specifically, a number of vertices are defined as the starting point for various objects to be rendered in 3D. These vertices are assembled into primitive shapes such as lines, triangles, quadrilaterals and other polygons depending on the OpenGL context. Triangles were used as the primitive shape created from vertices in this project since it is straightforward to define cubes through the use of triangles and most OpenGL hardware supports render acceleration for triangles. Surfaces are created by generating a number of these shapes adjacent to each other with varying sizes and orientations. These vertices and shapes encounter a number of processes and transformations when being converted from a description in 3D space to a collection of pixels on a 2D computer screen. There are approximately six such steps in this process which are known as the six stages of the graphics pipeline which is shown in Figure \ref{fig:graphics-pipeline}.
+The foundation of rendering using OpenGL is centred around the use of vertices. Specifically, a number of vertices are defined as the starting point for various objects to be rendered in 3D. These vertices are assembled into primitive shapes such as lines, triangles, quadrilaterals and other polygons depending on the OpenGL context. Triangles were used as the primitive shape created from vertices in this project since it is straightforward to define cubes through the use of triangles and most OpenGL hardware supports render acceleration for triangles. Surfaces are created by generating a number of these shapes adjacent to each other with varying sizes and orientations. These vertices and shapes encounter a number of processes and transformations when being converted from a description in 3D space to a collection of pixels on a 2D computer screen. There are approximately six such steps in this process which are known as the six stages of the graphics pipeline. Two of these steps require an implementation to be defined when using OpenGL, namely the vertex shader and the fragment shader. These shaders were written using the  OpenGL Shading Language (GLSL)\footnote{GLSL is a high-level language with C-style syntax that executes on graphics hardware and allows modification of the graphics pipeline.}. In order to define the positions and orientations of the various objects to be rendered as well as how they are transformed to 2D space on the screen, a number of coordinate systems and transformation matrices are required.
 
-% TODO: Replace graphics pipeline image
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/graphics-pipeline.PNG}
-	\caption{Six stages of the graphics pipeline.}
-	\label{fig:graphics-pipeline}
-\end{figure}
-
-Two of the stages shown in Figure \ref{fig:graphics-pipeline} require an implementation to be defined when using OpenGL, namely the vertex shader and the fragment shader. These shaders were written using the  OpenGL Shading Language (GLSL)\footnote{GLSL is a high-level language with C-style syntax that executes on graphics hardware and allows modification of the graphics pipeline.}. In order to define the positions and orientations of the various objects to be rendered as well as how they are transformed to 2D space on the screen, a number of coordinate systems and transformation matrices are required. These are shown in Figure \ref{fig:transformation-matrices} below.
+% These are shown in Figure \ref{fig:transformation-matrices} below.
 
 % TODO: Replace transformation matrix image with custom renders of cube in each of these states
 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=1\linewidth]{figures/transformation-matrices.PNG}
-	\caption{Transformation matrices involved in mapping the vertices from local space to screen space.}
-	\label{fig:transformation-matrices}
-\end{figure}
+%\begin{figure}[!ht]
+%	\centering
+%	\includegraphics[width=1\linewidth]{figures/transformation-matrices.PNG}
+%	\caption{Transformation matrices involved in mapping the vertices from local space to screen space.}
+%	\label{fig:transformation-matrices}
+%\end{figure}
 
 The object is described in the local frame \textit{l} with the origin of the frame of reference usually located somewhere on or within the object. The world frame \textit{w} is the space  that relates the position, orientation and scale of all the objects to be rendered together. The matrix that maps the local frame to the world frame is known as the model matrix, denoted here by $\matr{M}^{wl}$. Similarly, the view of the world, usually thought of as a camera, has its own coordinate system called view space \textit{v}. The world space is mapped to this view space by means of the view matrix $\matr{M}^{vw}$. This defines the point of view the world is seen from. Lastly, it is noted that the coordinates that are mapped to the screen need to be normalized device coordinates (NDC) where all vertex values of the coordinate axes are between 0 and 1. Any vertex outside of this space will not be projected onto the screen. As such, this space is called clip space \textit{c} and the projection matrix $\matr{M}^{cv}$ is used to map from view space to clip space. The projection matrix can be used to define the nature of this clip space and as such can be used to control the projection perspective. 
 
@@ -963,8 +993,8 @@ where $\hat{u}^w_{x,i}$, $\hat{u}^w_{y,i}$, $\hat{u}^w_{z,i}$ and $p^w_{c,i}$ ar
 where $n$ and $f$ are the near and far z-planes of the projection frustum respectively in the view frame. Furthermore, $r$ and $t$ are the right and top bounding x- and y-planes respectively for the near frustum z-plane. Equation \ref{eqn:projection-matrix} assumes that the frustum exhibits x and y symmetry such that the left and bottom bounding planes need not be specified. It was found to be more intuitive to parameterise the projection in terms of the frustum angle $\alpha$ and aspect ratio $\beta$ of the frustum z-planes alongside $f$ and $n$. To this end, $n/r$ and $n/t$ in Equation \ref{eqn:projection-matrix} are computed as
 
 \begin{align}
-	\frac{n}{r}&=\frac{1}{\alpha\tan(\beta/2)}\\
-	\frac{n}{r}&=\frac{1}{\tan(\beta/2)}
+	\frac{n}{r}&=\frac{1}{\alpha\tan(\beta/2)},\\
+	\frac{n}{r}&=\frac{1}{\tan(\beta/2)}.
 \end{align} 
 
 \begin{figure}[!ht]
@@ -991,25 +1021,25 @@ where $n$ and $f$ are the near and far z-planes of the projection frustum respec
 	\label{fig:opengl}
 \end{figure}
 
-By defining cubes using vertex arrays and manipulating these vertices as described above, a pyramid 3D shape that the robot could build was rendered as shown in Figure \ref{fig:initial-opengl} below.
-
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=0.8\linewidth]{figures/initial-opengl-shape.PNG}
-	\caption{3D render of pyramid shape generated using OpenGL within QT framework.}
-	\label{fig:initial-opengl}
-\end{figure}
-
-
-\subsubsection{User Control}
-
-The desired camera behaviour was defined as follows:
-
-\begin{compactitem}
-	\item The camera frame x-axis should remain parallel to the world xz plane.
-	\item The camera movement about a point should always be on the surface of a dome about that point when not translating or zooming.
-	\item As the camera rotates the camera should continue to look at the same focal point.
-\end{compactitem}
+%By defining cubes using vertex arrays and manipulating these vertices as described above, a pyramid 3D shape that the robot could build was rendered as shown in Figure \ref{fig:initial-opengl} below.
+%
+%\begin{figure}[!ht]
+%	\centering
+%	\includegraphics[width=0.8\linewidth]{figures/initial-opengl-shape.PNG}
+%	\caption{3D render of pyramid shape generated using OpenGL within QT framework.}
+%	\label{fig:initial-opengl}
+%\end{figure}
+%
+%
+%\subsubsection{User Control}
+%
+%The desired camera behaviour was defined as follows:
+%
+%\begin{compactitem}
+%	\item The camera frame x-axis should remain parallel to the world xz plane.
+%	\item The camera movement about a point should always be on the surface of a dome about that point when not translating or zooming.
+%	\item As the camera rotates the camera should continue to look at the same focal point.
+%\end{compactitem}
 
 %\begin{compactitem}
 %	\item Camera control by means of computer peripherals was implemented. The right mouse button can be used to control the rotation of the camera about a given focal point. The middle mouse button can be used to translate the camera horizontally in the world scene.
@@ -1063,14 +1093,14 @@ The location of the cube with respect to the robot needs to be determined from t
 
 % TODO: Include image of robot coordinate system, image coordinate system and camera coordinate
 
-The pinhole camera model shown in Figure \ref{fig:pinhole-camera-model} was used as the foundation for the mapping methods discussed here. This model requires that several parameters about the camera and its orientation to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that are required to be performed to map arbitrary point $\vect{p}^w$ to $\vect{p}^c$. These transformations are captured by the rotation-translation matrix $[\matr{R}|\vect{t}]$.
+The pinhole camera model was used as the foundation for the mapping methods discussed here. This model requires that several parameters about the camera and its orientation to be known. These parameters can be divided into two categories, namely intrinsic and extrinsic parameters. Intrinsic parameters describe internal properties inherent to the camera itself and include the principal point $(c_x,c_y)$ as well as the focal lengths ($f_x$ and $f_y$) of the camera. Extrinsic parameters describe the location and orientation of the camera with respect to the world coordinate system and include the rotation and translation transformations that are required to be performed to map arbitrary point $\vect{p}^w$ to $\vect{p}^c$. These transformations are captured by the rotation-translation matrix $[\matr{R}|\vect{t}]$.
 
-\begin{figure}[!ht]
-	\centering
-	\includegraphics[width=0.7\linewidth]{figures/pinhole-camera-model.png}
-	\caption{Diagram showing the parameters of the pinhole camera model. Source: INSERT}
-	\label{fig:pinhole-camera-model}
-\end{figure}
+%\begin{figure}[!ht]
+%	\centering
+%	\includegraphics[width=0.7\linewidth]{figures/pinhole-camera-model.png}
+%	\caption{Diagram showing the parameters of the pinhole camera model. Source: \cite{OpenCV:Camera_Calibration}}
+%	\label{fig:pinhole-camera-model}
+%\end{figure}
 
 The intrinsic parameters of the camera can be expressed as a calibration matrix $\matr{K}$ defined as
 
@@ -1227,7 +1257,7 @@ In order to make use of the mathematical tools discussed above, the intrinsic pa
 
 \subsubsection{Top-Level Design} \label{sec:Top-Level Design}
 
-The \textit{System Controller} maintains a non-probabilistic belief state for the location and orientation of each cube with respect to the robot's coordinate system. Furthermore, four mutually exclusive states are used to distinguish between cubes. A \textit{source cube} is a cube that is believed to be in its known initial position while a \textit{structure cube} is believed to have been successfully placed in its designated position within the 3D shape under construction. If no unexpected events occur during the construction process, each cube will only exist in either of one these two states. The two unexpected events the system is expected to deal with are the dropped cube case and the structural damage case. If the vacuum system pressure sensor detects that a cube is dropped during manipulation by the robot, the cube is classified as a \textit{missing cube}. A cube that is detected by the \textit{Vision System} that is not in an expected \textit{source cube} or \textit{structure cube} location is classified as an \textit{independent cube}. The \textit{System Controller} is able to deal with both the dropped cube case and the structural damage case when the position and orientation of all \textit{independent cubes} with respect to the robot's coordinate system are provided. This is discussed in greater detail in Section <INSERT>. As such, the purpose of the \textit{Vision System} is to detect and localise all \textit{independent cubes} with respect to the robot given the image input data of the robot's workspace. The expected location of the \textit{source cubes} and the \textit{structure cubes} with respect to the robot for a given time instance are also required as input to distinguish these cubes from the \textit{independent cubes}.
+The \textit{System Controller} maintains a non-probabilistic belief state for the location and orientation of each cube with respect to the robot's coordinate system. Furthermore, four mutually exclusive states are used to distinguish between cubes. A \textit{source cube} is a cube that is believed to be in its known initial position while a \textit{structure cube} is believed to have been successfully placed in its designated position within the 3D shape under construction. If no unexpected events occur during the construction process, each cube will only exist in either of one these two states. The two unexpected events the system is expected to deal with are the dropped cube case and the structural damage case. If the vacuum system pressure sensor detects that a cube is dropped during manipulation by the robot, the cube is classified as a \textit{missing cube}. A cube that is detected by the \textit{Vision System} that is not in an expected \textit{source cube} or \textit{structure cube} location is classified as an \textit{independent cube}. The \textit{System Controller} is able to deal with both the dropped cube case and the structural damage case when the position and orientation of all \textit{independent cubes} with respect to the robot's coordinate system are provided. As such, the purpose of the \textit{Vision System} is to detect and localise all \textit{independent cubes} with respect to the robot given the image input data of the robot's workspace. The expected location of the \textit{source cubes} and the \textit{structure cubes} with respect to the robot for a given time instance are also required as input to distinguish these cubes from the \textit{independent cubes}.
 
 % TODO: Possibly insert cube state diagram
 
@@ -1246,9 +1276,9 @@ Following the preprocessing step, contour detection is applied to the binary ima
 
 With the set of fiducial and cube candidate contours compiled, the next phase of the algorithm is concerned with the classification of these contours. Firstly, the contours that enclose fiducial markers are identified as part of the fiducial identification step (see Section \ref{sec:Fiducial Identification}) which includes the extraction of the unique fiducial identifier values. The location of each fiducial in the world coordinate system is known and retrieved from a look-up table based on the fiducial identifier. The location of the fiducial within the image coordinate system is taken as the location of the fiducial contour centroid. With this information, a point correspondence between the world coordinate system and image coordinate system can be formed for each fiducial and used to compute the extrinsic camera parameters as discussed in Section \ref{sec:3D Localisation}. Furthermore, the methods to map between the image frame and world frame may now be used with the camera extrinsics calibrated. The base plane of the robot was controlled such that the workspace only contains cubes and fiducials. By restricting the remaining contours under consideration to only those that are detected within the robot's workspace, these contours are guaranteed to be artifacts of construction cubes since the fiducial contours have already been identified.
 
-The rectangular bounding region of the robot's workspace is aligned with the world coordinate system. As such, it is trivial to determine if a point falls within this region if the point is also defined in the world frame. Therefore, to determine if the centroid point of a given contour in the image frame falls within the bounding region, the point is first projected to the world coordinate system using Equation \ref{eqn:expanded-pinhole-camera-mapping-final}. As noted in section \ref{sec:3D Localisation}, when projecting from image space to world space, it is necessary to specify the $Z$ plane of projection in the world frame. Since the camera captured images from the vertical perspective, it was considered sufficient to project the contour centroids to the base plane, $Z=0$. Following this step, all contours with centroids external to the bounding region are discarded.
+The rectangular bounding region of the robot's workspace is aligned with the world coordinate system. As such, it is trivial to determine if a point falls within this region if the point is also defined in the world frame. Therefore, to determine if the centroid point of a given contour in the image frame falls within the bounding region, the point is first projected to the world coordinate system using Equation \ref{eqn:expanded-pinhole-camera-mapping-final}. As noted in Section \ref{sec:3D Localisation}, when projecting from image space to world space, it is necessary to specify the $Z$ plane of projection in the world frame. Since the camera captured images from the vertical perspective, it was considered sufficient to project the contour centroids to the base plane, $Z=0$. Following this step, all contours with centroids external to the bounding region are discarded.
 
-With the remaining contours assumed to only be image artifacts originating from cubes, the contours need to be classified as either \textit{source cube}, \textit{structure cube} or \textit{independent cube} contours. This classification is based on expected locations of the \textit{source cubes} and \textit{structure cubes} in the world frame as provided to the \textit{Vision System} by the \textit{System Controller}. For the \textit{source cubes}, the proximity of the centroid of each contour to the centre of the top face of each \textit{source cube} is considered. If the contour centroid is considered sufficiently close\footnote{A centroid is considered sufficiently close to the centre of the top cube face if the Euclidean distance between these points is less than one cube side length.} to the top face centre of any of the \textit{source cubes}, the contour is considered to be a \textit{source cube} contour. The same applies for \textit{structure cubes}. To facilitate the proximity calculations, the contour centroid is projected to the world coordinate system for each cube the contour is compared with using Equation\ref{eqn:expanded-pinhole-camera-mapping-final}. The $Z$ coordinate of the top face of the cube under consideration is used as the $Z$ plane of projection in the world frame. The world frame Euclidean distance between the projected centroid point and the cube top face centre is computed as the measure of their proximity. If a contour is classified as neither a \textit{source cube} nor a \textit{structure cube} contour, it is assumed to be an \textit{independent cube} contour. Finally, The orientation and location of each detected \textit{independent cube} is estimated as outlined in Section \ref{sec:Cube Pose Estimation}.
+With the remaining contours assumed to only be image artifacts originating from cubes, the contours need to be classified as either \textit{source cube}, \textit{structure cube} or \textit{independent cube} contours. This classification is based on expected locations of the \textit{source cubes} and \textit{structure cubes} in the world frame as provided to the \textit{Vision System} by the \textit{System Controller}. For the \textit{source cubes}, the proximity of the centroid of each contour to the centre of the top face of each \textit{source cube} is considered. If the contour centroid is considered sufficiently close\footnote{A centroid is considered sufficiently close to the centre of the top cube face if the Euclidean distance between these points is less than one cube side length.} to the top face centre of any of the \textit{source cubes}, the contour is considered to be a \textit{source cube} contour. The same applies for \textit{structure cubes}. To facilitate the proximity calculations, the contour centroid is projected to the world coordinate system for each cube the contour is compared with using Equation \ref{eqn:expanded-pinhole-camera-mapping-final}. The $Z$ coordinate of the top face of the cube under consideration is used as the $Z$ plane of projection in the world frame. The world frame Euclidean distance between the projected centroid point and the cube top face centre is computed as the measure of their proximity. If a contour is classified as neither a \textit{source cube} nor a \textit{structure cube} contour, it is assumed to be an \textit{independent cube} contour. Finally, The orientation and location of each detected \textit{independent cube} is estimated as outlined in Section \ref{sec:Cube Pose Estimation}.
 
 % TODO: Insert the final image processing image
 
@@ -1297,7 +1327,7 @@ The fiducial identification step takes place after the contour extraction phase 
 
 It was noted that the fiducial in the image captured by the camera has a degree of perspective warping compared to the reference digital fiducial image. In order to correct for this perspective warp, a 3x3 homography matrix $\matr{H}$ is computed using the \textit{findHomography} OpenCV library function. Four point correspondences are required to compute $\matr{H}$. These correspondences are obtained by arbitrarily pairing each of the fiducial candidate's detected corner coordinates in the original image to the corner coordinates of a 128 x 128 pixel destination image. The fiducial candidate region in the original image is warped to the destination image such that the fiducial pattern is isolated as shown in Figure \ref{fig:fiducial-step2}. The internal region of the isolated fiducial candidate image is divided into a pre-placed 3x3 grid of squares corresponding to the expected positions of the fiducial squares. This grid is shown in Figure \ref{fig:fiducial-step3}. For the grid cell to be classified as a binary one or zero, at least 75\% of the inner 30 x 30 pixels of the square need to have a pixel intensity of 255 or 0 respectively. If the condition is not met for either value for any grid cell, the grid cell is considered unclassified and the contour is discarded.
 
-Once all the grid cells have been classified, the orientation reference cells at $(0, 0)$, $(2, 0)$ and $(2,2)$ are compared with the expected binary values of 0, 0 and 1 respectively. If these match, the fiducial is considered to be correctly oriented. Otherwise, the isolated fiducial candidate is rotated 90$^{\circ}$ clockwise until the correct orientation is found. If the correct orientation is not found after three rotations have been performed, the contour is discarded. Finally the unique binary identifier encoded in the fiducial is extracted by reading the binary values of the cells from left to right and top to bottom excluding the orientation cells. The cells are ordered from the least significant bit (LSB) to the most significant bit (MSB). Figure \ref{fig:fiducial-step3} shows the result of applying the fiducial identification step to the isolated fiducial in Figure \ref{fig:fiducial-step3}. The orientation reference cells are indicated by green crosses while the fiducial has been rotated to align with these cells. The binary values detected in each cell are indicated in red. In this case the identifier is calculated as $100101_2=37$. The fiducial in the original image is annotated with the detected corners as well as the fiducial identifier as shown in Figure \ref{fig:fiducial-step4}.
+Once all the grid cells have been classified, the orientation reference cells at $(0, 0)$, $(2, 0)$ and $(2,2)$ are compared with the expected binary values of 0, 0 and 1 respectively. If these match, the fiducial is considered to be correctly oriented. Otherwise, the isolated fiducial candidate is rotated 90$^{\circ}$ clockwise until the correct orientation is found. If the correct orientation is not found after three rotations have been performed, the contour is discarded. Finally the unique binary identifier encoded in the fiducial is extracted by reading the binary values of the cells from left to right and top to bottom excluding the orientation cells. The cells are ordered from the least significant bit (LSB) to the most significant bit (MSB). Figure \ref{fig:fiducial-step3} shows the result of applying the fiducial identification step to the isolated fiducial in Figure \ref{fig:fiducial-step2}. The orientation reference cells are indicated by green crosses while the fiducial has been rotated to align with these cells. The binary values detected in each cell are indicated in red. In this case the identifier is calculated as $100101_2=37$. The fiducial in the original image is annotated with the detected corners as well as the fiducial identifier as shown in Figure \ref{fig:fiducial-step4}.
 
 %\begin{figure}[H]
 %	\centering
@@ -1325,31 +1355,53 @@ Since the corners are defined with respect to the image frame, they are also pro
 
 \subsection{System Controller} \label{sec:System Controller}
 
-The core requirements that the PC-based software needed to fulfil are as follows:
+The \textit{System Controller} serves as the point of intersection between the \textit{Vision System}, \textit{Shape Definition} component and the \textit{Robotic System}. Furthermore, the functional purpose of the \textit{System Controller} is to integrate these components to allow the system to function as a whole. Since these components make up the majority of the PC-based software component, it was natural to structure the system controller as the base of this component. To this end, the design of the integrated system software is first presented in Section \ref{sec:Integrated Software}. Finally the design of the final two software components, namely the construction planner and the robotic motion planner, are discussed in Sections \ref{sec:Construction Planner} and \ref{sec:Robotic Motion Planner} respectively.
+
+\subsubsection{Integrated Software} \label{sec:Integrated Software}
+
+The first step in the design of the integrated system software was to identify the requirements of the software. Given the \textit{Vision System} and \textit{Shape Definition} components developed in Sections \ref{sec:Computer Vision System} and \ref{sec:Shape Definition Interface}
+respectively, the following core requirements were derived:
 
 \begin{compactitem}
-	\item The software needs to capture the desired 3D shape to be constructed from the user.
-	\item The software needs to provide a visualisation of the shape to be constructed to the user to verify the captured shape is correct.
-	\item The software needs to interface with the camera hardware to receive the image input data from the camera.
-	\item The software needs to process the image data to detect and localise the cubes input image data.
-	\item The software needs to display the raw and annotated camera image data to the user to show the image processing functionality to the user.
-	\item The software needs to the utilise the 3D shape input information in conjunction with the processed image information to generate instructions for the robot to construct the 3D shape.
-	\item The software needs to convert the robot instructions into a format corresponding to the serial communication protocol between the robot and the computer before sending this data to the robot.
-	\item The software needs to monitor the status of the robotic subsystem based on data received from the robot.
-	\item The software needs to support the initialisation of the necessary system qualification tests.
+	\item The software needs integrate the \textit{Vision System} and \textit{Shape Definition} software components into a single unified piece of software.
+	\item The software needs to use the shape model information generated by the \textit{Shape Definition} component to generate a set of instructions for the \textit{Robotic System} to build the shape.
+	\item The software needs to facilitate communication with the \textit{Robotic System} such that the robot can be controlled through the integrated software.
+	\item The software needs to use the information generated by the \textit{Vision System} to determine an intelligent response to unexpected events and direct the \textit{Robotic System} accordingly.
+	\item The software needs to provide an integrated user interface that allows the user to make use of the \textit{Shape Definition} component as well as initiate and monitor the 3D shape construction process.
 \end{compactitem}
 
-\subsubsection{Construction Planner}
+Based on these requirements, a number of modular components were identified and developed into the component-oriented solution shown in Figure \ref{fig:component-diagram}. Each of the components were implemented as a class using C++ and the QT framework to form the base of the integrated software implementation. The \textit{System Controller} class sits at the top level of this implementation and directly contains the user interface classes\footnote{Each of the user interface classes correspond to a distinct screen in the user interface.} as well as the \textit{Logger} class through which all system event information, warnings and errors are recorded. The user interface classes partition the software based on functionality requirements. Specifically, the \textit{Home View} serves as the entrance point to the software and its purpose is to ensure the \textit{Robotic System} and camera hardware are present and connected. The \textit{Design View} integrates the components related to the \textit{Shape Definition} function. This includes the \textit{OpenGL View} which uses OpenGL to create a 3D render of a model of cubes. This class is supported by the \textit{Shader Program} class which manages the shaders used for the rendering task. The model itself is sourced from the \textit{Cube World Model} class. The purpose of this class is to simply capture the arrangement of cubes, which are each represented by an instance of the \textit{Cube} class, and relate this arrangement to the world coordinate system. The \textit{Design View} interface facilitates the creation and manipulation of a \textit{Cube World Model} instance which serves as output from the \textit{Shape Definition} component.
 
-\ldots
+The \textit{Cube World Model} instance created in the \textit{Design View} acts as input to the construction process around which the \textit{Construction View} class is based. In order for construction to take place, the system needs to interact with the robot. The \textit{Robot} class was created for this purpose. The class provides an abstract interface for the \textit{Construction View} instance to send position and actuation control commands to the \textit{Robotic System}. The units of communication which the \textit{Robot} class uses to interact with embedded robotic controller are abstracted in the form of the \textit{Packet} class. This class is based on the packet designed in Section \ref{sec:Serial Communication}. Similarly, the \textit{Vision} class exists to offer an abstract interface to the \textit{Vision System} developed in Section \ref{sec:Computer Vision System}. The \textit{Construction View} instance receives information from this component that is used to guide the control of the \textit{Robot} instance during the construction process accordingly.
 
-\subsubsection{Robotic Motion Planner}
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[scale=1]{figures/component-diagram.pdf}
+	\caption{Component diagram showing the structure of the integrated PC-based software solution.}
+	\label{fig:component-diagram}
+\end{figure}
 
-\ldots
+\subsubsection{Construction Planner} \label{sec:Construction Planner}
 
-\subsubsection{Integration}
+The modular component-based integrated software design developed in Section \ref{sec:Integrated Software} greatly simplified the design of the construction planner functional unit to the extent where it was not necessary to create a separate class for this component. Rather, the construction planner was simply developed as an algorithm that was implemented as a function within the \textit{Construction View} class. From an algorithmic perspective, the construction planner takes as input the \textit{Cube World Model} instance to be constructed and converts this to a list of cube translation and rotation tasks that need to occur in a given order. Specifically the physical cubes begin in a number of known \textit{source cube} positions in the robot's workspace. The construction planner generates a number of tasks, which are represented by the \textit{Cube Task} class, which each relate a \textit{source cube} to a destination \textit{structure cube} position. The construction planner determines the order in which these tasks are completed. The structure is build one layer at a time by scheduling the \textit{Cube Task} instances with \textit{structure cubes} in the lowest layer first followed by the tasks for the next layer and so forth. Should an unexpected event occur and a cube be dropped and lost, the \textit{Cube Task} instance can simply be restarted with a different \textit{source cube}.
 
-\ldots
+\subsubsection{Robotic Motion Planner} \label{sec:Robotic Motion Planner}
+
+The construction planner defines the start and end position for a cube associated with a particular \textit{Cube Task} instance. In order for the robot to execute this task, a sequence of individual robotic positioning and actuation actions need to be performed in sequence. The sequence of steps performed by the robot to complete a cube tasks were defined as follows:
+
+\begin{compactenum}
+	\item Move end-effector to just above the \textit{source cube}.
+	\item Lower the end-effector onto the cube.
+	\item Actuate the end-effector vacuum mechanism.
+	\item Lift the cube up to one layer above the destination layer height.
+	\item Translate the cube to above the destination position.
+	\item Lower the cube to the destination layer.
+	\item Release the end-effector vacuum mechanism.
+	\item Lift the end-effector to just above the cube..
+	\item Move the end-effector to the image capture position such that the \textit{Vision System} can process the scene.
+\end{compactenum}
+
+To execute these steps within the \textit{Cube Task} instance, an internal state is maintained. When the task is initiated or a previous task step is completed, the state is updated and the next step is performed. Each step is performed by calling the appropriate function in the \textit{Robot} instance's interface. The \textit{Robot} instance generates a signal when the step is complete to trigger the next state update. When all the steps within a \textit{Cube Task} instance are complete, the next scheduled instance is initiated. This repeats until all \textit{Cube Task} instances have been completed at which point the 3D shape should be complete in the physical world.
 
 \newpage
 
