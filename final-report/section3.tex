@@ -23,7 +23,7 @@ This section presents a summary of the project design tasks as well as the imple
 		\hline
 		Mechanical design and construction of robotic manipulator & The mechanical design of the robot manipulator was completed from first principles using the Fusion 360 CAD software. This was constructed by the student both using 3D printing and metal machining technologies. & Completed. Section \ref{sec:Mechancial Robotic Component} \\
 		\hline
-		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & Completed. Section \ref{sec:Mechancial Robotic Component} \\
+		Mechanical design and construction of robotic end-effector mechanism & The mechanical design of the robotic end-effector mechanism was completed from first principles using the Fusion 360 CAD software. This was constructed by the student using 3D printing technologies. & Completed. Section \ref{sec:End-Effector Mechanism} \\
 		\hline
 		Design of embedded robot controller circuit & The design was completed from first principles and a prototype was implemented on a breadboard. & Completed. Section \ref{sec:Embedded Robot Controller} \\
 		\hline
@@ -62,24 +62,24 @@ This section presents a summary of the project design tasks as well as the imple
 
 \subsection{Mechanical Robotic Component} \label{sec:Mechancial Robotic Component}
 
-\subsubsection{End-Effector Mechanism}
+\subsubsection{End-Effector Mechanism} \label{sec:End-Effector Mechanism}
 
-For the purposes of this project, the end-effector subsystem refers to the components responsible for enabling the direct manipulation of the cube. These components include the vacuum pad, tubing and vacuum generation system. The end-effector subsystem is attached to the gantry robot by means of an end-effector mechanism. In order to design this component, the machine design procedure was followed. The first step of this procedure involves understanding the requirements of the machine. The end-effector mechanism requirements are listed below. The end-effector mechanism should:
+For the purposes of this project, the end-effector subsystem refers to the components responsible for enabling the direct manipulation of the cube. These components include the vacuum pad, tubing and vacuum generation system. The end-effector subsystem is attached to the gantry robot by means of an end-effector mechanism. In order to design this component, the machine design procedure was followed. The first step of this procedure involves understanding the requirements of the machine. The end-effector mechanism requirements are listed below.
 
 \begin{compactitem}
-	\item Attach the end-effector to the gantry robot.
-	\item Maintain the suction-pad component in a vertical orientation.
-	\item Allow limited linear buffered motion of the vertical suction-pad component along the z-axis w.r.t the gantry robot.
+	\item It should attach the end-effector to the gantry robot.
+	\item It should maintain the suction-pad component in a vertical orientation.
+	\item It should allow limited linear buffered motion of the vertical suction-pad component along the z-axis w.r.t the gantry robot.
 	\item The linear buffer should facilitate at least a 5mm range of linear motion.
 	\item The purpose of the linear buffer is to allow the robot to target a z-axis position slightly below the intended z-axis position to ensure the cube is definitely touching the placement surface so the cube is not released in mid-air.
-	\item Allow the vertical suction-pad components to rotate about the z-axis.
-	\item Allow the connection of a drive mechanism to drive the rotation about the z-axis.
-	\item Allow the vacuum tubing to be routed to the gantry robot.
+	\item It should allow the vertical suction-pad components to rotate about the z-axis.
+	\item It should allow the connection of a drive mechanism to drive the rotation about the z-axis.
+	\item It should allow the vacuum tubing to be routed to the gantry robot.
 \end{compactitem}
 
 The initial design investigated for the end-effector mechanism was centred around the requirement of a 5mm linear displacement buffer. A buffer can be implemented as a linear rod with guide holes as well as a ridge on the rod that allows a spring to be placed between the ridge and one of the guide holes. This provides a linear buffering action along the axis to which the rod is aligned. The design idea with respect to the end-effector mechanism is to mount the vacuum pad on the end of the rod opposite to the spring and position the rod in a vertical orientation with the vacuum pad at the bottom where it can access cubes on the plane below it. When the vacuum pad is not in contact with anything, the spring and the force of gravity push the vacuum pad into its lowest position. When a force is applied vertically upwards against the vacuum pad, as is the case when the vacuum pad is pressed against a cube, the spring will compress if the force is greater than the gravitational force on the moving rod as well as the spring force at that length.
 
-An issue with this simple design is that the vacuum tube needs to be routed to the vacuum pad as well as the fact that the vacuum pad needs to be rotatable by an external motor. The tubing routing issue is solved by making the rod hollow and routing the tube through the rod and out top of the rod. Furthermore, it is noted that the system only needs to be able to rotate a minimum of 90 degrees to be able to realise any orientation of a cube in terms of rotation about the z-axis. The rubber tubing is comfortably able to absorb this degree of torsion and therefore, no additional mechanisms are required to route the tube.
+An issue with this simple design is that the vacuum tube needs to be routed to the vacuum pad as well as the fact that the vacuum pad needs to be rotatable by an external motor. The tubing routing issue is solved by making the rod hollow and routing the tube through the rod and out the top of the rod. Furthermore, it is noted that the system only needs to be able to rotate a minimum of 90 degrees to be able to realise any orientation of a cube in terms of rotation about the z-axis. The rubber tubing is comfortably able to absorb this degree of torsion and therefore, no additional mechanisms are required to route the tube.
 
 The second design consideration is how the rod will be rotated to rotate the vacuum pad given that the rod has linear motion of 5mm. The design solution to this investigated in the proof of concept design is the use of a gear attached to the rod which can be driven by a motor gear. The use of gears with their axes aligned with the rod axis allows the linear motion to be absorbed by the linear freedom of movement between the gear teeth. In order to absorb this motion, the height of the gear attached to the rod needs to be at least 5mm greater than the height of the motor gear is the maximum overlap is to be always maintained assuming the position of the motor is fixed with respect to the component supporting the rod. An alternative design that could be explored in the future, is fixing the linear position of the motor with respect to the spring to reduce the gear height and using the weight of the motor to act in a similar manner to the spring force.
 
@@ -134,7 +134,7 @@ where $m$ is the mass of the cylinder and $r$ is the radius of the outer shell o
 	\label{eqn:moment-equation}
 \end{align}
 
-where $M_{Oi}$ is the moment that results from the application of force $F_i$ at the $i^{th}$ point at perpendicular distance $r_i$ from the axis of rotation $O$. Two external forces to the rotary end-effector component are considered, namely the force of static friction $F_{fs}$ and the force $F_A$ applied to the component gear by the gear on the motor's drive shaft. Only static friction is considered as it is generally greater than kinetic friction and therefore more challenging to overcome. The coefficient of static friction for plastic on plastic used in these calculations is $\mu _s = 0.4$. Furthermore, it is assumed that the friction only acts along the outer edge of the cylinder model since this is requires the most torque to overcome. Using Equation \ref{eqn:moment-equation}, the force required to accelerate the end-effector component from standstill at the required rate can be calculated as shown in Equation \ref{eqn:Fa-required}
+where $M_{Oi}$ is the moment that results from the application of force $F_i$ at the $i^{th}$ point at perpendicular distance $r_i$ from the axis of rotation $O$. Two external forces to the rotary end-effector component are considered, namely the force of static friction $F_{fs}$ and the force $F_A$ applied to the component gear by the gear on the motor's drive shaft. Only static friction is considered as it is generally greater than kinetic friction and therefore more challenging to overcome. The coefficient of static friction for plastic on plastic used in these calculations is $\mu _s = 0.4$. Furthermore, it is assumed that the friction only acts along the outer edge of the cylinder model since this requires the most torque to overcome. Using Equation \ref{eqn:moment-equation}, the force required to accelerate the end-effector component from standstill at the required rate can be calculated as shown in Equation \ref{eqn:Fa-required}
 
 \begin{align}
 	&F_A r_A - F_{fs} r_{fs} = I_O \alpha
@@ -149,7 +149,7 @@ where $r_A$ and $r_{fs}$ are the distances between the point of force applicatio
 	\label{eqn:end-effector-motor-torque} \\
 \end{align}
 
-Using an engineering safety factor of 2 to account for inaccuracies in modeling the end-effector rotor and to ensure there is at least a 50\% torque margin for the motor, a minimum required motor holding torque of $1.63 \times 10^{-3} \; N \cdot m$ or $16.63 \; g \cdot cm$. Using the Wantai Motor product line as a reference, the smallest available stepper motor is the 20BYGH202 model which has a holding torque of $\tau_H=140 \; g \cdot cm$, detent torque of $\tau_D=20 \; g \cdot cm$ and a mass of $50 \; g$. The detent torque of the motor refers to the amount of torque generated by the motor when the windings of the motor are not energized. The holding torque, on the other hand, is the amount of torque required to rotate the motor one step when the rotor is stationary but the windings are energized. The running torque $\tau_R$ of the motor is limited by the motor's current rating and at low speeds is equal can be calculated using Equation \ref{eqn:running-torque} below.
+Using an engineering safety factor of 2 to account for inaccuracies in modeling the end-effector rotor and to ensure there is at least a 50\% torque margin for the motor, a minimum required motor holding torque of $1.63 \times 10^{-3} \; N \cdot m$ or $16.63 \; g \cdot cm$. Using the Wantai Motor product line as a reference, the smallest available stepper motor is the 20BYGH202 model which has a holding torque of $\tau_H=140 \; g \cdot cm$, detent torque of $\tau_D=20 \; g \cdot cm$ and a mass of $50 \; g$. The detent torque of the motor refers to the amount of torque generated by the motor when the windings of the motor are not energized. The holding torque, on the other hand, is the amount of torque required to rotate the motor one step when the rotor is stationary but the windings are energized. The running torque $\tau_R$ of the motor is limited by the motor's current rating and at low speeds is equal and can be calculated using Equation \ref{eqn:running-torque} below.
 
 \begin{align}
 	& \tau_R = \tau_H - 2\tau_D
@@ -247,8 +247,7 @@ The end-effector mount was designed to fulfil to following requirements:
 	\item It must provide a mounting structure for both the 20BYGH406 stepper motor and the vacuum rod such that the gear components of each are aligned and able to mesh correctly.
 	\item It must facilitate at least 5mm of translational motion of the vacuum rod along the z-axis.
 	\item It must provide a connection point for connecting the end-effector mount to the rest of the robotic subsystem.
-	\item It must facilitate assembly of the end-effector mount, 20BYGH406 stepper motor and vacuum rod components.
-	\item It must be designed in such a manner that is amenable to being manufactured using and FDM 3D printing techniques. 
+	\item It must facilitate assembly of the end-effector mount, 20BYGH406 stepper motor and vacuum rod components. 
 \end{compactitem}
 
 Figure \ref{fig:end-effector-disassembled} shows the end-effector mount and supporting components that were designed to meet these requirements along with the 20BYGH406 stepper motor and vacuum rod. The end-effector mount, motor mount and vacuum rod top mound were originally designed as a single piece. The vacuum rod top mount was separated as a component to facilitate the insertion of the vacuum rod into the end-effector assembly. The motor mount was similarly separated to facilitate the manufacturing of this part using FDM 3D printing methods as the overhang was not capable of being printed without support. Figure \ref{fig:end-effector-assembled} shows the same components when assembled to form the complete end-effector mount assembly.
@@ -530,7 +529,7 @@ Figure \ref{fig:x-axis-mount-left} shows the left x-axis mount that was designed
 
 %The second design that needs to be completed in order to complete the robotic subsystem is the y-axis drive mechanism. 
 
-The primary requirement of the y-axis drive mechanism is that it needs to be capable of driving the y-axis timing belts on both the left and right side of the robotic subsystem. The obvious basis of this mechanism is to use a dual shaft stepper motor with each shaft used to drive one of the y-axis timing belts. The 42BYGHW920L21B2 stepper motor was selected for this characteristic. Unfortunately, the length of the stepper motor is not sufficient to drive each belt directly off each shaft. Instead it was decided to drive only the left side y-axis timing belt directly off the shaft using a 20 tooth pulley for a 6mm GT2 timing belt with a 5mm bore. In order to drive the right side y-axis timing belt, the torque needs to be transferred from the stepper motor shaft to a pulley connected to the timing belt. It was decided to use an 8mm linear chromed steel rod in order to transfer this torque to a 20 tooth pulley for a 6mm GT2 timing belt with a 8mm bore. An 8mm diameter to 5mm diameter coupling is required to connect the stepper motor shaft to the 8mm linear rod. The rigid coupling is not sufficient to support the linear rod along the drive axis. Therefore, two KP08 8mm pillow block bearings were introduced to support the linear rod. In order to connect the pillow blocks to the aluminium v-slot extrusion frame of the robotic subsystem, two custom connector components needed to be designed. Similarly, a component needed to be designed to connect the 42BYGHW920L21B2 stepper motor to the frame as well. All of the components discussed above form the y-axis drive mechanism. The final robotic system assembly is shown in Figure \ref{fig:final-assembly}.
+The primary requirement of the y-axis drive mechanism is that it needs to be capable of driving the y-axis timing belts on both the left and right side of the robotic subsystem. The obvious basis of this mechanism is to use a dual shaft stepper motor with each shaft used to drive one of the y-axis timing belts. The 42BYGHW920L21B2 stepper motor was selected for this characteristic. Unfortunately, the length of the stepper motor is not sufficient to drive each belt directly off each shaft. Instead it was decided to drive only the left side y-axis timing belt directly off the shaft using a 20 tooth pulley for a 6mm GT2 timing belt with a 5mm bore. In order to drive the right side y-axis timing belt, the torque needs to be transferred from the stepper motor shaft to a pulley connected to the timing belt. It was decided to use an 8mm linear chromed steel rod in order to transfer this torque to a 20 tooth pulley for a 6mm GT2 timing belt with a 8mm bore. An 8mm diameter to 5mm diameter coupling is required to connect the stepper motor shaft to the 8mm linear rod. The rigid coupling is not sufficient to support the linear rod along the drive axis. Therefore, two KP08 8mm pillow block bearings were introduced to support the linear rod. In order to connect the pillow blocks to the aluminium v-slot extrusion frame of the robotic subsystem, two custom connector components needed to be designed. Similarly, a component needed to be designed to connect the 42BYGHW920L21B2 stepper motor to the frame as well. All of the components discussed above form the y-axis drive mechanism. The final robotic system assembly design is shown in Figure \ref{fig:final-assembly}. The physical realisation of this design is shown in Figure \ref{fig:final-robot}.
 
 %\begin{figure}[H]
 %	\centering
@@ -539,11 +538,22 @@ The primary requirement of the y-axis drive mechanism is that it needs to be cap
 %	\label{fig:y-axis-drive-assembly}
 %\end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/final-assembly.png}
-	\caption{Final robotic subsystem assembly.}
+	\begin{subfigure}{.55\textwidth}
+		\centering
+	\includegraphics[width=1\linewidth]{figures/final-assembly.png}
+	\caption{Complete robot 3D model}
 	\label{fig:final-assembly}
+	\end{subfigure}%
+	\begin{subfigure}{.44\textwidth}
+		\centering
+	\includegraphics[width=1\linewidth]{figures/complete-system.jpg}
+	\caption{Constructed robot}
+	\label{fig:final-robot}
+	\end{subfigure}%
+	\caption{The \textit{Robotic System} in both the final designed and final constructed states.}
+	\label{fig:x}
 \end{figure}
 
 %Component Manufacturing
@@ -803,7 +813,7 @@ The simplest form of control for the stepper motors is constant speed control wh
 
 \subsubsection{Serial Communication} \label{sec:Serial Communication}
 
-A communication protocol needed to be developed between the robotic controller and the PC running the system control software. It was noted that the maximum data unit that needed to be transmitted between the \textit{Robotic Subsystem} and the PC-based software component was a command instruction the robot to move to a target position. Since the position of each of the robot's axes was specified by a 16 bit number, eight data bytes were required to contain this information. Furthermore, an additional control byte was required to distinguish between the purpose of each data byte for a given packet. Each packet was formed by specifying the control byte followed with a concatenation of the four data bytes. The definitions assigned to each of the control bytes are also determined by the direction of transmission and given in Table \ref{tab:serial-communication-protocol}.
+A communication protocol needed to be developed between the robotic controller and the PC running the system control software. It was noted that the maximum data unit that needed to be transmitted between the \textit{Robotic Subsystem} and the PC-based software component was a command instruction for the robot to move to a target position. Since the position of each of the robot's axes was specified by a 16 bit number, eight data bytes were required to contain this information. Furthermore, an additional control byte was required to distinguish between the purpose of each data byte for a given packet. Each packet was formed by specifying the control byte followed with a concatenation of the four data bytes. The definitions assigned to each of the control bytes are also determined by the direction of transmission and given in Table \ref{tab:serial-communication-protocol}.
 
 \begin{table}[!ht]
 	\renewcommand{\arraystretch}{1.3}
@@ -820,7 +830,7 @@ A communication protocol needed to be developed between the robotic controller a
 		\hline
 		0x3 & Set target position & Set the desired step position on each axis to define the position to which the robot will move. \\
 		\hline
-		0x4 & Actuate vacuum mechanism & Move the vacuum system servo motor the suction position. \\
+		0x4 & Actuate vacuum mechanism & Move the vacuum system servo motor to the suction position. \\
 		\hline
 		0x5 & Delay & Delay the robot's command complete return packet by a short period of time. \\
 		\hline
@@ -836,7 +846,7 @@ A communication protocol needed to be developed between the robotic controller a
 	\caption{\label{tab:serial-communication-protocol}Serial communication protocol utilised between the \textit{PC System} and the \textit{Robotic System}.}
 \end{table}
 
-For the serial communication component required to facilitate the use of this protocol, a word length of 8 bits was selected with no parity bit and 1 stop bit as this the most common structure used and there was no reason to choose an altered structure. A baud rate of 115200 bits/s was also selected with the maximum oversampling rate of 16 samples chosen to minimise the effective noise during data reception. 
+For the serial communication component required to facilitate the use of this protocol, a word length of 8 bits was selected with no parity bit and 1 stop bit as this is the most common structure used and there was no reason to choose an altered structure. A baud rate of 115200 bits/s was also selected with the maximum oversampling rate of 16 samples chosen to minimise the effective noise during data reception. 
 
 
 %The value of USARTDIV in the \textit{USART\_BRR} register of the STM32L072RZT6 is used to define the baud rate. Different equations are used to compute the baud rate based on the oversampling frequency used. For an oversampling rate of 16, the baud equation is

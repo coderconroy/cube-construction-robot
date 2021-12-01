@@ -15,7 +15,7 @@ int fiducialHeight = 128;
 
 // Bounding box parameters
 bool showCoords = true;
-double areaThreshold = 1300;
+double areaThreshold = 800;
 
 Vision::Vision(QObject* parent) : QObject(parent)
 {
@@ -99,34 +99,41 @@ void Vision::processScene(const cv::Mat& image, bool calibrate, std::vector<cv::
             // Find corners
             std::vector<cv::Point> corners = findSquareCorners(contour);
 
-            // Isolate rectangle
-            cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
-            cv::Mat annotatedFiducialImage(fiducialWidth, fiducialHeight, CV_8UC1);
-            cv::Mat homographyMatrix;
-            isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
-            cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
-
-            // Process fiducial
-            int fiducialId = identifyFiducial(isolatedImage, isolatedImage, annotatedFiducialImage);
-
-            // Add to fiducial contour list if fiducial
-            // TODO: Add further checks to confirm fiducial nature
-            if (fiducialId >= 0)
+            // Check if corners could be found and check for fiducial if found
+            bool fiducialFound = false;
+            if (corners.size() == 4)
             {
-                FiducialContour fiducial;
-                fiducial.id = fiducialId;
-                fiducial.centroid = centroid;
-                fiducial.contour = contour;
-                fiducial.corners = corners;
-                fiducial.homographyMatrix = homographyMatrix;
-                fiducialContours.push_back(fiducial);
 
-                fiducialImages.push_back(isolatedImage);
-                annotatedFiducialImages.push_back(annotatedFiducialImage);
+                // Isolate rectangle
+                cv::Mat isolatedImage(fiducialWidth, fiducialHeight, CV_8UC1);
+                cv::Mat annotatedFiducialImage(fiducialWidth, fiducialHeight, CV_8UC1);
+                cv::Mat homographyMatrix;
+                isolateRectangle(corners, processImage, isolatedImage, homographyMatrix);
+                cv::threshold(isolatedImage, isolatedImage, thresh, maxThresh, cv::THRESH_BINARY);
+
+                // Process fiducial
+                int fiducialId = identifyFiducial(isolatedImage, isolatedImage, annotatedFiducialImage);
+
+                // Add to fiducial contour list if fiducial
+                if (fiducialId >= 0)
+                {
+                    fiducialFound = true;
+
+                    FiducialContour fiducial;
+                    fiducial.id = fiducialId;
+                    fiducial.centroid = centroid;
+                    fiducial.contour = contour;
+                    fiducial.corners = corners;
+                    fiducial.homographyMatrix = homographyMatrix;
+                    fiducialContours.push_back(fiducial);
+
+                    fiducialImages.push_back(isolatedImage);
+                    annotatedFiducialImages.push_back(annotatedFiducialImage);
+                }
             }
+
             // Assume contour is cube and add to cube contour list
-            // TODO: Add further checks to confirm cube nature
-            else
+            if (!fiducialFound)
             {
                 CubeContour cube;
                 cube.centroid = centroid;
@@ -417,6 +424,10 @@ cv::Point Vision::getCentroid(const std::vector<cv::Point>& contour) const
 
 std::vector<cv::Point> Vision::findSquareCorners(const std::vector<cv::Point>& contour) const
 {
+    // Check if contour has at least four points
+    if (contour.size() < 4)
+        return std::vector<cv::Point>();
+
     // Find the contour point furthest from the centroid and take as first corner
     cv::Point centroid = getCentroid(contour);
     std::vector<cv::Point> corners(4);
@@ -462,6 +473,13 @@ std::vector<cv::Point> Vision::findSquareCorners(const std::vector<cv::Point>& c
         }
     }
 
+    // Verify diagonals are approximately the same length
+    float diag1 = sqrt(pow(corners[0].x - corners[2].x, 2) + pow(corners[0].y - corners[2].y, 2));
+    float diag2 = sqrt(pow(corners[1].x - corners[3].x, 2) + pow(corners[1].y - corners[3].y, 2));
+
+    if (diag1 / diag2 > 1.5 || diag2 / diag1 > 1.5)
+        return std::vector<cv::Point>();
+    
     return corners;
 }
 
@@ -476,6 +494,14 @@ void Vision::isolateRectangle(const std::vector<cv::Point>& corners, const cv::M
 
     // Compute homography matrix and isolate and warp rectangle to isolation image
     homographyMatrix = cv::findHomography(corners, isolatedImagePoints);
+
+    if (homographyMatrix.dims == 0)
+    {
+        emit log(Message(MessageType::ERROR_LOG, "Vision System", "Homography matrix failed to generate"));
+        return;
+    }
+
+
     warpPerspective(sourceImage, isolatedImage, homographyMatrix, isolatedImage.size());
 }
 
