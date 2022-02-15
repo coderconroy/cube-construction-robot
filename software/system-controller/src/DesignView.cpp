@@ -50,10 +50,10 @@ DesignView::DesignView(QWidget* parent): QWidget(parent)
 	controlsLayout->addWidget(clearModel);
 	controlsLayout->addWidget(insertCube);
 	controlsLayout->addWidget(removeCube);
-	controlsLayout->addWidget(cubeXPosition);
-	controlsLayout->addWidget(cubeYPosition);
-	controlsLayout->addWidget(cubeZPosition);
-	controlsLayout->addWidget(cubeRotation);
+	//controlsLayout->addWidget(cubeXPosition);
+	//controlsLayout->addWidget(cubeYPosition);
+	//controlsLayout->addWidget(cubeZPosition);
+	//controlsLayout->addWidget(cubeRotation);
 	controlsLayout->addWidget(cubeList);
 
 	updateControlState();

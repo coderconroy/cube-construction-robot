@@ -10,7 +10,7 @@ SystemController::SystemController(QWidget *parent): QWidget(parent)
 	camera->set(cv::CAP_PROP_FRAME_WIDTH, 1920);
 	camera->set(cv::CAP_PROP_FRAME_HEIGHT,1080);
 	camera->set(cv::CAP_PROP_EXPOSURE, CAMERA_EXPOSURE);
-	camera->set(cv::CAP_PROP_FOCUS, CAMERA_FOCUS);
+	//camera->set(cv::CAP_PROP_FOCUS, CAMERA_FOCUS);
 
 	if (!camera->isOpened())
 		messageLog->log(Message(MessageType::ERROR_LOG, "System Controller", "No camera found"));

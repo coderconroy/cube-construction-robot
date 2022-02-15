@@ -108,6 +108,6 @@ private:
 	//int yOffset = 1125;
 
 	int xOffset = 507;
-	int yOffset = 562;
+	int yOffset = 650;
 };
 

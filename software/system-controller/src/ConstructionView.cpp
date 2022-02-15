@@ -9,6 +9,7 @@ QVector<Cube*> sourceCubes;
 QVector<Cube*> structCubes;
 int missingCubes = 0;
 int externalCubes = 0;
+int discardFrames = 5;
 bool captureVisionImages = false;
 
 enum class RobotCommandState
@@ -98,7 +99,7 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     robotCommandLayout->addWidget(idleRobotActuator);
     robotCommandLayout->addWidget(actuateRobotActuator);
     robotCommandLayout->addWidget(releaseRobotActuator);
-    robotCommandLayout->addWidget(executeQTP3);
+    //robotCommandLayout->addWidget(executeQTP3);
 
     // Initialize robot position control
     xPositionLabel = new QLabel("X steps: [0, 1015]");
@@ -320,6 +321,18 @@ ConstructionView::ConstructionView(QWidget* parent): QWidget(parent)
     int xStart = 134;
     int xStop = 1015;
     float xStep = ((float) (xStop - xStart)) / (numCubes - 1);
+
+    //for (int i = numCubes - 1; i >= 0; i--)
+    //{
+    //    int xPos = std::round(xStart + xStep * i);
+    //    sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 189, 0));
+    //}
+
+    for (int i = numCubes - 1; i >= 0; i--)
+    {
+        int xPos = std::round(xStart + xStep * i);
+        sourceCubes.append(cubeWorldModel->insertCube(xPos, 32, 126, 0));
+    }
 
     for (int i = numCubes - 1; i >= 0; i--)
     {
@@ -746,8 +759,8 @@ void ConstructionView::handleConstructVisionState()
 
     // Capture frame from camera
     cv::Mat input;
-    *camera >> input;
-    *camera >> input;
+    for (int i = 0; i < discardFrames; i++)
+        *camera >> input;
 
     // Process image
     vision.processScene(input, true, &sourceCentroids, &structCentroids);
@@ -831,8 +844,8 @@ void ConstructionView::handleProcessSceneState()
 
     // Capture frame from camera
     cv::Mat input;
-    *camera >> input;
-    *camera >> input;
+    for (int i = 0; i < discardFrames; i++)
+        *camera >> input;
 
     // Process image
     vision.processScene(input, true, &sourceCentroids);

@@ -3,9 +3,9 @@
 #include <string>
 
 // Threshold parameters
-int thresh = 100;
+int thresh = 120;
 int maxThresh = 255;
-int blurSize = 1;
+int blurSize = 0;
 int maxBlurSize = 20;
 
 // Fiducials
@@ -15,7 +15,7 @@ int fiducialHeight = 128;
 
 // Bounding box parameters
 bool showCoords = true;
-double areaThreshold = 800;
+double areaThreshold = 1000;
 
 Vision::Vision(QObject* parent) : QObject(parent)
 {
